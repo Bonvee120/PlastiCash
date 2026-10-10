@@ -46,7 +46,7 @@ Impact page and API, ESG PDF for organizations (WeasyPrint), `/jobs/reminders` w
 
 ## Step 10 — Landing page, polish, deploy
 Landing page (problem, how it works, live prices, who it's for, who pays, impact), toasts and skeletons everywhere, mobile check, deploy API to Render and web to Vercel, set Paystack webhook and cron, seed production demo data. README with: The problem (with evidence), The hard part, Why this design (with sources), Who pays.
-**Done when:** the main journey works on the deployed URLs; 15+ tests pass; README and LOG.md are complete.
+**Done when:** the main journey works on the deployed URLs; all 20 tests in 04-money-rules-and-tests.md pass (the capstone minimum is 15); README and LOG.md are complete.
 
 ## Out of scope for the MVP
 WhatsApp bot, mobile money payouts, multiple logins per organization, admin-defined time slots, plastic credits/EPR data sales, route optimisation.
