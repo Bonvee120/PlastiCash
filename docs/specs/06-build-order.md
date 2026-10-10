@@ -18,7 +18,7 @@ SQLModel models and the first Alembic migration for all 7 tables, enums, constra
 
 ## Step 3 — Auth and profiles
 Supabase sign-up/login in web; JWT verification in API; `/me`, `/me/profile`; role guards; sign-up step 2 (Individual/Organization); "Welcome, {name}" header.
-**Done when:** each seeded role logs in and lands on its own area; access tests 14–16 pass.
+**Done when:** each seeded role logs in and lands on its own area; access test 16 passes.
 
 ## Step 4 — Money core (the hard part) — API only
 Ledger service, balance, `pickup_state.transition`, `credit_pickup`, withdrawals request/approve/reject, Paystack client (recipient, transfer), webhook with signature check.
@@ -26,7 +26,7 @@ Ledger service, balance, `pickup_state.transition`, `credit_pickup`, withdrawals
 
 ## Step 5 — Pickup flow — API
 Prices + estimate, create request (50 kg rule, pooling flag), Cloudinary signature, assign, start, location, QR scan, weigh with price snapshot, OTP (Termii behind `SMS_ENABLED`), confirm, dispute, resolve, walk-in.
-**Done when:** tests 7–8, 12–13, 18 pass.
+**Done when:** tests 7–8, 12–15, 18 pass.
 
 ## Step 6 — User screens
 Dashboard, request form with estimate + progress bar, pickups list/detail with QR, Realtime live map, confirm/dispute, wallet + withdraw, bank details, guide page.
