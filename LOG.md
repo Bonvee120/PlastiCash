@@ -17,3 +17,16 @@ One entry per day: what was done, what broke, what's next.
 **Next**
 - 0.1 and 0.2: field conversations, price board photo, competitors, sources; fill in `RESEARCH.md`.
 - 0.3: run the spike against a real Paystack test webhook through ngrok.
+
+## 2026-10-12
+
+**Done**
+- 0.3 spike works against real Paystack. Test transaction `T301509561689991` paid with the Paystack test card; Paystack (`Paystack/2.0`, domain `test`) sent `charge.success` through ngrok and the spike answered 200.
+- Replayed the exact captured body and `x-paystack-signature` to the spike: 200 `VERIFIED`. The same body with one word changed and the original signature: 401 `REJECTED`.
+
+**Broke**
+- `curl localhost:8000` returned 404 from Docker/WSL, which also listen on port 8000 over IPv6 (`::1`). Using `127.0.0.1` reaches the spike; ngrok already forwards to `127.0.0.1`, so the real webhook was not affected.
+
+**Next**
+- 0.1 and 0.2: field conversations, price board photo, competitors, sources; fill in `RESEARCH.md` and sign off. Then step 1.
+- Remove the ngrok test webhook URL from the Paystack dashboard once the tunnel is closed.
