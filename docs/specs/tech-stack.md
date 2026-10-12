@@ -132,8 +132,8 @@ The docs don't decide these. Choose them at the step shown, then record the choi
 
 | Item | Decide at | Note |
 |---|---|---|
-| Versions of Next.js, Tailwind, daisyUI, shadcn/ui | Step 1 | Tailwind 3 vs 4 changes how the daisyUI `d-` prefix is configured |
-| Linter and formatter (web and api) | Step 1 | |
+| Versions of Next.js, Tailwind, daisyUI, shadcn/ui | Step 1 | **Decided (1.3):** Next.js 16.4, React 19.3, Tailwind CSS 4, daisyUI 5.7 (prefix set in `app/globals.css` with `@plugin "daisyui" { prefix: "d-"; }`), shadcn CLI 4.21 with the `base-nova` style (Base UI primitives) |
+| Linter and formatter (web and api) | Step 1 | **Web (1.3):** ESLint 9 with `eslint-config-next`. Formatter and API linter still open |
 | Web Supabase client package | Step 3 | Must support the session check in `middleware.ts` |
 | Chart library for `/app/impact` | Step 9 | Keep the user dashboard under ~500 KB |
 | Cron service: cron-job.org or GitHub Actions | Step 10 | Both are allowed by the docs |

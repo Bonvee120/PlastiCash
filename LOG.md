@@ -28,11 +28,13 @@ One entry per day: what was done, what broke, what's next.
 - 1.1 done: `docker-compose.yml` with `db-test` (Postgres 16 on port 5433, with a health check); `api/.env.example` and `web/.env.example` (secrets empty, non-secret defaults from `05-setup-and-env.md`). `docker compose up -d db-test` starts Postgres 16.15 and reports healthy.
 - 1.2 done: FastAPI app with `GET /api/v1/health` → `{"ok": true}` and CORS for `FRONTEND_ORIGIN`; `config.py` (pydantic-settings, reads `api/.env`); `db.py` (engine and per-request session); pinned `requirements.txt`; pytest fixtures on `TEST_DATABASE_URL`, each test in a rolled-back transaction. `pytest`: 2 passed against Postgres 16 (`db-test`). `Dockerfile` (`python:3.12-slim` + WeasyPrint system libraries) and an `api` service in compose; the image builds and answers `/api/v1/health`.
 - Local venv uses Python 3.12 via `uv venv --python 3.12 api/.venv`; the machine default is 3.14.
+- 1.3 done: `web/` from `create-next-app` 16.4 (App Router, TypeScript, Tailwind 4, ESLint); shadcn (`base-nova`) with Button; daisyUI 5 with prefix `d-`. Brand colours from `DESIGN_BRIEF.md` set once as shadcn CSS variables and as the `plasticash` daisyUI theme; Plus Jakarta Sans (headings) and Inter (body) via `next/font`; `tabular` utility for balances. Placeholder home page. `npm run lint` and `npm run build` pass; `npm run dev` shows the page with brand colours, fonts and both button styles, no console errors. Versions recorded in `tech-stack.md` §8.
+- Step 1 done.
 
 **Broke**
-- `curl localhost:8000` returned 404 during the spike test. Cause: an old prototype compose project (`platicash`, from `Desktop\PlatiCash`) still runs on ports 8000, 3000 and 5432. Using `127.0.0.1` reached the spike; ngrok already forwards to `127.0.0.1`, so the real webhook was not affected. Stop that project before `docker compose up api`, or the ports clash.
+- `curl localhost:8000` returned 404 during the spike test. Cause: an old prototype compose project (`platicash`, from `Desktop\PlatiCash`) still runs on ports 8000, 3000 and 5432. Using `127.0.0.1` reached the spike; ngrok already forwards to `127.0.0.1`, so the real webhook was not affected. Stop that project before `docker compose up api`, or the ports clash. The web dev server ran on port 3001 for the same reason.
+- Next 16 dev blocks HMR and fonts (403) when the page is opened on `127.0.0.1`; open `http://localhost:<port>` instead.
 
 **Next**
-- 1.3: web skeleton (Next.js App Router + TypeScript, Tailwind, shadcn/ui, daisyUI with prefix `d-`, tokens and fonts from `DESIGN_BRIEF.md`); pin the Tailwind 3 vs 4 choice in `tech-stack.md`.
-- 0.1: field conversations and price board photo; `RESEARCH.md` design decisions and sign-off, before Step 2. Decide the SACHET CO₂ factor (Mixed Plastics proxy or 0).
+- 0.1: field conversations and price board photo; `RESEARCH.md` design decisions and sign-off. This blocks Step 2. Decide the SACHET CO₂ factor (Mixed Plastics proxy or 0).
 - Remove the ngrok test webhook URL from the Paystack dashboard once the tunnel is closed.

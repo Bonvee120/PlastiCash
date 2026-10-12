@@ -1,0 +1,138 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+/* daisyUI classes take the d- prefix (d-btn, d-badge) so they never clash with shadcn or Tailwind. */
+@plugin "daisyui" {
+  prefix: "d-";
+  themes: false;
+}
+
+/* Brand colours from docs/DESIGN_BRIEF.md. Light mode only for the MVP.
+   Keep these hex values in sync with :root below. */
+@plugin "daisyui/theme" {
+  name: "plasticash";
+  default: true;
+  prefersdark: false;
+  color-scheme: light;
+
+  --color-base-100: #FFFFFF;
+  --color-base-200: #F8FAFC;
+  --color-base-300: #E2E8F0;
+  --color-base-content: #0F172A;
+  --color-primary: #15803D;
+  --color-primary-content: #FFFFFF;
+  --color-secondary: #DCFCE7;
+  --color-secondary-content: #14532D;
+  --color-accent: #F59E0B;
+  --color-accent-content: #0F172A;
+  --color-neutral: #14532D;
+  --color-neutral-content: #FFFFFF;
+  --color-info: #2563EB;
+  --color-info-content: #FFFFFF;
+  --color-success: #15803D;
+  --color-success-content: #FFFFFF;
+  --color-warning: #F59E0B;
+  --color-warning-content: #0F172A;
+  --color-error: #DC2626;
+  --color-error-content: #FFFFFF;
+
+  --radius-selector: 9999px;
+  --radius-field: 10px;
+  --radius-box: 12px;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-inter);
+  --font-heading: var(--font-jakarta);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+
+  /* Brand names from the design brief, for direct use (bg-primary-light, text-ink, ...). */
+  --color-primary-dark: var(--brand-primary-dark);
+  --color-primary-light: var(--brand-primary-light);
+  --color-accent-light: var(--brand-accent-light);
+  --color-ink: var(--brand-ink);
+  --color-surface: var(--brand-surface);
+  --color-danger: var(--destructive);
+  --color-info: var(--brand-info);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: 12px;
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+  --brand-primary-dark: #14532D;
+  --brand-primary-light: #DCFCE7;
+  --brand-accent-light: #FEF3C7;
+  --brand-ink: #0F172A;
+  --brand-surface: #FFFFFF;
+  --brand-info: #2563EB;
+
+  /* shadcn variables, mapped to the brand palette. */
+  --background: #F8FAFC;
+  --foreground: #0F172A;
+  --card: #FFFFFF;
+  --card-foreground: #0F172A;
+  --popover: #FFFFFF;
+  --popover-foreground: #0F172A;
+  --primary: #15803D;
+  --primary-foreground: #FFFFFF;
+  --secondary: #DCFCE7;
+  --secondary-foreground: #14532D;
+  --muted: #F1F5F9;
+  --muted-foreground: #64748B;
+  --accent: #F59E0B;
+  --accent-foreground: #0F172A;
+  --destructive: #DC2626;
+  --border: #E2E8F0;
+  --input: #E2E8F0;
+  --ring: #15803D;
+  --radius: 10px; /* buttons and inputs; cards use rounded-xl = 12px */
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+  h1, h2, h3, h4 {
+    @apply font-heading;
+  }
+}
+
+/* Balances and kg: tabular figures so columns line up. */
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}
