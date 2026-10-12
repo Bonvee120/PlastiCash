@@ -58,6 +58,16 @@ One entry per day: what was done, what broke, what's next.
 - 4.7 `POST /webhooks/paystack`: HMAC-SHA512 of the raw body with `compare_digest`; refuses everything if no secret is set; transfer.success -> PAID, transfer.failed / reversed -> FAILED + one reversal; duplicates and replays change nothing.
 - Required tests passing: 1, 2, 3, 4, 5, 6, 10, 11 (and 12 at service level, 16). Races are tested on real separate connections: two simultaneous confirmations (credit once), two simultaneous withdrawals (no overdraw), three simultaneous failure webhooks (one reversal). Mutation checks: removing the pickup lock or the profile lock makes those tests fail. `pytest`: 151 passed. Supabase migrated; live: Chinaza's wallet 880,650 kobo, her PAID withdrawal listed, a forged webhook gets 401.
 - Step 4 done.
+- 5.1 `GET /prices/current` (public, one query for all materials) and `POST /estimate` (sacks x kg per sack, or count / items per kg; points at today's prices; the 50 kg door check and kg still needed).
+- 5.2 `POST /uploads/signature` (signed Cloudinary params; the secret never leaves the server; 503 until Cloudinary is configured), `POST /pickups` (photo must come from our Cloudinary account; under 50 kg -> 400 `BELOW_MINIMUM` with `HUB_OR_AREA_DAY` unless `pool: true`), `GET /pickups`, `GET /pickups/{id}`, cancel. Someone else's pickup is 404.
+- 5.3 admin assign (active collector only); collector day list, start (ASSIGNED -> EN_ROUTE), location only while EN_ROUTE. A collector's view shows the customer's first name and address, never the QR token; a pickup assigned to another collector is 404.
+- 5.4 QR scan (constant-time compare), weigh: price snapshot per item, deductions, totals, `under_minimum` (door only), location cleared, AWAITING_CONFIRMATION.
+- 5.5 OTP: 6 digits from `secrets`, stored as HMAC-SHA256 with `OTP_SECRET`, 30 min, 5 wrong tries lock it (the customer can still confirm in the app), 3 resends; codes only go out by SMS, after the commit. `services/termii.py` behind `SMS_ENABLED` (when off it logs "SMS would send" with only the last 4 digits).
+- 5.6 user confirm, collector OTP confirm, dispute, admin disputes list and resolve (final kg per material priced with the original snapshot, then COMPLETED + one credit). Admin board with waiting requests and estimated kg per area for pooling.
+- 5.7 hub walk-in: find the customer by phone (id and name only), create the HUB pickup already weighed (created in `pickup_state.py`, rule 6) with the same OTP flow.
+- `tests/test_pickups.py` (36 tests, end to end through the API): required tests 7, 8, 12, 13, 14, 15, 18. Mutation checks: removing the user ownership check fails test 14; resolving at today's price instead of the snapshot fails test 8. `pytest`: 202 passed (three runs in a row).
+- Live on Supabase (read-only): prices, estimate (3 sacks PET + 130 cans = 32 kg, 6,350 pts, 18 kg short of the door minimum), Chinaza's 6 seeded pickups with the collector's first name and QR on the ASSIGNED one, admin board area totals, 1 open dispute.
+- Step 5 done.
 
 **Broke**
 - `curl localhost:8000` returned 404 during the spike test. Cause: an old prototype compose project (`platicash`, from `Desktop\PlatiCash`) still runs on ports 8000, 3000 and 5432. Using `127.0.0.1` reached the spike; ngrok already forwards to `127.0.0.1`, so the real webhook was not affected. Stop that project before `docker compose up api`, or the ports clash. The web dev server ran on port 3001 for the same reason.
@@ -78,9 +88,11 @@ One entry per day: what was done, what broke, what's next.
 - The browser showed React error #441 (a server component failed) while the API had been stopped by the low-memory reaper: `fetch` to the API failed and nothing caught it. Fixed with the root error page above.
 - FastAPI 0.143 keeps included routers wrapped, so `app.routes` doesn't list them; test 16 at first found no admin routes (its guard test caught that). It now reads the routes from the OpenAPI schema.
 - The first version of test 2 (simultaneous withdrawals) passed even with the profile lock removed: the two requests never overlapped. It now pauses right after the balance read, so without the lock both requests overdraw and the test fails.
+- Lists made one database query per pickup row (items and names), and `/prices/current` one per material. Each round trip to Supabase takes 0.14-0.36 s from here, so a 20-pickup list would have taken many seconds; lists now use three queries whatever their length, and prices one. Production should run the API in Render's Frankfurt region, next to Supabase (recorded in `tech-stack.md`).
+- `test_withdraw_holds_the_amount` failed once: two ledger rows written in the same test transaction share `now()`, so their order was random. The test now compares them without order (in production each request is its own transaction).
 
 **Next**
-- Step 5 (pickup flow, API): 5.1 prices and estimate.
+- Step 6 (user screens): 6.1 shared UI components (Button, Card, StatusBadge, MoneyDisplay, Timeline, EmptyState, Stepper) and the API client.
 - Header balance ("2,450 pts (₦2,450)") comes with the wallet API in step 4/6.
 - 0.1: 2 real conversations with evidence and a price board photo; then the final, named sign-off of `RESEARCH.md`.
 - Remove the ngrok test webhook URL from the Paystack dashboard once the tunnel is closed.

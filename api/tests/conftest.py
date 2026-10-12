@@ -115,6 +115,38 @@ def fake_supabase_auth(monkeypatch) -> Settings:
     return settings
 
 
+@pytest.fixture
+def app_settings(monkeypatch) -> Settings:
+    """Test values for OTP, Cloudinary and SMS, in every module that reads them. SMS stays off."""
+    from app.services import cloudinary, otp, pickups, termii, withdrawals
+
+    settings = Settings(
+        otp_secret="otp-secret-for-tests-only-0123456789",
+        cloudinary_cloud_name="testcloud",
+        cloudinary_api_key="123456",
+        cloudinary_api_secret="cloudinary-secret-for-tests",
+        sms_enabled=False,
+    )
+    for module in (cloudinary, otp, pickups, termii, withdrawals):
+        monkeypatch.setattr(module, "get_settings", lambda: settings)
+    return settings
+
+
+@pytest.fixture
+def sms(monkeypatch) -> list[tuple[str, str]]:
+    """Capture SMS instead of sending: [(phone, text), ...]."""
+    from app.services import termii
+
+    sent: list[tuple[str, str]] = []
+
+    async def fake_send(phone: str, message: str) -> bool:
+        sent.append((phone, message))
+        return True
+
+    monkeypatch.setattr(termii, "send_sms", fake_send)
+    return sent
+
+
 @pytest_asyncio.fixture
 async def client(session: AsyncSession) -> AsyncIterator[AsyncClient]:
     """The real app, in the tests' event loop, using the test's session."""

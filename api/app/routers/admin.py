@@ -1,17 +1,24 @@
 """Ops portal API. Every route is ADMIN only: the guard sits on the router itself, so a route added here later
 can't forget it (docs/specs/02-api.md, required test 16)."""
+from datetime import date
+from decimal import Decimal
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
+from sqlalchemy import func
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from app.auth import AdminProfile, require_admin
 from app.db import get_session
-from app.models import Material, Price, Withdrawal, WithdrawalStatus
+from app.errors import ApiError
+from app.models import Material, Pickup, PickupStatus, Price, Profile, Role, Withdrawal, WithdrawalStatus
+from app.pickup_schemas import AdminBoardOut, AdminPickupOut, AreaTotal, AssignIn, CancelIn, ResolveIn
 from app.schemas import PriceOut, RejectBody, WithdrawalOut
-from app.services import paystack, withdrawals
+from app.schemas import display_name
+from app.services import paystack, pickups, withdrawals
+from app.services.pickup_state import transition
 from app.services.paystack import PaystackError
 
 router = APIRouter(prefix="/admin", tags=["admin"], dependencies=[Depends(require_admin)])
@@ -73,3 +80,90 @@ async def reject_withdrawal(
     withdrawal = await withdrawals.reject(session, withdrawal_id, admin, body.reason)
     await session.commit()
     return WithdrawalOut.from_withdrawal(withdrawal)
+
+
+# ----- Pickups -----
+
+
+async def _admin_views(session: AsyncSession, rows: list[Pickup]) -> list[AdminPickupOut]:
+    """Many pickups with three queries in total, not three per pickup."""
+    items = await pickups.items_by_pickup(session, [p.id for p in rows])
+    people = await pickups.names(session, {p.user_id for p in rows} | {p.collector_id for p in rows})
+    return [
+        AdminPickupOut.build(p, items[p.id], display_name(people[p.user_id]) or people[p.user_id].full_name,
+                             people[p.collector_id].full_name if p.collector_id in people else None)
+        for p in rows
+    ]
+
+
+async def _admin_view(session: AsyncSession, pickup: Pickup) -> AdminPickupOut:
+    await session.refresh(pickup)
+    user = await session.get(Profile, pickup.user_id)
+    collector = await session.get(Profile, pickup.collector_id) if pickup.collector_id else None
+    return AdminPickupOut.build(
+        pickup, await pickups.items_of(session, pickup.id), display_name(user) or user.full_name,
+        collector.full_name if collector else None,
+    )
+
+
+@router.get("/pickups", response_model=AdminBoardOut)
+async def pickup_board(
+    session: SessionDep,
+    status: PickupStatus | None = None,
+    area: str | None = None,
+    day: Annotated[date | None, Query(alias="date")] = None,
+) -> AdminBoardOut:
+    """The board, plus waiting requests per area with their estimated kg, for planning pooled area days."""
+    query = select(Pickup).order_by(Pickup.created_at.desc()).limit(200)
+    if status is not None:
+        query = query.where(Pickup.status == status)
+    if area:
+        query = query.where(Pickup.area == area)
+    if day:
+        query = query.where((Pickup.scheduled_date == day) | (Pickup.preferred_date == day))
+    rows = (await session.exec(query)).all()
+    totals = await session.exec(
+        select(Pickup.area, func.count(), func.count().filter(Pickup.pooled), func.coalesce(func.sum(Pickup.estimated_kg), 0))
+        .where(Pickup.status == PickupStatus.REQUESTED)
+        .group_by(Pickup.area)
+        .order_by(func.coalesce(func.sum(Pickup.estimated_kg), 0).desc())
+    )
+    return AdminBoardOut(
+        pickups=await _admin_views(session, list(rows)),
+        area_totals=[AreaTotal(area=a or "Unknown", requests=n, pooled=pooled, estimated_kg=Decimal(kg))
+                     for a, n, pooled, kg in totals.all()],
+    )
+
+
+@router.post("/pickups/{pickup_id}/assign", response_model=AdminPickupOut)
+async def assign_pickup(pickup_id: UUID, body: AssignIn, admin: AdminProfile, session: SessionDep) -> AdminPickupOut:
+    collector = await session.get(Profile, body.collector_id)
+    if collector is None or collector.role != Role.COLLECTOR or not collector.is_active:
+        raise ApiError(422, "VALIDATION_ERROR", "Choose an active collector.")
+    pickup = await transition(session, pickup_id, PickupStatus.ASSIGNED, admin, collector_id=collector.id,
+                              scheduled_date=body.scheduled_date)
+    await session.commit()
+    return await _admin_view(session, pickup)
+
+
+@router.post("/pickups/{pickup_id}/cancel", response_model=AdminPickupOut)
+async def cancel_pickup(pickup_id: UUID, body: CancelIn, admin: AdminProfile, session: SessionDep) -> AdminPickupOut:
+    pickup = await transition(session, pickup_id, PickupStatus.CANCELLED, admin, reason=body.reason)
+    await session.commit()
+    return await _admin_view(session, pickup)
+
+
+@router.get("/disputes", response_model=list[AdminPickupOut])
+async def disputes(session: SessionDep) -> list[AdminPickupOut]:
+    """Open disputes, oldest first: both photos, the collector's weights and the customer's claim."""
+    rows = await session.exec(
+        select(Pickup).where(Pickup.status == PickupStatus.DISPUTED).order_by(Pickup.disputed_at)
+    )
+    return await _admin_views(session, list(rows.all()))
+
+
+@router.post("/pickups/{pickup_id}/resolve", response_model=AdminPickupOut)
+async def resolve_dispute(pickup_id: UUID, body: ResolveIn, admin: AdminProfile, session: SessionDep) -> AdminPickupOut:
+    pickup = await pickups.resolve(session, pickup_id, admin, body.items, body.note.strip())
+    await session.commit()
+    return await _admin_view(session, pickup)

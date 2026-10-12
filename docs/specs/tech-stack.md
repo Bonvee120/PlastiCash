@@ -107,7 +107,7 @@ Cron (every 15 min, X-Cron-Secret) ──▶ FastAPI /jobs/reminders
 | Env | Web | API | DB |
 |---|---|---|---|
 | Local | `npm run dev` | `uvicorn --reload` | Supabase dev project; tests on local Postgres |
-| Production (demo) | Vercel (root `web/`) | Render Docker web service, pre-deploy `alembic upgrade head`, health check `/api/v1/health` | Supabase project |
+| Production (demo) | Vercel (root `web/`) | Render Docker web service in the **Frankfurt** region (closest to the Supabase project in `eu-west-1`; every request makes several database round trips, which take 0.14–0.36 s each from Enugu but tens of ms within Europe), pre-deploy `alembic upgrade head`, health check `/api/v1/health` | Supabase project (`eu-west-1`) |
 
 - Paystack test webhook URL: `https://<render-url>/api/v1/webhooks/paystack`.
 - Cron: `POST https://<render-url>/api/v1/jobs/reminders` every 15 min with header `X-Cron-Secret`.

@@ -33,11 +33,14 @@ async def make_pickup(session: AsyncSession, user: Profile, area: str = "GRA") -
     return pickup
 
 
-async def make_price(session: AsyncSession, material: Material, naira: int, *, kg_per_full_sack: str = "10") -> Price:
+async def make_price(
+    session: AsyncSession, material: Material, naira: int, *, kg_per_full_sack: str = "10", items_per_kg: int | None = None
+) -> Price:
     price = Price(
         material=material,
         price_kobo_per_kg=naira * 100,
         kg_per_full_sack=Decimal(kg_per_full_sack),
+        items_per_kg=items_per_kg,
         effective_from=datetime.now(timezone.utc) - timedelta(seconds=1),
     )
     session.add(price)

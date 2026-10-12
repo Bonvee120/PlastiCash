@@ -146,3 +146,20 @@ async def transition(
     if to == S.COMPLETED:
         await ledger.credit_pickup(session, pickup)
     return pickup
+
+
+async def create_walk_in(session: AsyncSession, pickup: Pickup, collector: Profile) -> Pickup:
+    """A hub walk-in starts life already weighed: a new HUB pickup goes straight to AWAITING_CONFIRMATION
+    (spec 04: "(new HUB pickup) -> AWAITING_CONFIRMATION, hub collector")."""
+    pickup = await lock_pickup(session, pickup.id)
+    if collector.role != Role.COLLECTOR or pickup.collector_id != collector.id:
+        raise ApiError(403, "FORBIDDEN", "You can't make this change to this pickup.")
+    if pickup.channel.value != "HUB" or pickup.status != S.REQUESTED or pickup.weighed_at is not None:
+        raise IllegalTransition(pickup.status, S.AWAITING_CONFIRMATION, "Only a new hub walk-in starts as weighed.")
+    if pickup.qr_scanned_at is None or not pickup.total_amount_kobo:
+        raise IllegalTransition(pickup.status, S.AWAITING_CONFIRMATION, "Add the weighed items first.")
+    now = datetime.now(timezone.utc)
+    pickup.status, pickup.weighed_at, pickup.updated_at = S.AWAITING_CONFIRMATION, now, now
+    session.add(pickup)
+    await session.flush()
+    return pickup

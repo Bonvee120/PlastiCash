@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 from decimal import ROUND_HALF_UP, Decimal
 from uuid import UUID
 
+from sqlalchemy.dialects.postgresql import distinct_on
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
@@ -34,6 +35,18 @@ async def current_price(session: AsyncSession, material: Material, at: datetime 
     if price is None:
         raise ApiError(409, "NO_PRICE", f"There is no price for {material.value} yet.")
     return price
+
+
+async def current_prices(session: AsyncSession, at: datetime | None = None) -> dict[Material, Price]:
+    """The price in force for every material, in one query (one round trip; Supabase is far away)."""
+    at = at or datetime.now(timezone.utc)
+    rows = await session.exec(
+        select(Price)
+        .where(Price.effective_from <= at)
+        .ext(distinct_on(Price.material))
+        .order_by(Price.material, Price.effective_from.desc())
+    )
+    return {price.material: price for price in rows.all()}
 
 
 async def priced_item(

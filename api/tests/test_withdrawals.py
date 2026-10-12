@@ -64,7 +64,8 @@ async def test_withdraw_holds_the_amount(client: AsyncClient, session: AsyncSess
     assert await balance(client, user) == 200_000
 
     wallet = (await client.get("/api/v1/wallet", headers=bearer(user.id))).json()
-    assert [e["type"] for e in wallet["entries"]] == ["WITHDRAWAL_HOLD", "ADJUSTMENT"]
+    # Both rows were written in one test transaction, so they share a timestamp: compare without order.
+    assert sorted(e["type"] for e in wallet["entries"]) == ["ADJUSTMENT", "WITHDRAWAL_HOLD"]
     assert wallet["points"] == "2000"
     mine = (await client.get("/api/v1/withdrawals", headers=bearer(user.id))).json()
     assert [w["id"] for w in mine] == [body["id"]]
