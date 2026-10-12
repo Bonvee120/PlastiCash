@@ -8,12 +8,14 @@ Checklist:
 - [ ] Photo of a buy-back price board
 - [x] 2 competitors
 - [x] 3 cited sources
-- [ ] 3 design decisions tied to findings
-- [ ] Signed off
+- [x] 3 design decisions tied to findings (from desk research; to confirm in the field)
+- [ ] Signed off (provisional desk-research sign-off in section 5; field items still open)
 
 ---
 
 ## 1. Conversations
+
+Status: **not done yet.** No interview has taken place. The tables below stay TODO until real conversations happen; use the question lists and record template under "Interview questions" below.
 
 ### Conversation 1: waste picker
 
@@ -57,6 +59,51 @@ What they said:
 | Tin | TODO |
 | Sachets / nylon | TODO |
 
+Online comparison until the photo exists. This is not field evidence and not an Enugu price:
+
+| Material | EcoCyclers opening price (`docs/product-description.md`) | Westman Recycle website, Lekki/Ajah, Lagos (checked 12 Oct 2026) |
+|---|---|---|
+| PET | ₦100 – ₦270 | ₦200 |
+| Other / hard plastics | ₦280 | ₦120 |
+| Cans (aluminium) | ₦400 | ₦500 |
+| Tin (iron) | ₦200 | ₦300 |
+| Sachets / nylon | ₦50 | ₦60 (nylon/plastic bags) |
+
+Source: [westmanrecycle.com](https://westmanrecycle.com/) "Today's buy rates"; the page shows no date. A second listing (GreenBin, Surulere) was reported at PET ₦80/kg, but its page did not load for checking, so it is left out.
+
+### Desk evidence (secondary; does not replace the conversations)
+
+| Finding | Source |
+|---|---|
+| A survey of 1,274 waste pickers in 20 Lagos LGAs: about half earned ₦30,001–₦50,000 a month; common hazards were harassment (19%), injuries (13%), accidents (11%) and burns (7%). | Fagbo et al. 2025, *Journal of Community Health* 50(5) ([DOI](https://doi.org/10.1007/s10900-025-01463-9)) |
+| 58.2% of 770 households in Lagos and the FCT did not separate plastic from general waste. Lagos households reported recycling (51.0%), open dumping (28.1%), burning (8.4%), waste-to-energy (6.9%), biodegradation (5.6%). | Oke & Olayide 2026, *Environmental Management and Sustainable Development* 15(2) ([article](https://www.macrothink.org/journal/index.php/emsd/article/view/23735)) |
+| Buy prices for the same material differ a lot between buyers (PET: ₦100–₦270 at EcoCyclers vs ₦200 at Westman; hard plastics ₦280 vs ₦120). There is no national price list; LAWMA publishes a directory of recyclers, not prices. | Table above; [LAWMA recyclers directory](https://lawma.gov.ng/recyclers/) |
+| Nigerian recycling services serve people without smartphones: Soso Care runs an app and a USSD service; Scrapays uses USSD; Wecyclers sends points by SMS. | [GSMA: Soso Care](https://www.gsma.com/solutions-and-impact/connectivity-for-good/mobile-for-development/digital-grantees-portfolio/soso-care/); section 2 |
+| No source found shows how often buyers under-weigh or whether sellers trust the scale. This is an open question for the interviews. | — |
+
+### Interview questions and record template
+
+Waste picker: what you collect and kg in the last 7 days; how often you sell; who buys and the price per kg per material (clean vs dirty, sorted vs mixed); how you are paid and how long after weighing; bank account in your own name (never record numbers); ever cheated on weight, trust in the scale; how you carry plastic and what it costs; phone type (own, shared, none) and whether you would confirm a weight by app or SMS.
+
+Household or school: what happens to PET, hard plastic, sachets and cans today; bags or sacks per week (weigh one bag if possible); would you store to 50 kg or carry to a hub, and how far is too far (time and fare); what would make you trust an app's weight and a bank payout; for a school, who would use a recycling report and for what.
+
+```text
+Interview ID:
+Role:
+First name (optional; permission received?):
+Area / place:
+Date and time:
+Interviewer:
+Consent to notes / voice note / photo: Yes / No each
+Key answers (verbatim where useful):
+Material and kg details:
+Price/payment details:
+Evidence filename(s) in research/:
+Follow-up / uncertainty:
+```
+
+Never invent names, quotes, weights, prices or dates. Never record bank details.
+
 ---
 
 ## 2. Competitors
@@ -93,11 +140,11 @@ Source: WARM v16 net recycling emission factors, in MTCO₂E per short ton. Plas
 |---|---|---|---|
 | PET | PET | (1.04) | 1.146 |
 | PLASTIC | Mixed Plastics (40% HDPE, 60% PET) | (0.93) | 1.025 |
-| SACHET | No WARM recycling factor for LDPE film; proposed proxy: Mixed Plastics | (0.93) | 1.025 (to confirm) |
+| SACHET | No WARM recycling factor for LDPE film; proxy: Mixed Plastics | (0.93) | 1.025 (estimate) |
 | CAN | Aluminum Cans | (9.13) | 10.064 |
 | TIN | Steel Cans | (1.83) | 2.017 |
 
-Open question: WARM has recycling factors only for HDPE, PET and PP ("due to LCI data limitations"). Sachets are LDPE film, so SACHET needs a decision: use the Mixed Plastics proxy above, or use 0 and claim no CO₂ for sachets.
+WARM has recycling factors only for HDPE, PET and PP ("due to LCI data limitations"). Sachets are LDPE film. **Decision (12 Oct 2026):** use the Mixed Plastics proxy, 1.025, not 0. Label it as an estimate wherever CO₂ is shown (impact page, ESG PDF methodology), and replace it if a sachet-specific factor is found. The unit is kg CO₂e throughout.
 
 ---
 
@@ -112,9 +159,13 @@ Each decision must point to a finding above. Candidates already in the docs that
 
 | # | Finding | Decision | Where it shows in the product |
 |---|---|---|---|
-| 1 | TODO | TODO | TODO |
-| 2 | TODO | TODO | TODO |
-| 3 | TODO | TODO | TODO |
+| 1 | Buy prices for the same material vary widely between buyers and change over time; there is no national price list (section 1, desk evidence and price comparison). | The admin sets prices per material as versions; each weighed item stores a snapshot of the price in force, so a later change never alters a past pickup. Users see today's prices before they sell. | `prices` table (versioned), price snapshot on `pickup_items`, `/ops-portal` prices, `/guide` and live prices on the landing page |
+| 2 | Trust in the scale is unproven either way, and most households do not separate plastic, so contamination is likely (Oke & Olayide 2026: 58.2% do not separate). | The collector photographs the load and records gross kg, deduction kg with a reason, and net kg per material. The user must confirm, or dispute with their own photo, before any credit. | Collector weigh form, user confirm/dispute screen, admin disputes view with both photos |
+| 3 | Nigerian services reach people without smartphones through USSD or SMS (Soso Care, Scrapays, Wecyclers). | The user can confirm a weight with a 6-digit SMS code given to the collector, not only in the app; reminders by SMS; auto-confirm after 48 hours. | OTP flow via Termii (`SMS_ENABLED`), `/jobs/reminders` |
+
+Challenged by the research, to test in the field: the 50 kg door minimum. No source found shows that households reach 50 kg. The current design already sends loads under 50 kg to the hub (walk-ins, no minimum) or to area pooling; the interviews should check hub distance and fare.
+
+Suggestions from the research, not adopted (would change the specs): a receipt with tare shown, a second weighing on request, and a price register with buyer, location and evidence photo.
 
 ---
 
@@ -122,5 +173,7 @@ Each decision must point to a finding above. Candidates already in the docs that
 
 | | |
 |---|---|
-| Signed off by | TODO |
-| Date | TODO |
+| Signed off by | EcoCyclers Research Team (provisional; replace with a named person once they agree to sign) |
+| Date | 12 October 2026 |
+| Scope | Desk research only: competitors, sources, CO₂ factors, design decisions. |
+| Still open | 2 real conversations with evidence; price board photo; check competitors' current services. |
