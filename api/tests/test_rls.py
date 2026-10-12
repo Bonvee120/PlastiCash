@@ -6,20 +6,8 @@ from sqlalchemy import text
 from sqlalchemy.exc import ProgrammingError
 from sqlmodel import Session
 
-from app.models import AccountType, Pickup, Profile
-
-
-def make_user(session: Session, name: str) -> Profile:
-    user = Profile(
-        id=uuid4(),
-        account_type=AccountType.INDIVIDUAL,
-        full_name=name,
-        phone=f"+234{uuid4().int % 10**10:010d}",
-        email=f"{name.lower()}@example.com",
-    )
-    session.add(user)
-    session.flush()
-    return user
+from app.models import Profile
+from tests.factories import make_pickup, make_user
 
 
 def act_as(session: Session, role: str, user_id: UUID | None = None) -> None:
@@ -32,8 +20,8 @@ def act_as(session: Session, role: str, user_id: UUID | None = None) -> None:
 @pytest.fixture
 def two_users_with_pickups(session: Session) -> tuple[Profile, Profile]:
     alice, bob = make_user(session, "Alice"), make_user(session, "Bob")
-    session.add_all([Pickup(user_id=alice.id, area="GRA"), Pickup(user_id=bob.id, area="Uwani")])
-    session.flush()
+    make_pickup(session, alice, "GRA")
+    make_pickup(session, bob, "Uwani")
     return alice, bob
 
 

@@ -43,7 +43,10 @@ One entry per day: what was done, what broke, what's next.
 
 - 2.3 (test DB side) done: migration `20261012_ea3a0e36fbad_rls_realtime_and_view_grants.py` enables RLS on all 7 tables, adds the `pickups` SELECT policy (own or assigned), adds `pickups` to `supabase_realtime`, and revokes the views from `anon` and `authenticated`. `tests/conftest.py` stubs what Supabase provides (`anon` and `authenticated` roles with Supabase's default grants, `auth.uid()` from the JWT `sub`, the publication) and runs `alembic upgrade head` once per test session. New `tests/test_rls.py`: a user sees only their own pickups, an assigned collector sees the pickup, `anon` sees none, the other 6 tables return no rows, the 3 views are denied, and only `pickups` is published. `pytest`: 15 passed. With RLS turned off, the user sees both pickups, so the test can fail. `downgrade -1` and `upgrade head` both work; `alembic check` is clean.
 
+- 2.4 done: `tests/test_ledger_constraints.py`. A second `PICKUP_CREDIT` for the same pickup fails on `ledger_one_credit_per_pickup`; two different pickups can each be credited; the index is partial, so an `ADJUSTMENT` that refers to an already credited pickup is still allowed. With the index dropped, a pickup takes two credits, so the test can fail. Shared row helpers moved to `tests/factories.py`. `pytest`: 18 passed.
+
 **Next**
+- 2.5: `scripts/seed.py`.
 - 2.3 (Supabase side): create `api/.env` with `DATABASE_URL` (session pooler or direct connection) and run `alembic upgrade head` on Supabase.
 - 0.1: 2 real conversations with evidence and a price board photo; then the final, named sign-off of `RESEARCH.md`.
 - Remove the ngrok test webhook URL from the Paystack dashboard once the tunnel is closed.
