@@ -1,8 +1,6 @@
 """Token verification and role guards, with our own ES256 key standing in for Supabase's JWKS."""
 from collections.abc import Iterator
-from datetime import datetime, timedelta, timezone
-from types import SimpleNamespace
-from uuid import UUID, uuid4
+from uuid import uuid4
 
 import jwt
 import pytest
@@ -11,31 +9,16 @@ from fastapi import Depends, FastAPI
 from fastapi.testclient import TestClient
 from sqlmodel import Session
 
-from app import auth
 from app.auth import AdminProfile, CollectorProfile, CurrentProfile, UserProfile, get_auth_user
 from app.config import Settings
 from app.db import get_session
 from app.errors import install_error_handlers
 from app.models import Role
 from tests.factories import make_user
+from tests.tokens import ISSUER, token
 
-SUPABASE_URL = "https://testproject.supabase.co"
-ISSUER = f"{SUPABASE_URL}/auth/v1"
-SIGNING_KEY = ec.generate_private_key(ec.SECP256R1())
 OTHER_KEY = ec.generate_private_key(ec.SECP256R1())
 LEGACY_SECRET = "legacy-hs256-secret-for-tests-only-0123456789"
-
-
-def token(sub: UUID | str, *, key=SIGNING_KEY, algorithm: str = "ES256", minutes: int = 60, **claims) -> str:
-    payload = {
-        "sub": str(sub),
-        "aud": "authenticated",
-        "iss": ISSUER,
-        "exp": datetime.now(timezone.utc) + timedelta(minutes=minutes),
-        "email": "someone@example.com",
-        **claims,
-    }
-    return jwt.encode(payload, key, algorithm=algorithm, headers={"kid": "test-key"})
 
 
 def bearer(t: str) -> dict:
@@ -43,15 +26,8 @@ def bearer(t: str) -> dict:
 
 
 @pytest.fixture
-def settings(monkeypatch) -> Settings:
-    s = Settings(supabase_url=SUPABASE_URL, supabase_jwt_secret="")
-    monkeypatch.setattr(auth, "get_settings", lambda: s)
-    public_key = SIGNING_KEY.public_key()
-    monkeypatch.setattr(
-        auth, "get_jwks_client",
-        lambda url: SimpleNamespace(get_signing_key_from_jwt=lambda t: SimpleNamespace(key=public_key)),
-    )
-    return s
+def settings(fake_supabase_auth: Settings) -> Settings:
+    return fake_supabase_auth
 
 
 @pytest.fixture

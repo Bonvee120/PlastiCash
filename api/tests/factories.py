@@ -13,7 +13,7 @@ def make_user(session: Session, name: str = "User", role: Role = Role.USER, is_a
         account_type=AccountType.INDIVIDUAL if role == Role.USER else None,
         is_active=is_active,
         full_name=name,
-        phone=f"+234{uuid4().int % 10**10:010d}",
+        phone=f"+2348{uuid4().int % 10**9:09d}",
         email=f"{name.lower()}@example.com",
     )
     session.add(user)

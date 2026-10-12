@@ -22,4 +22,11 @@ def install_error_handlers(app: FastAPI) -> None:
 
     @app.exception_handler(RequestValidationError)
     async def validation_error(_: Request, exc: RequestValidationError) -> JSONResponse:
-        return JSONResponse(_body("VALIDATION_ERROR", "Some fields are missing or invalid.", {"errors": exc.errors()}), 422)
+        errors = [
+            {
+                "field": ".".join(str(part) for part in err["loc"] if part != "body"),
+                "message": err["msg"].removeprefix("Value error, "),
+            }
+            for err in exc.errors()
+        ]
+        return JSONResponse(_body("VALIDATION_ERROR", "Some fields are missing or invalid.", {"errors": errors}), 422)

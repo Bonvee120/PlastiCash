@@ -9,7 +9,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import Engine, text
 from sqlmodel import Session, create_engine
 
-from app.config import get_settings
+from app.config import Settings, get_settings
 from app.db import get_session
 from app.main import app
 
@@ -71,6 +71,20 @@ def session(engine: Engine) -> Iterator[Session]:
         with Session(bind=connection, join_transaction_mode="create_savepoint") as session:
             yield session
         transaction.rollback()
+
+
+@pytest.fixture
+def fake_supabase_auth(monkeypatch) -> Settings:
+    """Make app.auth trust tokens from tests/tokens.py instead of fetching Supabase's JWKS."""
+    from app import auth
+    from tests import tokens
+
+    settings = Settings(supabase_url=tokens.SUPABASE_URL, supabase_jwt_secret="")
+    monkeypatch.setattr(auth, "get_settings", lambda: settings)
+    public_key = tokens.SIGNING_KEY.public_key()
+    jwks = SimpleNamespace(get_signing_key_from_jwt=lambda _token: SimpleNamespace(key=public_key))
+    monkeypatch.setattr(auth, "get_jwks_client", lambda _url: jwks)
+    return settings
 
 
 @pytest.fixture
