@@ -31,11 +31,14 @@ One entry per day: what was done, what broke, what's next.
 - 1.3 done: `web/` from `create-next-app` 16.4 (App Router, TypeScript, Tailwind 4, ESLint); shadcn (`base-nova`) with Button; daisyUI 5 with prefix `d-`. Brand colours from `DESIGN_BRIEF.md` set once as shadcn CSS variables and as the `plasticash` daisyUI theme; Plus Jakarta Sans (headings) and Inter (body) via `next/font`; `tabular` utility for balances. Placeholder home page. `npm run lint` and `npm run build` pass; `npm run dev` shows the page with brand colours, fonts and both button styles, no console errors. Versions recorded in `tech-stack.md` §8.
 - Step 1 done.
 - `RESEARCH.md`: merged the desk research from `../RESEARCH.md` after checking its sources. Added secondary evidence (Fagbo et al. 2025, Oke & Olayide 2026, an online price comparison with Westman Recycle), interview questions and record template, 3 design decisions tied to findings, the SACHET CO₂ decision (Mixed Plastics proxy 1.025, labelled as an estimate), and a provisional desk-research sign-off. Left out two claims I could not check: the GreenBin prices and a Soso Care app/USSD percentage split.
+- Decision: started Step 2 on the provisional desk-research sign-off. The 2 real conversations, price board photo and named sign-off are still required for Step 0 to count as done.
+- 2.1 done: `api/app/models.py` with the 9 enums and 7 tables, including the checks and indexes (partial unique indexes on `ledger_entries` among them), so Alembic autogenerate stays in sync. Checked by creating the `BACKEND_SCHEMA.md` SQL and the models side by side on `db-test`: 118 columns, 47 constraints, 24 indexes and 9 enums, all identical.
 
 **Broke**
 - `curl localhost:8000` returned 404 during the spike test. Cause: an old prototype compose project (`platicash`, from `Desktop\PlatiCash`) still runs on ports 8000, 3000 and 5432. Using `127.0.0.1` reached the spike; ngrok already forwards to `127.0.0.1`, so the real webhook was not affected. Stop that project before `docker compose up api`, or the ports clash. The web dev server ran on port 3001 for the same reason.
 - Next 16 dev blocks HMR and fonts (403) when the page is opened on `127.0.0.1`; open `http://localhost:<port>` instead.
 
 **Next**
+- 2.2: first Alembic migration (tables from the models; `env.py` excludes `auth`, `storage`, `realtime`; views via `op.execute`).
 - 0.1: 2 real conversations with evidence and a price board photo; then the final, named sign-off of `RESEARCH.md`.
 - Remove the ngrok test webhook URL from the Paystack dashboard once the tunnel is closed.
