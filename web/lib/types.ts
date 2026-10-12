@@ -120,3 +120,14 @@ export const MATERIALS: { value: Material; label: string; hint: string }[] = [
 ];
 
 export const materialLabel = (m: Material) => MATERIALS.find((x) => x.value === m)?.label ?? m;
+
+// GET /collector/pickups[/id] (CollectorPickupOut): the customer's first name only, never their phone (rule 8).
+export type CollectorPickup = Omit<Pickup, "collector_first_name" | "collector_position" | "qr_token"> & {
+  estimate_sacks: string | null;
+  request_photo_url: string | null;
+  customer_name: string;
+  qr_scanned: boolean;
+  otp_locked: boolean;
+};
+export type WeighResult = { pickup: CollectorPickup; sms_sent: boolean };
+export type WeighItemIn = { material: Material; gross_kg: string; deduction_kg: string; deduction_reason: string | null };

@@ -44,3 +44,9 @@ export const WINDOW_LABEL = { MORNING: "9 am to 12 pm", AFTERNOON: "12 pm to 4 p
 export function ref(id: string): string {
   return `PC-${id.replace(/-/g, "").slice(0, 4).toUpperCase()}`;
 }
+
+// "7 Ezillo Street, Independence Layout"; no repeat when the address already names the area.
+export function place({ address, area }: { address: string | null; area: string | null }): string {
+  if (!address) return area ?? "";
+  return area && !address.includes(area) ? `${address}, ${area}` : address;
+}

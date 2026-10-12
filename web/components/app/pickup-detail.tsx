@@ -173,6 +173,10 @@ function QrCard({ token }: { token: string }) {
       />
       <b>Show this to your collector</b>
       <p className="text-sm text-muted-foreground">They scan it before weighing, so only your plastic is paid to you.</p>
+      <p className="text-xs text-muted-foreground">
+        Camera not working? They can type this code:
+        <span className="tabular mt-1 block text-sm font-semibold tracking-wide text-ink">{token.match(/.{1,4}/g)?.join(" ")}</span>
+      </p>
     </Card>
   );
 }

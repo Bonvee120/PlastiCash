@@ -77,6 +77,12 @@ One entry per day: what was done, what broke, what's next.
 - 6.7 `/guide` (public): price per kg, items per kg and full-sack value for each material at today's prices, tips, hub address. Linked from the sidebar ("How much is my plastic?").
 - Browser run as Chinaza on the production build (desktop and 390 px phone): withdraw ₦1,000 (balance 8,806.5 -> 7,806.5, "Waiting for approval"), edit and restore the address, bank check with a made-up number shows Paystack's "didn't match" message inline, confirm pickup PC-53F3 (56.5 kg, +11,022.5 -> 18,829 pts, header chip updated). No console errors after the fix below.
 - Step 6 done.
+- 7.1 `/collector`: today's door jobs in the API's order with stats (done, kg to collect, to go); the first job not yet weighed is outlined and marked NEXT; Hub walk-in button. `/collector/pickups/[id]`: customer first name, address, estimate and photo, Google Maps directions; Start trip; while EN_ROUTE and the page is open the phone's position is watched and the latest fix is sent every 20 s (first fix at once).
+- 7.2 QR scan with `html5-qrcode` 2.3.8 (no install scripts, no dependencies; loaded in the browser only). If the camera can't start, the collector types the code; the user's QR card now shows its 32-character code in groups of 4 for that.
+- 7.3 weigh form (shared with walk-in): pick materials, large kg inputs, "Take off weight" with kg and reason, scale photo, running total pinned at the bottom using the API's half-up rounding. Code step: 6-digit input, resend, and "will confirm on PlastiCash" after 5 wrong tries.
+- 7.4 `/collector/walk-in`: find the customer by phone, weigh, code.
+- Phone run (360 px, production build) as Ifeanyi: PC-28E9 assigned for today through the admin API, Start trip, location stored on the pickup and updated after 20 s, wrong typed QR refused and right one accepted, weighed (12.40 kg PET less 0.40 wet + 3.80 kg cans = 3,740 pts), wrong code ("4 tries left") then right code: COMPLETED. PC-07F3 weighed through the form (validation messages, running total 12,195 pts = API total), left for the customer to confirm in the app. Walk-in for Emeka (unknown phone refused, 4.60 kg PET = 851 pts) completed by code.
+- Test shortcuts used in that run: SMS is off in dev and codes are never logged, so a scratch script stored a fresh code for the two code confirmations; photo uploads to Cloudinary were stubbed in the browser (see Broke), so PC-07F3 and the walk-in have placeholder photo URLs.
 
 **Broke**
 - `curl localhost:8000` returned 404 during the spike test. Cause: an old prototype compose project (`platicash`, from `Desktop\PlatiCash`) still runs on ports 8000, 3000 and 5432. Using `127.0.0.1` reached the spike; ngrok already forwards to `127.0.0.1`, so the real webhook was not affected. Stop that project before `docker compose up api`, or the ports clash. The web dev server ran on port 3001 for the same reason.
@@ -99,10 +105,14 @@ One entry per day: what was done, what broke, what's next.
 - The first version of test 2 (simultaneous withdrawals) passed even with the profile lock removed: the two requests never overlapped. It now pauses right after the balance read, so without the lock both requests overdraw and the test fails.
 - Lists made one database query per pickup row (items and names), and `/prices/current` one per material. Each round trip to Supabase takes 0.14-0.36 s from here, so a 20-pickup list would have taken many seconds; lists now use three queries whatever their length, and prices one. Production should run the API in Render's Frankfurt region, next to Supabase (recorded in `tech-stack.md`).
 - The pickup page logged React error #419 and the server logged `window is not defined`: `components/app/maps.tsx` re-exported the `ENUGU` constant from `map-view.tsx`, and that one line pulled Leaflet into the server render despite `ssr: false`. The constant now lives in `maps.tsx`; `map-view.tsx` is only reached through `next/dynamic`.
+- Photo uploads fail: Cloudinary answers 401 "Invalid cloud_name PlastiCash". `CLOUDINARY_CLOUD_NAME` in `api/.env` must be the cloud name from the Cloudinary dashboard (lowercase id), not the product name. No live upload has worked yet; the seeded photos use Cloudinary's demo account.
+- Walk-in crashed when the page opened (`Cannot read properties of null (reading 'id')`): the React Compiler memoized a callback on `customer!.id` during render, while no customer was chosen yet. The callback now checks `customer` itself. No other `x!.y` on possibly-null state in the web app.
 - `test_withdraw_holds_the_amount` failed once: two ledger rows written in the same test transaction share `now()`, so their order was random. The test now compares them without order (in production each request is its own transaction).
 
 **Next**
-- Step 7 (collector screens), per `06-build-order.md`.
+- Kenzy: fix `CLOUDINARY_CLOUD_NAME` in `api/.env`, then one real photo upload from a phone (request and weigh).
+- Step 7 done-when on a real phone: camera QR scan and location over HTTPS need the deployed site (step 10) or a tunnel; checked here with the typed code and an emulated position.
+- Step 8 (admin portal).
 - Open questions: brief §9 prices (PET ₦180, cans ₦250...) differ from the seed (PET ₦185, cans ₦400...); which is right? `NEXT_PUBLIC_WHATSAPP_NUMBER` is not set. Withdraw confirm should be a Drawer on phones (brief), now a Dialog.
 - 0.1: 2 real conversations with evidence and a price board photo; then the final, named sign-off of `RESEARCH.md`.
 - Remove the ngrok test webhook URL from the Paystack dashboard once the tunnel is closed.

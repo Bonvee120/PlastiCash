@@ -241,9 +241,11 @@ export function CollectorShell({
         <LogoMark variant="white" size={36} />
         <div className="min-w-0 flex-1">
           <b className="block truncate font-display text-lg font-bold">
-            {greeting(me)}
+            {me.full_name}
           </b>
-          <span className="eyebrow !text-[10px] text-[#86EFAC]">Collector</span>
+          <span className="eyebrow block truncate !text-[10px] text-[#86EFAC]">
+            ID {me.id.slice(0, 4).toUpperCase()}
+          </span>
         </div>
         <span className="rounded-full bg-leaf px-2.5 py-1 text-xs font-bold text-forest">
           ● Online
