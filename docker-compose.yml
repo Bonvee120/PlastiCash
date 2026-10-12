@@ -1,4 +1,12 @@
 services:
+  api:
+    build: ./api
+    env_file:
+      - path: ./api/.env
+        required: false
+    ports:
+      - "8000:8000"
+
   # Postgres for pytest only. The app itself uses Supabase.
   db-test:
     image: postgres:16
