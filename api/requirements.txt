@@ -4,8 +4,9 @@ sqlmodel==0.0.48
 psycopg[binary]==3.3.6
 pydantic-settings==2.15.0
 alembic==1.20.0
+pyjwt[crypto]==2.15.1
+httpx==0.28.1
 
 # tests
 pytest==9.1.1
-httpx==0.28.1
 respx==0.23.1
