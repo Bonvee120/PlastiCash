@@ -68,6 +68,15 @@ One entry per day: what was done, what broke, what's next.
 - `tests/test_pickups.py` (36 tests, end to end through the API): required tests 7, 8, 12, 13, 14, 15, 18. Mutation checks: removing the user ownership check fails test 14; resolving at today's price instead of the snapshot fails test 8. `pytest`: 202 passed (three runs in a row).
 - Live on Supabase (read-only): prices, estimate (3 sacks PET + 130 cans = 32 kg, 6,350 pts, 18 kg short of the door minimum), Chinaza's 6 seeded pickups with the collector's first name and QR on the ASSIGNED one, admin board area totals, 1 open dispute.
 - Step 5 done.
+- Step 6 API additions: `GET /banks` (Paystack list, cached), `POST /me/bank/resolve` (shows the account name before saving), `POST /me/bank` (resolves again and creates the Paystack recipient; only the last 4 digits come back), `GET /impact` (kg and CO2 per material from completed pickups). `tests/test_bank.py`, `tests/test_impact.py`; 210 tests pass.
+- 6.1 shared UI (`components/brand/ui.tsx`): Btn, Card, StatusBadge (label + icon, never colour alone), MoneyDisplay, Timeline, Stepper, EmptyState, PageTitle; ConfirmDialog; `lib/format.ts`, `lib/types.ts`, server actions in `lib/actions.ts`.
+- 6.2 dashboard: wallet card, request button, impact stats, the active pickup, recent activity; header balance chip ("7,806.5 pts (₦7,806.5)").
+- 6.3 `/app/request`: 5 steps (materials, amounts with a live estimate, pool or hub when under 10 kg, photo straight to Cloudinary, pin on a Leaflet map and time window).
+- 6.4/6.5 `/app/pickups` (filters, grouped by month) and `/app/pickups/[id]`: Supabase Realtime on the row with a 15 s polling fallback, QR while ASSIGNED/EN_ROUTE, live map while EN_ROUTE, weight table, confirm or dispute with the auto-confirm countdown, cancel.
+- 6.6 `/app/wallet`: balance, bank row, withdraw form (₦1,000 / ₦2,000 / All, minimum ₦1,000, confirm dialog with the bank shown), withdrawals with status, history with filters and a running balance. `/app/settings`: profile form (sends only changed fields, shows field errors from the API), bank form (pick bank, 10-digit number, "Check account" shows the name from Paystack, then "Yes, save this account").
+- 6.7 `/guide` (public): price per kg, items per kg and full-sack value for each material at today's prices, tips, hub address. Linked from the sidebar ("How much is my plastic?").
+- Browser run as Chinaza on the production build (desktop and 390 px phone): withdraw ₦1,000 (balance 8,806.5 -> 7,806.5, "Waiting for approval"), edit and restore the address, bank check with a made-up number shows Paystack's "didn't match" message inline, confirm pickup PC-53F3 (56.5 kg, +11,022.5 -> 18,829 pts, header chip updated). No console errors after the fix below.
+- Step 6 done.
 
 **Broke**
 - `curl localhost:8000` returned 404 during the spike test. Cause: an old prototype compose project (`platicash`, from `Desktop\PlatiCash`) still runs on ports 8000, 3000 and 5432. Using `127.0.0.1` reached the spike; ngrok already forwards to `127.0.0.1`, so the real webhook was not affected. Stop that project before `docker compose up api`, or the ports clash. The web dev server ran on port 3001 for the same reason.
@@ -89,10 +98,11 @@ One entry per day: what was done, what broke, what's next.
 - FastAPI 0.143 keeps included routers wrapped, so `app.routes` doesn't list them; test 16 at first found no admin routes (its guard test caught that). It now reads the routes from the OpenAPI schema.
 - The first version of test 2 (simultaneous withdrawals) passed even with the profile lock removed: the two requests never overlapped. It now pauses right after the balance read, so without the lock both requests overdraw and the test fails.
 - Lists made one database query per pickup row (items and names), and `/prices/current` one per material. Each round trip to Supabase takes 0.14-0.36 s from here, so a 20-pickup list would have taken many seconds; lists now use three queries whatever their length, and prices one. Production should run the API in Render's Frankfurt region, next to Supabase (recorded in `tech-stack.md`).
+- The pickup page logged React error #419 and the server logged `window is not defined`: `components/app/maps.tsx` re-exported the `ENUGU` constant from `map-view.tsx`, and that one line pulled Leaflet into the server render despite `ssr: false`. The constant now lives in `maps.tsx`; `map-view.tsx` is only reached through `next/dynamic`.
 - `test_withdraw_holds_the_amount` failed once: two ledger rows written in the same test transaction share `now()`, so their order was random. The test now compares them without order (in production each request is its own transaction).
 
 **Next**
-- Step 6 (user screens): 6.1 shared UI components (Button, Card, StatusBadge, MoneyDisplay, Timeline, EmptyState, Stepper) and the API client.
-- Header balance ("2,450 pts (₦2,450)") comes with the wallet API in step 4/6.
+- Step 7 (collector screens), per `06-build-order.md`.
+- Open questions: brief §9 prices (PET ₦180, cans ₦250...) differ from the seed (PET ₦185, cans ₦400...); which is right? `NEXT_PUBLIC_WHATSAPP_NUMBER` is not set. Withdraw confirm should be a Drawer on phones (brief), now a Dialog.
 - 0.1: 2 real conversations with evidence and a price board photo; then the final, named sign-off of `RESEARCH.md`.
 - Remove the ngrok test webhook URL from the Paystack dashboard once the tunnel is closed.

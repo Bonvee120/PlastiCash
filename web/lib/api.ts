@@ -42,3 +42,10 @@ export async function api<T>(path: string, init: { method?: string; body?: unkno
     error: (payload as ApiErrorBody) ?? { code: "UNKNOWN", message: "Something went wrong.", details: {} },
   };
 }
+
+// For pages: the data or an error (caught by app/error.tsx with a friendly retry screen).
+export async function get<T>(path: string): Promise<T> {
+  const result = await api<T>(path);
+  if (!result.ok) throw new Error(`GET ${path} failed: ${result.status} ${result.error.code}`);
+  return result.data;
+}

@@ -237,3 +237,37 @@ class WalletOut(BaseModel):
     points: Decimal
     entries: list[LedgerEntryOut]
     total_entries: int
+
+
+# ----- Bank details -----
+
+
+class BankOption(BaseModel):
+    name: str
+    code: str
+
+
+class BankIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    bank_code: str = Field(min_length=3, max_length=10, pattern=r"^[0-9A-Za-z]+$")
+    account_number: str = Field(pattern=r"^\d{10}$")  # NUBAN
+
+
+class BankResolveOut(BaseModel):
+    bank_name: str
+    account_name: str
+
+
+class MaterialImpact(BaseModel):
+    material: Material
+    kg: Decimal
+    co2_kg: Decimal
+
+
+class ImpactOut(BaseModel):
+    total_kg: Decimal
+    co2_kg: Decimal
+    pickups: int
+    earned_kobo: int
+    earned_points: Decimal
+    by_material: list[MaterialImpact]

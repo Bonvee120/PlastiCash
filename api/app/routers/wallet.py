@@ -9,8 +9,8 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from app.auth import UserProfile
 from app.db import get_session
 from app.models import LedgerEntry, Withdrawal
-from app.schemas import LedgerEntryOut, WalletOut, WithdrawalCreate, WithdrawalOut, points
-from app.services import ledger, withdrawals
+from app.schemas import ImpactOut, LedgerEntryOut, WalletOut, WithdrawalCreate, WithdrawalOut, points
+from app.services import impact, ledger, withdrawals
 
 router = APIRouter(tags=["wallet"])
 
@@ -56,3 +56,9 @@ async def my_withdrawals(me: UserProfile, session: SessionDep) -> list[Withdrawa
         await session.exec(select(Withdrawal).where(Withdrawal.user_id == me.id).order_by(Withdrawal.created_at.desc()))
     ).all()
     return [WithdrawalOut.from_withdrawal(w) for w in rows]
+
+
+@router.get("/impact", response_model=ImpactOut)
+async def my_impact(me: UserProfile, session: SessionDep) -> ImpactOut:
+    data = await impact.for_user(session, me.id)
+    return ImpactOut(**data, earned_points=points(data["earned_kobo"]))

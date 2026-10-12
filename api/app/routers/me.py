@@ -8,11 +8,13 @@ from sqlalchemy.exc import IntegrityError
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from app.auth import AuthUser, CurrentProfile, get_auth_user
+from app.auth import AuthUser, CurrentProfile, UserProfile, get_auth_user
 from app.db import get_session
 from app.errors import ApiError
 from app.models import AccountType, Profile, Role
-from app.schemas import MeOut, ProfileCreate, ProfileUpdate
+from app.schemas import BankIn, BankOption, BankResolveOut, MeOut, ProfileCreate, ProfileUpdate
+from app.services import paystack
+from app.services.paystack import PaystackError
 
 router = APIRouter(tags=["me"])
 
@@ -77,4 +79,60 @@ async def update_me(body: ProfileUpdate, profile: CurrentProfile, session: Sessi
         raise phone_taken_error()
     for key, value in changes.items():
         setattr(profile, key, value)
+    return MeOut.from_profile(await save(session, profile))
+
+
+# ----- Bank details (payouts go only to a checked account) -----
+
+
+def _paystack_error(error: PaystackError) -> ApiError:
+    if error.not_sent and error.status_code and error.status_code < 500:
+        return ApiError(422, "ACCOUNT_NOT_FOUND",
+                        "That account number didn't match a bank account. Check the number and the bank.")
+    return ApiError(502, "PAYSTACK_UNAVAILABLE", "We couldn't reach the bank check. Try again in a minute.")
+
+
+async def _bank_name(code: str) -> str:
+    try:
+        banks = await paystack.list_banks()
+    except PaystackError as error:
+        raise _paystack_error(error) from None
+    name = next((b["name"] for b in banks if b["code"] == code), None)
+    if name is None:
+        raise ApiError(422, "VALIDATION_ERROR", "Choose a bank from the list.")
+    return name
+
+
+@router.get("/banks", response_model=list[BankOption])
+async def banks(_: CurrentProfile) -> list[BankOption]:
+    try:
+        return [BankOption(**b) for b in await paystack.list_banks()]
+    except PaystackError as error:
+        raise _paystack_error(error) from None
+
+
+@router.post("/me/bank/resolve", response_model=BankResolveOut)
+async def resolve_bank(body: BankIn, _: UserProfile) -> BankResolveOut:
+    """Show the account holder's name before saving, so the user can check it's theirs."""
+    bank_name = await _bank_name(body.bank_code)
+    try:
+        account_name = await paystack.resolve_account(body.account_number, body.bank_code)
+    except PaystackError as error:
+        raise _paystack_error(error) from None
+    return BankResolveOut(bank_name=bank_name, account_name=account_name)
+
+
+@router.post("/me/bank", response_model=MeOut)
+async def save_bank(body: BankIn, profile: UserProfile, session: SessionDep) -> MeOut:
+    """Check the account with the bank again (never trust the name from the browser), create the Paystack
+    transfer recipient, then save. Withdrawals use a snapshot of these details."""
+    bank_name = await _bank_name(body.bank_code)
+    try:
+        account_name = await paystack.resolve_account(body.account_number, body.bank_code)
+        recipient = await paystack.create_recipient(account_name, body.account_number, body.bank_code)
+    except PaystackError as error:
+        raise _paystack_error(error) from None
+    profile.bank_name, profile.bank_code = bank_name, body.bank_code
+    profile.account_number, profile.account_name = body.account_number, account_name
+    profile.paystack_recipient_code = recipient
     return MeOut.from_profile(await save(session, profile))
