@@ -45,8 +45,10 @@ One entry per day: what was done, what broke, what's next.
 
 - 2.4 done: `tests/test_ledger_constraints.py`. A second `PICKUP_CREDIT` for the same pickup fails on `ledger_one_credit_per_pickup`; two different pickups can each be credited; the index is partial, so an `ADJUSTMENT` that refers to an already credited pickup is still allowed. With the index dropped, a pickup takes two credits, so the test can fail. Shared row helpers moved to `tests/factories.py`. `pytest`: 18 passed.
 
+- 2.5 (test DB side) done: `scripts/seed.py` adds 8 people (admin, 2 collectors with one at the hub, Chinaza Okafor and 2 more individuals including a verified picker, Green Hills School and a company), 6 price versions (an old PET ₦170 and today's prices with WARM CO₂ factors; sack and items-per-kg are placeholders), 20 pickups covering every status (one DISPUTED, one under the 50 kg minimum, one pooled request, hub walk-ins, one pickup at the old price), 11 ledger entries, 3 withdrawals (PAID, PENDING, FAILED with reversal) and 5 bales within raw stock. `app/areas.py` holds the 14 Enugu areas. On Supabase the seed creates confirmed Auth accounts through the Admin API (`<key>@example.com`, password `SEED_PASSWORD` from `api/.env`, 12+ characters); it refuses to run on a database that already has profiles. `tests/test_seed.py` checks balances by hand, one credit per completed pickup, item totals, the price snapshot and raw stock. `pytest`: 25 passed. The CLI was also run end to end on a throwaway database (seed, refusal on rerun, missing-config message), then the database was dropped.
+- Found and fixed: the seed first inserted COMPLETED pickups before their totals, and the `completed_has_amount` check rejected them. Pickups now get their id, items and totals before the insert.
+
 **Next**
-- 2.5: `scripts/seed.py`.
-- 2.3 (Supabase side): create `api/.env` with `DATABASE_URL` (session pooler or direct connection) and run `alembic upgrade head` on Supabase.
+- 2.3 and 2.5 (Supabase side): fill `DATABASE_URL`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` and `SEED_PASSWORD` in `api/.env`, then `alembic upgrade head` and `python -m scripts.seed` on Supabase. That closes Step 2.
 - 0.1: 2 real conversations with evidence and a price board photo; then the final, named sign-off of `RESEARCH.md`.
 - Remove the ngrok test webhook URL from the Paystack dashboard once the tunnel is closed.

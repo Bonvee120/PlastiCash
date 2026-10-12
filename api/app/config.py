@@ -37,6 +37,8 @@ class Settings(BaseSettings):
     auto_confirm_hours: int = 48
     sms_enabled: bool = False
 
+    seed_password: str = ""  # scripts/seed.py only: password for the demo Supabase Auth accounts
+
 
 @lru_cache
 def get_settings() -> Settings:
