@@ -1,7 +1,8 @@
 fastapi==0.143.0
 uvicorn[standard]==0.54.0
 sqlmodel==0.0.48
-psycopg[binary]==3.3.6
+asyncpg==0.32.0
+greenlet==3.5.6  # needed by SQLAlchemy's asyncio layer
 pydantic-settings==2.15.0
 alembic==1.20.0
 pyjwt[crypto]==2.15.1
@@ -9,4 +10,5 @@ httpx==0.28.1
 
 # tests
 pytest==9.1.1
+pytest-asyncio==1.4.0
 respx==0.23.1

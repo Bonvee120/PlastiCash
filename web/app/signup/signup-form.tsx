@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
 
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createClient } from "@/lib/supabase/client";
@@ -88,9 +87,9 @@ export function SignupForm() {
         <Label htmlFor="confirm">Confirm password</Label>
         <Input id="confirm" name="confirm" type="password" autoComplete="new-password" required />
       </div>
-      <Button type="submit" size="lg" disabled={pending}>
+      <button type="submit" className="d-btn d-btn-primary d-btn-block" disabled={pending}>
         {pending ? "Creating account…" : "Create account"}
-      </Button>
+      </button>
     </form>
   );
 }

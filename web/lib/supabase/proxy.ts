@@ -3,7 +3,8 @@ import { type NextRequest, NextResponse } from "next/server";
 
 // Areas that need a logged-in user. Which role may enter which area is checked by the area layouts
 // (UX only); the API checks role and ownership on every call.
-const PROTECTED = ["/app", "/collector", "/ops-portal"];
+const PROTECTED = ["/app", "/collector", "/ops-portal", "/signup/details"];
+// Exact paths only: /signup/details (sign-up step 2) is for logged-in users.
 const AUTH_PAGES = ["/login", "/signup"];
 
 const startsWithAny = (path: string, prefixes: string[]) =>
@@ -36,6 +37,8 @@ export async function updateSession(request: NextRequest) {
   const loggedIn = Boolean(data?.claims);
   const path = request.nextUrl.pathname;
 
+  // Next strips its prefetch headers before this runs, so a redirect here also hits background link prefetches
+  // (Next then logs a 404 in the console). Links between logged-in and logged-out pages use prefetch={false}.
   if (!loggedIn && startsWithAny(path, PROTECTED)) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
@@ -43,7 +46,7 @@ export async function updateSession(request: NextRequest) {
     return redirectKeepingCookies(url, response);
   }
 
-  if (loggedIn && startsWithAny(path, AUTH_PAGES)) {
+  if (loggedIn && AUTH_PAGES.includes(path)) {
     const url = request.nextUrl.clone();
     url.pathname = "/app";
     url.search = "";

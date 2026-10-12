@@ -1,0 +1,183 @@
+/*
+ * PlastiCash design tokens (docs/DESIGN_BRIEF.md §5): shadcn/ui variables, brand colours, fonts, radius, shadows,
+ * d-btn sizes. Imported by web/app/globals.css after Tailwind. Light mode only for the MVP.
+ * The daisyUI plugin and its `plasticash` theme sit in web/app/globals.css, because `@plugin "daisyui"` must
+ * resolve from web/node_modules. Keep the hex values there identical to the ones here.
+ * Fonts come from next/font in web/app/layout.tsx as --font-bricolage, --font-jakarta and --font-geist-mono.
+ */
+
+@theme inline {
+  /* Fonts (§5.4) */
+  --font-sans: var(--font-jakarta);
+  --font-display: var(--font-bricolage);
+  --font-mono: var(--font-geist-mono);
+
+  /* shadcn semantic colours */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Brand names from the brief (§5.2), e.g. bg-forest, text-heading, bg-mint, text-gold */
+  --color-primary-dark: #14532D;
+  --color-forest: #052E16;
+  --color-heading: #0B3B20;
+  --color-leaf: #22C55E;
+  --color-mint: #DCFCE7;
+  --color-mist: #F0FDF4;
+  --color-amber: #F59E0B;
+  --color-gold: #FBBF24;
+  --color-cream: #FEF3C7;
+  --color-ink: #0F172A;
+  --color-canvas: #F8FAFC;
+  --color-danger: #DC2626;
+
+  /* Shape (§5.6) */
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: var(--radius); /* 12px: inputs */
+  --radius-xl: 14px; /* buttons */
+  --radius-2xl: 20px; /* cards */
+  --radius-3xl: 24px; /* hero and wallet cards */
+  --radius-input: 12px;
+  --radius-button: 14px;
+  --radius-card: 20px;
+  --radius-hero: 24px;
+
+  /* Depth: soft, green-tinted, only on raised elements */
+  --shadow-raised: 0 18px 36px -18px rgb(5 46 22 / 0.8);
+  --shadow-primary: 0 10px 24px -10px rgb(21 128 61 / 0.6);
+  --shadow-toast: 0 20px 40px -16px rgb(5 46 22 / 0.6);
+}
+
+:root {
+  --background: #F8FAFC; /* canvas */
+  --foreground: #0F172A; /* ink */
+  --card: #FFFFFF;
+  --card-foreground: #0F172A;
+  --popover: #FFFFFF;
+  --popover-foreground: #0F172A;
+  --primary: #15803D;
+  --primary-foreground: #FFFFFF;
+  --secondary: #DCFCE7; /* mint */
+  --secondary-foreground: #0B3B20;
+  --muted: #F1F5F9;
+  --muted-foreground: #64748B; /* "muted" text in the brief */
+  --accent: #F0FDF4; /* mist: hover and selected backgrounds in shadcn menus */
+  --accent-foreground: #0B3B20;
+  --destructive: #DC2626;
+  --border: #E2E8F0;
+  --input: #CBD5E1;
+  --ring: #22C55E; /* leaf focus ring */
+  --radius: 0.75rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    @apply font-sans;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display text-heading;
+    letter-spacing: -0.025em;
+  }
+  /* Visible focus everywhere: 3 px leaf ring with a 2 px offset (§14) */
+  :focus-visible {
+    outline: 3px solid var(--color-leaf);
+    outline-offset: 2px;
+  }
+}
+
+/* Buttons are daisyUI d-btn (§7). Heights: 52 default, 58 large, 40 small, 56 collector.
+   daisyUI 5 sizes a button from its --d-size, --d-btn-p and --d-fontsize variables (the d- prefix renames them too)
+   and paints it from --d-btn-* variables
+   guarded by high-specificity :not(...) selectors; its rules win the cascade over plain overrides. So sizes set those
+   variables with !important (a Tailwind h-* utility still wins, since it sets height directly), and the colour
+   variants use !important on the properties daisyUI guards. */
+.d-btn {
+  /* daisyUI's own size variables; !important because daisyUI's rules win the cascade otherwise */
+  --d-size: 52px !important;
+  --d-btn-p: 20px !important;
+  --d-fontsize: 16px !important;
+  font-weight: 700;
+  gap: 10px;
+}
+.d-btn.d-btn-sm {
+  --d-size: 40px !important;
+  --d-btn-p: 14px !important;
+  --d-fontsize: 14px !important;
+  border-radius: 12px;
+}
+.d-btn.d-btn-lg {
+  --d-size: 58px !important;
+  --d-fontsize: 17px !important;
+}
+.d-btn.d-btn-collector {
+  --d-size: 56px !important;
+  width: 100%;
+}
+.d-btn.d-btn-primary {
+  box-shadow: var(--shadow-primary);
+}
+.d-btn.d-btn-outline {
+  background-color: #FFFFFF !important;
+  color: var(--color-ink) !important;
+  border-color: transparent !important;
+  box-shadow: inset 0 0 0 1.5px var(--input) !important;
+}
+.d-btn.d-btn-outline:hover {
+  background-color: var(--color-mist) !important;
+  box-shadow: inset 0 0 0 1.5px var(--color-primary) !important;
+}
+.d-btn.d-btn-glass {
+  background-color: rgb(255 255 255 / 0.14) !important;
+  color: #FFFFFF !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+.d-btn.d-btn-glass:hover {
+  background-color: rgb(255 255 255 / 0.22) !important;
+}
+.d-btn.d-btn-danger {
+  background-color: #FFFFFF !important;
+  color: #B91C1C !important;
+  border-color: transparent !important;
+  box-shadow: inset 0 0 0 1.5px #FCA5A5 !important;
+}
+
+/* Numbers, kg, refs and codes: Geist Mono with tabular figures */
+@utility tabular {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* "Overline" in the brief: mono caps with +12% tracking. Named eyebrow because Tailwind already has an overline utility (text decoration). */
+@utility eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}

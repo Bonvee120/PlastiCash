@@ -20,8 +20,8 @@ Free tiers to know about: Supabase pauses inactive free projects, and Render's f
 `api/.env` (never committed; add `api/.env.example` with empty values):
 
 ```
-DATABASE_URL=postgresql+psycopg://...        # Supabase connection string (session pooler or direct)
-TEST_DATABASE_URL=postgresql+psycopg://postgres:postgres@localhost:5433/plasticash_test
+DATABASE_URL=postgresql+asyncpg://...        # Supabase connection string (session pooler port 5432, or direct)
+TEST_DATABASE_URL=postgresql+asyncpg://postgres:postgres@localhost:5433/plasticash_test
 SUPABASE_URL=https://xxxx.supabase.co
 SUPABASE_JWT_SECRET=                          # only if the project uses legacy HS256 JWTs; else JWKS is used
 SUPABASE_SERVICE_ROLE_KEY=                    # server only: creating collector accounts

@@ -13,10 +13,11 @@ export default function SignupPage() {
     <AuthCard
       title="Create your account"
       description="Sell your plastic by weight and get paid to your bank."
+      step={{ current: 1, total: 2 }}
       footer={
         <span>
-          Already have an account?{" "}
-          <Link href="/login" className="font-medium text-primary underline-offset-4 hover:underline">
+          Have an account?{" "}
+          <Link href="/login" prefetch={false} className="font-bold text-primary underline-offset-4 hover:underline">
             Log in
           </Link>
         </span>

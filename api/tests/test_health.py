@@ -1,14 +1,14 @@
-from fastapi.testclient import TestClient
+from httpx import AsyncClient
 from sqlalchemy import text
-from sqlmodel import Session
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 
-def test_health(client: TestClient) -> None:
-    response = client.get("/api/v1/health")
+async def test_health(client: AsyncClient) -> None:
+    response = await client.get("/api/v1/health")
     assert response.status_code == 200
     assert response.json() == {"ok": True}
 
 
-def test_database_is_postgres(session: Session) -> None:
-    version = session.exec(text("show server_version")).scalar_one()
+async def test_database_is_postgres(session: AsyncSession) -> None:
+    version = (await session.exec(text("show server_version"))).scalar_one()
     assert version.startswith("16")

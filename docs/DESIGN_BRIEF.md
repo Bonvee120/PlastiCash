@@ -1,190 +1,400 @@
-# Design Brief
-## PlastiCash by EcoCyclers
+# PlastiCash Design Brief (web app)
 
-How PlastiCash should look, feel and read. Use it with `specs/03-screens-and-routes.md`, which lists every page.
+How PlastiCash looks, feels and reads. This brief describes the approved mockup:
+**https://claude.ai/artifact/NzdCNvD42EkacFsHtEqdXS**
+
+Read it with `specs/03-screens-and-routes.md` (every route) and `design/theme.css` (the tokens in code).
+Where it disagrees with the older `docs/DESIGN_BRIEF.md`, this brief wins.
+
+---
 
 ## 1. The product in one line
 
-PlastiCash pays people in Enugu for their plastic waste: request a pickup, get it weighed, get paid, see your impact.
+PlastiCash pays people in Enugu for their plastic waste. You request a pickup, it gets weighed in front of you, you get paid and you see your impact.
 
-## 2. Who we design for
+**1 point = ₦1.** Door pickup starts at 50 kg. The minimum withdrawal is ₦1,000. A weight auto-confirms after 48 hours.
 
-| Person | Situation | What they need from the design |
+## 2. Platform: a web app, mobile first
+
+PlastiCash is **one responsive web app** (Next.js) opened in a browser at `plasticash.ng`. It is not a native app.
+
+| Who | Where they open it | Design for |
 |---|---|---|
-| **Chinaza**, mother of three, Independence Layout | Mid-range Android phone, data is expensive, uses WhatsApp daily | Clear steps, few words, knows exactly what she will be paid and when |
-| **Emeka**, waste picker | Cheap Android, cracked screen, often outdoors in bright sun, limited reading | Huge buttons, icons with labels, high contrast, numbers he can trust, fast loading |
-| **Mrs Okoye**, admin officer at Green Hills School | Laptop and phone, reports to the principal | Professional look, the ESG report, a history she can show others |
-| **Collector** (EcoCyclers staff) | Phone in one hand, sack in the other, in the street | One action per screen, thumb-reachable buttons, works on a slow network |
-| **Admin** (EcoCyclers office) | Desktop | Dense, scannable tables, filters, nothing hidden |
+| Households (Chinaza) | Phone browser, slow or expensive data | 360 px first |
+| Organizations (Mrs Okoye, Green Hills School) | Laptop and phone | 1280 px and 360 px |
+| Collectors (Emeka) | Cheap Android phone, outdoors | 360 px only, high contrast |
+| EcoCyclers office (admin) | Desktop | 1280 px+, dense tables |
 
-Most users are on **phones with slow or expensive data**. Design for a 360 px wide screen first, then scale up.
+**Breakpoints (Tailwind):** `base` from 360 px, `md` from 768 px, `lg` from 1024 px, `xl` from 1280 px.
+Below `lg` the user area uses a top bar and a bottom nav. From `lg` up, a left sidebar replaces both.
+
+**Installable (PWA).** Saving the site to the home screen shows a green launch screen with the logo and "Made in Enugu · 1 point = ₦1". There is no browser bar in that mode.
 
 ## 3. Brand personality
 
 **Trustworthy, hopeful, local, simple.**
 
-- It handles people's money, so it must feel **reliable** like a bank app, not playful like a game.
-- It's about cleaner streets and earning, so it should feel **positive and green**, not preachy about the environment.
-- It's from **Enugu**, so it should use local names, local places and Nigerian photos, not foreign stock images.
-- **Plain words.** "Your plastic is money", not "Monetize your recyclable waste stream."
+- **Reliable:** it handles money, so it should feel like a bank, not a game.
+- **Positive and green:** about cleaner streets and earning. It never preaches.
+- **From Enugu:** local names, local streets and Nigerian photos only.
+- **Plain words:** "Your plastic is money.", not "Monetize your recyclable waste stream."
 
 ## 4. Design principles
 
-1. **Money is always clear.** Every amount shows points and naira: **2,450 pts (₦2,450)**. Never hide how a payout was calculated: show kg × price per material.
-2. **One main action per screen.** One primary button, so the user always knows what to do next.
-3. **Show where things are.** A pickup always shows its current step on a progress timeline.
-4. **Light on data.** Compress images, avoid autoplay video, show skeletons while loading, and keep the user dashboard under about 500 KB.
-5. **Readable outdoors.** High contrast, at least 16 px body text, tap targets at least 48 px.
-6. **Forgiving.** Confirm before anything with money; explain errors in plain words with what to do next.
+1. **Money is always clear.** Every amount shows points with naira: **2,450 pts (₦2,450)**. Payouts always show kg × price per material.
+2. **One main action per screen.** There is exactly one primary (green) button per view.
+3. **Show where things are.** Every pickup shows its step on a progress track.
+4. **Light on data.** Use WebP photos through Cloudinary and Skeleton loaders. No autoplay video. Keep the dashboard under about 500 KB.
+5. **Readable outdoors.** Body text is 16 px minimum, tap targets 48 px minimum, and collector buttons 56 px.
+6. **Forgiving.** Ask for confirmation before anything with money. Errors say what happened and what to do next.
+
+---
 
 ## 5. Visual identity
 
-### Logo
+### 5.1 Logo
 
-Wordmark **"PlastiCash"** with a simple mark: a bottle shape merged with a naira sign or a coin. Sub-line "by EcoCyclers". It must work in one colour and at 32 px (favicon, collector screen). Until a designer makes one, use the wordmark in the heading font with a Lucide `recycle` icon.
+- **Mark:** a PET bottle with the naira sign drawn inside. Two amber bars break out of the bottle (plastic becomes cash).
+  - Built on a 64-unit grid with an 18-unit corner radius.
+  - Files are in `design/logo/`: `plasticash-mark.svg`, `-reversed.svg` and `-mono.svg`.
+- **Wordmark:** "Plasti**Cash**" in Bricolage Grotesque ExtraBold with −3% tracking. "Cash" is green on light backgrounds and gold `#FBBF24` on dark ones.
+- **Sub-line:** "by EcoCyclers" in small caps with wide tracking.
+- **Minimum size:** 32 px, so it works as the favicon and on collector screens.
+- **Ops portal:** shows "OPS PORTAL" under the wordmark.
 
-### Colour palette
+### 5.2 Colour
 
 | Token | Hex | Use |
 |---|---|---|
-| `primary` | `#15803D` | Main buttons, links, active nav (green, readable on white) |
-| `primary-dark` | `#14532D` | Headings on light backgrounds, footer |
-| `primary-light` | `#DCFCE7` | Highlight backgrounds, selected cards |
-| `accent` | `#F59E0B` | Points, earnings, celebration moments (use dark text on it) |
-| `accent-light` | `#FEF3C7` | Wallet card background |
+| `primary` | `#15803D` | Primary buttons, links, active nav, progress |
+| `primary-dark` | `#14532D` | Gradients, deep accents |
+| `forest` | `#052E16` | Hero, ops sidebar, totals rows, dark screens |
+| `heading` | `#0B3B20` | Headings on light backgrounds |
+| `leaf` | `#22C55E` | Focus ring, progress gradient start, chart series 2 |
+| `mint` | `#DCFCE7` | Selected nav item, icon tiles, success badges |
+| `mist` | `#F0FDF4` | Selected cards, info panels |
+| `amber` | `#F59E0B` | Withdraw and "Start earning" buttons, ESG download, warnings (always with dark text `#0B3B20`) |
+| `gold` | `#FBBF24` | "pts" suffix and highlights on dark backgrounds |
+| `cream` | `#FEF3C7` | Wallet card, balance chip, countdown chip |
 | `ink` | `#0F172A` | Body text |
 | `muted` | `#64748B` | Secondary text |
-| `border` | `#E2E8F0` | Lines, card borders |
-| `surface` | `#FFFFFF` | Cards |
-| `background` | `#F8FAFC` | Page background |
-| `danger` | `#DC2626` | Errors, disputes |
-| `info` | `#2563EB` | Informational states |
+| `border` | `#E2E8F0` | Card borders and dividers |
+| `input` | `#CBD5E1` | Input borders |
+| `canvas` | `#F8FAFC` | Page background |
+| `danger` | `#DC2626` | Errors, disputes, "Something's wrong" |
 
-Set these once as CSS variables for shadcn (`--primary` etc.) **and** as the daisyUI theme, so both libraries use the same colours. Light mode only for the MVP.
+- The product is **light mode only** for the MVP.
+- Signature surfaces:
+  - **Wallet card:** a gradient from `#15803D` to `#052E16` with a faint logo watermark.
+  - **Hero:** a gradient from `#052E16` to `#166534` with a soft green glow.
 
-### Pickup status colours (badges and timeline)
+### 5.3 Pickup status badges
 
-| Status | Label shown to users | Colour |
+Every badge has a label and an icon. Colour is never used alone.
+
+| Status | Label | Background / text |
 |---|---|---|
-| REQUESTED | Requested | slate |
-| ASSIGNED | Collector assigned | blue |
-| EN_ROUTE | On the way | indigo |
-| AWAITING_CONFIRMATION | Please confirm | amber |
-| DISPUTED | Under review | red |
-| COMPLETED | Paid | green |
-| CANCELLED | Cancelled | slate, struck through |
+| REQUESTED | Requested | `#F1F5F9` / `#475569` |
+| ASSIGNED | Assigned | `#DBEAFE` / `#1D4ED8` |
+| EN_ROUTE | On the way | `#E0E7FF` / `#4338CA` |
+| AWAITING_CONFIRMATION | Please confirm | `#FEF3C7` / `#B45309` |
+| DISPUTED | Under review | `#FEE2E2` / `#B91C1C` |
+| COMPLETED | Paid | `#DCFCE7` / `#15803D` |
+| CANCELLED | Cancelled | `#F1F5F9` / `#94A3B8`, struck through |
 
-Never use colour alone: every badge also has a text label and an icon.
+### 5.4 Typography
 
-### Typography
+| Role | Font | Weights |
+|---|---|---|
+| Display, headings, balances | **Bricolage Grotesque** | 600–800, tracking −2% to −4.5% |
+| UI and body | **Plus Jakarta Sans** | 400–700 |
+| Numbers, kg, refs, codes, ledger | **Geist Mono** | 400–600, tabular figures |
 
-- **Headings:** Plus Jakarta Sans, 600–700 (Google Fonts, loaded via `next/font`).
-- **Body and UI:** Inter, 400–500.
-- **Numbers** (balances, kg): Inter with tabular figures, so columns line up.
-- Sizes (mobile): body 16, small 14, h3 20, h2 24, h1 30, balance figure 36. Desktop scales h1 to 44 on the landing page.
+All three are free on Google Fonts; load them with `next/font/google`. The mono face makes money columns line up, and it separates 0 from O and 1 from l in SMS codes.
 
-### Icons
+| Style | Phone | Laptop |
+|---|---|---|
+| Landing hero | 40 / 0.98 | 84 / 0.95 |
+| Section title (landing) | 30 | 46 |
+| Page title | 26 | 24 (top bar) |
+| Card title | 17 | 17–18 |
+| Body | 15–16 | 15 |
+| Small / help | 12–13 | 12–13 |
+| Overline (mono caps, +12% tracking) | 11 | 11–12 |
+| Balance figure | 46–48 | 54–60 |
 
-Lucide icons (they ship with shadcn), 24 px, 2 px stroke. Always paired with a text label on nav and buttons. Material icons per type: PET = bottle, Plastic = container, Sachet = droplet, Can = cylinder, Tin = box.
+### 5.5 Icons
 
-### Imagery
+- Use **Lucide** icons (they ship with shadcn): 20–24 px with a 2 px stroke. Always pair an icon with a text label in nav and on buttons.
+- Material icons:
+  - PET = `bottle`
+  - Cans = `cylinder`
+  - Hard plastic and tins = `package`
+  - Sachets = `droplet`
+- Icons sit on 40 px tiles with a 12 px radius, tinted with `mint`.
 
-- Real photos from Enugu: collectors in EcoCyclers uniform, sacks at the hub, a school handing over plastic, clean drains vs. clogged drains. Take them during your research visits.
-- Until then, use simple flat illustrations with Nigerian people, in the brand colours (e.g. from unDraw with the colour set to `#15803D`).
-- No foreign stock photos of beaches and turtles.
-- Images compressed (WebP), served through Cloudinary with automatic format and width.
+### 5.6 Shape, space and depth
 
-### Shape and spacing
+- **Radius:**
+  - Cards: 20 px (shadcn `--radius` 0.75rem is the base).
+  - Hero and wallet cards: 24 px.
+  - Buttons: 14 px.
+  - Inputs: 12 px.
+  - Badges and chips: pill.
+- **Spacing:** 8 px grid. Gutters are 16 px on phones and 32 px in the laptop content area. Cards use 18–24 px padding.
+- **Shadows:** soft and green-tinted (`rgba(5,46,22,…)`). Only raised elements get one: the wallet card, the primary button, the active pickup and toasts.
 
-- Corner radius 12 px on cards, 10 px on buttons and inputs, pills for badges.
-- 8 px spacing grid. Mobile page padding 16 px.
-- Soft shadows only on raised cards (wallet, active pickup).
+---
 
-## 6. Voice and copy
+## 6. Layout shells
 
-- Simple English, short sentences, second person ("Your pickup is on the way").
-- Greet by name: "Welcome, Chinaza" / "Welcome, Green Hills School".
-- Celebrate earnings: "You earned 2,450 pts from 13.5 kg of plastic."
-- Explain the 50 kg rule kindly: "About 12 kg so far. Door pickup starts at 50 kg. Keep saving, or drop it at our hub."
-- Errors say what happened and what to do: "That account number didn't match a bank account. Check the number and the bank."
-- Later: Igbo and Pidgin translations. Keep all text in one file so this is easy.
+### 6.1 Public site (`/`, `/guide`, `/login`, `/signup`)
 
-## 7. Motion (Framer Motion)
+- **Laptop:**
+  - Full-width forest hero, with the nav: logo, How it works, Prices, For organizations, Bottle guide, Log in, and "Start earning" (amber).
+  - Content runs to 1280 px with 72 px side padding.
+- **Phone:** the logo and a menu button, then the hero. Prices sit directly under the fold.
+- **Auth pages on a laptop:** a split screen. A 600 px photo carousel sits on the left and the form on the right, max 560 px wide.
 
-- Subtle and quick: 150–250 ms, ease-out.
-- Use it to explain change: page transitions, timeline step advancing, balance counting up when points are credited, collector marker gliding on the map.
-- One celebration only: a small confetti or pulse when a pickup is paid.
-- Respect `prefers-reduced-motion`: turn animations off.
-- Never animate on the collector screens beyond basic feedback; speed matters there.
+### 6.2 User area (`/app/...`)
 
-## 8. Feedback states
+- **Laptop:**
+  - **248 px white sidebar** containing:
+    - logo
+    - full-width green **Request pickup** button
+    - Home, Pickups, Wallet, Impact and Settings (the active item is mint)
+    - a help card at the bottom: hub address and "Chat on WhatsApp". Organizations see "Monthly ESG report" here instead.
+  - **Top bar:** page title and subtitle on the left. On the right: a balance chip ("2,450 pts (₦2,450)" on cream), notifications, then the avatar with name and account type.
+- **Phone:**
+  - Top area: greeting and notifications.
+  - **Bottom nav:** Home, **Request** (raised green square button in the middle), Pickups, Wallet, Impact.
 
-- **Loading:** shadcn Skeletons shaped like the content (cards, rows), never a blank screen.
-- **Toasts (Sonner):** success green, error red, bottom-centre on mobile, 4 s. Every form submit gets one.
-- **Empty states:** a small illustration, one line and one action. E.g. no pickups yet: "No pickups yet. Gather your plastic and request your first pickup." with a button.
-- **Offline/slow:** a thin banner "You're offline. We'll retry when you're back."
-- **Confirm dialogs** before: withdrawing, confirming a weight, raising a dispute, approving a withdrawal, resolving a dispute.
+### 6.3 Collector (`/collector/...`)
 
-## 9. Key screens: layout notes
+- Phone only, with a forest header.
+- One job per screen, with full-width 56 px buttons in this order: Start trip → Scan QR → Weigh → Get code.
+- No decoration and no motion beyond button feedback.
 
-### Landing page (`/`)
-1. **Hero:** headline "Your plastic is money.", sub-line "We pick up your plastic in Enugu, weigh it, and pay you.", primary button "Start earning", secondary "See prices". Photo or illustration of a family handing a sack to a collector.
-2. **Problem:** three short cards: no incentive, no convenience, no visibility, with the drains-and-floods photo.
-3. **How it works:** 5 numbered steps with icons in a row (stacked on mobile).
-4. **What we pay today:** live price cards per material from the API, with "about 50 bottles ≈ 1 kg" from the guide.
-5. **For individuals / For organizations:** two columns; the organization side mentions the ESG report.
-6. **Impact counter:** total kg recycled, points paid, CO₂ saved (animated count-up).
-7. **FAQ**, then a final call to action, and a footer with the hub address and a "Chat on WhatsApp" link.
+### 6.4 Ops portal (`/ops-portal/...`)
 
-### User dashboard (`/app`)
-- Top: "Welcome, Chinaza" and a small avatar.
-- **Wallet card** (amber-light background): big balance in points with naira under it, "Withdraw" button.
-- **Active pickup card**: status badge, timeline, and a map preview when the collector is on the way.
-- Big primary button: **"Request pickup"**.
-- Impact strip: kg recycled · CO₂ saved · pickups.
-- Bottom nav with 5 items: Home, Request, Pickups, Wallet, Impact.
+- Desktop with a **240 px forest sidebar** containing Overview, Pickups (count), Disputes (red count), Withdrawals (count), Prices, Users and collectors, and Stock and bales.
+- The content area uses 30 px padding, a 32 px page title, filter inputs at the top right, then stat cards and tables.
+- The portal is not linked from the public site.
 
-### Request pickup (`/app/request`)
-- A stepper (1 of 5) at the top; one question per step, "Back" and "Next" at the bottom within thumb reach.
-- Materials as large toggle cards with icons.
-- Estimate step: +/– counters for sacks, bags or bottles, with a **live progress bar to 50 kg** and the estimated payout updating as they tap.
-- Photo step: camera button, preview.
-- Location: map with a draggable pin, "Use my location" button, address field, area dropdown.
-- Review: summary card, then "Request pickup".
+---
 
-### Pickup detail (`/app/pickups/[id]`)
-- Vertical timeline of steps with times.
-- While the collector is on the way: full-width map, collector's first name, "on the way" text, and the QR code in a card ("Show this to your collector").
-- While awaiting confirmation: weight table (material · kg · price · amount), the collector's photo, total in big text, two buttons **"Confirm and get paid"** (primary) and **"Something's wrong"** (outline), and a countdown "Auto-confirms in 41 h".
+## 7. Components (daisyUI `d-` prefix + shadcn/ui)
 
-### Collector job (`/collector/pickups/[id]`)
-- Full-width buttons, 56 px tall, one step at a time: **Start trip → Scan QR → Weigh → Get code**.
-- Weigh screen: one row per material with large number inputs (numeric keyboard), deduction toggle, photo button, running total at the bottom.
-- High contrast, no decoration.
+The rule from the spec: **daisyUI for buttons, badges, progress and carousels; shadcn for forms, dialogs, drawers, toasts and tables.** Both libraries read one palette from `theme.css`.
 
-### Admin portal (`/ops-portal`)
-- Left sidebar on desktop; data tables with filters and status badges.
-- Pickups board: columns by status (kanban-style) or a table with an "area totals" bar on top showing estimated kg per area for pooling.
-- Disputes: two photos side by side with the weights under each.
-- Stock: cards per material (raw kg, bales in store / processed / sold), bales table.
+| Component | Built with | Notes |
+|---|---|---|
+| Button | `d-btn` | Variants: primary (green), accent (amber), outline, ghost, danger (red outline), glass (on dark). Heights: 52 default, 58 large, 40 small, 56 collector |
+| StatusBadge | `d-badge` | Table in 5.3; icon + label |
+| Progress to 50 kg | `d-progress` | Leaf-to-green gradient, 12 px tall, with the "N kg more for a door pickup" label |
+| Stepper | custom | Phone: 5 segments + "Step n of 5". Laptop: numbered circles joined by lines (done = mint ✓, current = green) |
+| Timeline | custom | Vertical on phone, horizontal on laptop; done = green ✓, waiting = amber with a halo |
+| MoneyDisplay | custom | Big Bricolage figure + gold/amber "pts" + mono "(₦…)" line |
+| Wallet card | custom | Forest gradient, Withdraw (accent) + History (glass) |
+| Counter | custom | − value + for sacks, bags and bottles; the plus side is green |
+| Material toggle card | custom | Selected = 2 px green border, mist fill, green tick |
+| Inputs, Select | shadcn `Input`, `Select` | 52 px tall; focus = 2 px green; error = 2 px red + message under the field |
+| InputOTP | shadcn `InputOTP` | 6 boxes, mono 24 px |
+| Withdraw confirm | shadcn `Drawer` (phone) / `Dialog` (laptop) | Shows the amount, bank and arrival time before money moves |
+| Toasts | Sonner | Forest background; bottom-centre on phone, bottom-right on laptop; 4 s |
+| Data table | shadcn `Table` | Mono numbers right-aligned; mono uppercase header on `canvas` |
+| Weight table | shadcn `Table` | Material · kg · ₦/kg · points; deduction rows in amber, indented; forest total row |
+| Map | Leaflet | Muted green base map; the collector is an amber marker with a truck; home is a green dot; dotted route; "6 min · 1.2 km away" chip |
+| QR card | `qrcode.react` | Logo in the centre; caption "Show this to your collector" |
+| Carousel | `d-carousel` + small script | See section 8 |
+| Skeleton | shadcn `Skeleton` | Shaped like the content; never a blank screen |
 
-### ESG report PDF (organizations)
-A4, one page: logo and organization name at the top; period; big numbers (kg recycled, CO₂ saved, pickups); a table by material; a short statement "Green Hills School diverted 1,240 kg of plastic from Enugu's drains in 2026"; an EcoCyclers sign-off. Same colours and fonts as the app.
+---
 
-## 10. Accessibility
+## 8. Carousels
 
-- WCAG AA contrast for all text (the palette above passes on white for `primary`, `ink` and `muted`).
-- Visible focus rings on everything.
-- Labels on every input, not just placeholders.
-- Errors announced and shown next to the field.
-- Everything works without hover (touch first).
+Three carousels appear in the mockup. All of them follow these rules:
 
-## 11. Physical brand (beyond the app)
+- They pause when the user prefers reduced motion.
+- Every slide can be reached with dots and with arrows or swipes.
+- Dots are 8 px. The active dot stretches to 26 px: green on light backgrounds, gold on dark.
 
-- **EcoCyclers sack:** one standard size, green with the logo and "Fill me with bottles. We pay." It anchors the estimate in the app ("3 full sacks").
-- **Collector uniform/vest** with the logo and staff ID, which builds trust at the gate.
-- **Hub signboard** with today's prices, which also matches the prices in the app.
+| Where | Behaviour |
+|---|---|
+| **Landing hero** (`/`, laptop) | Three slides, cross-fade, auto-advance every 5 s, prev/next arrows + dots. Each slide pairs a headline with a photo |
+| **Landing hero** (`/`, phone) | Photo-only carousel above the headline, auto-advance 4.5 s |
+| **Sign-up** (`/signup`, laptop) | Full-height photo panel, 3 slides with headline + one line, auto-advance 4.5 s |
+| **Welcome** (`/welcome`, phone, first visit only) | Three swipeable slides with a bottom sheet: copy, dots, **Skip** and **Next**. The last slide's button says **Get started** |
+| **Stories from Enugu** (`/`) | Horizontal scroll-snap row of 380 px story cards with arrow buttons; no auto-advance |
 
-## 12. What to hand Claude Code
+Welcome slide copy:
+1. "Your plastic is money." Gather bottles, cans and sachets. We buy them by the kilo, and you see the price before we come.
+2. "We weigh it in front of you." A verified collector comes to your gate. Every kilo is weighed and photographed.
+3. "Paid in seconds. Withdraw anytime." Confirm the weight and points land in your wallet. 1 point = ₦1, sent to any Nigerian bank.
 
-This file plus `specs/03-screens-and-routes.md`. Ask it to set up the colour tokens, fonts and shared components (Button, Card, StatusBadge, MoneyDisplay, Timeline, EmptyState, Stepper) first, then build the screens with them.
+---
+
+## 9. Pages
+
+Every route below exists in the mockup. **L** = laptop layout, **P** = phone layout.
+
+### Public
+- **`/` Landing**
+  - L + P.
+  - Hero carousel ("Your plastic is money.", Start earning, See today's prices).
+  - Price cards per kg: PET ₦180, cans ₦250, hard plastic ₦120, sachets ₦90, tins ₦60. The top seller is shown on forest. Each card carries a hint such as "≈ 50 bottles = 1 kg".
+  - "Stories from Enugu" carousel.
+  - Impact band: kg recycled, points paid, CO₂ avoided.
+  - Still to design (in the spec but not yet in the mockup): how it works, for individuals and organizations, FAQ, and the footer with the hub address and WhatsApp.
+- **`/guide`:** bottles per kg per material, a photo of one full sack, and the hub address and hours (14 Ogui Road, Mon–Sat 8 am to 5 pm).
+- **`/signup`:**
+  - Layout: L split screen with the carousel; P is a form with step segments.
+  - Step 2 asks "Who's recycling?" with Just me / Organization cards, then full name, phone (+234), area and street.
+- **`/login`:** a hub photo header on P, then email, password, "Forgot password?", Log in, and "Chat with us on WhatsApp".
+
+### User
+- **`/app` Dashboard**
+  - L shows the wallet and the active pickup side by side. P stacks them.
+  - Wallet card.
+  - "Got another sack ready?" call-to-action.
+  - Three impact stats: kg, CO₂, pickups.
+  - Active pickup card: map, collector, 5-step track and "Show my QR code".
+  - Recent activity table.
+  - Enugu photo banner: "4,120 kg kept out of our drains".
+- **`/app/notifications`** (P): pickup, payment and price alerts, using the same words as the SMS messages.
+- **`/app/request`:** five steps.
+  - **1 Materials:** large toggle cards.
+  - **2 Estimate:** counters per material. L adds a sticky estimate panel with kg, points, the progress bar to 50 kg and the two under-50 kg options ("Join the next area pickup day" or "Drop it at the hub").
+  - **3 Photo:** camera and preview.
+  - **4 Location and time:** draggable map pin, "Use my location", area, date and window.
+  - **5 Review:** summary card, then Request pickup.
+  - **Sent:** clear next step.
+- **`/app/pickups`:** filter chips (All, Active, Paid) and rows grouped by month with badges.
+- **`/app/pickups/[id]`:**
+  - **On the way:** map with the distance chip, the collector with a verified badge and call/message buttons, and the QR card.
+  - **Please confirm:**
+    - Progress track: horizontal on L, vertical on P.
+    - "Auto-confirms in 41 h 12 m" chip.
+    - The collector's scale photo next to the weight table: PET 21.30 kg; −0.60 kg for "wet, caps on"; cans 3.80 kg; total **4,676 pts (₦4,676)** for 24.50 kg net.
+    - Buttons: **Confirm and get paid** (primary) and **Something's wrong** (danger outline).
+    - SMS-code fallback.
+  - **Dispute:** reason radio cards, claimed kg (with "Emeka recorded 24.50 kg"), the user's photo and a note. The button is "Send for review".
+  - **Paid** (P): the one celebration: confetti, "+4,676 points", new balance, CO₂ saved, Withdraw to bank and Rate Emeka.
+- **`/app/wallet`**
+  - Cream balance card, verified bank row and withdraw form: quick amounts ₦1,000 / ₦2,000 / All, with the "Minimum ₦1,000" help text.
+  - L shows the full ledger table (date, what, status, points, running balance) with All / Earned / Withdrawals filters.
+  - The confirm step is a Drawer (P) or Dialog (L).
+- **`/app/settings`:** profile, and bank details. Picking a bank and entering the account number shows the resolved name ("CHINAZA OKAFOR") before Save.
+- **`/app/impact`**
+  - Individual: kg by material and CO₂.
+  - Organization:
+    - Photo stat "1,240 kg in 2026".
+    - Stats: 1,860 kg CO₂ avoided, 186,400 pts earned, 18 pickups.
+    - Stacked monthly bar chart: PET green, sachets leaf, cans amber.
+    - ESG report card with a month/year picker and an amber **Download PDF** button.
+- **ESG report PDF:** one A4 page in the same brand: logo, period, "Prepared for", big numbers, a by-material table, a statement line and the EcoCyclers sign-off.
+
+### Collector (P only)
+- **`/collector`:** forest header with the collector's name and ID and an "Online" pill. Day stats: done, kg to collect, route km. The job list is ordered; the next job is outlined, marked **NEXT** and has a **Start trip** button.
+- **`/collector/pickups/[id]`:**
+  - **Scan QR:** camera view with a match card.
+  - **Weigh:** one row per material with large numeric inputs, a deduction toggle with a reason, a photo, and a running total pinned at the bottom.
+  - **Get the code:** 6-digit OTP, or "She'll confirm on PlastiCash".
+- **`/collector/walk-in`:** search by phone, then the weigh step, then OTP.
+
+### Ops portal (L only)
+- **`/ops-portal/pickups`:**
+  - Stats: kg this month, points paid, pending withdrawals, open disputes, raw stock.
+  - Estimated-kg bars per area for pooling; areas under 50 kg are amber.
+  - Table with Assign and Add to pool actions, plus area and date filters.
+- **`/ops-portal/disputes`:** collector photo and customer photo side by side with each weight table and the customer's words. Then final kg per material, a note, and **Resolve and pay N pts**.
+- **`/ops-portal/withdrawals`:** queue table with user, amount, bank and status; select rows to approve in bulk; reject asks for a reason.
+- **`/ops-portal/stock`:** cards per material (raw kg; bales in store, processed and sold) and a bales table with status actions and real loss %.
+- **Still to design:** `/ops-portal` overview, prices and users. Build them with the same shell and table patterns.
+
+---
+
+## 10. Photography
+
+**Real photos from Enugu only.** That means Nigerian people, EcoCyclers vests and sacks, and recognisable streets. No foreign stock and no beaches or turtles.
+
+- **Look:** warm natural light, late morning or golden hour. Real faces and real hands, never staged smiles at the camera.
+- **Delivery:** WebP through Cloudinary (`f_auto,q_auto,w_…`).
+- **Text over photos:** add a dark forest gradient from the bottom so the text stays readable.
+- **Shot list:** the mockup labels every photo slot with the shot it needs.
+
+| # | Shot | Used on |
+|---|---|---|
+| 1 | Mother hands a sack of bottles to a collector at her gate, Independence Layout | Hero, sign-up, welcome 1 |
+| 2 | Collector in an amber vest weighs a sack on a hanging scale | Hero, sign-up, welcome 2, stories |
+| 3 | Young woman smiles at her phone on the porch as her points arrive | Sign-up, welcome 3, stories |
+| 4 | Green Hills students carry sacks of bottles across the school yard | Impact (organization), hero, stories |
+| 5 | Clean drain on Zik Avenue after a community pickup day | Dashboard banner, stories |
+| 6 | EcoCyclers hub on Ogui Road: bales, scale and today's price board | Log in, guide, stories |
+| 7 | One full EcoCyclers sack of PET bottles next to a 1 kg bundle | Bottle guide, request estimate |
+| 8 | Close-up of a scale reading (collector's proof photo) | Confirm weights, disputes |
+| 9 | Bales leaving the Ogui Road hub on a truck | Stories, ops |
+
+The photo slots in the mockup are illustrated placeholders. Figma's AI image credits ran out before real images could be generated.
+
+---
+
+## 11. Voice and copy
+
+- Use simple English, short sentences and second person: "Your pickup is on the way."
+- Greet by name: "Welcome, Chinaza" or "Welcome, Green Hills School".
+- Celebrate earnings with the reason: "You earned 4,676 pts from 24.5 kg of plastic. That's about 1,200 bottles out of Enugu's drains."
+- Explain the 50 kg rule kindly: "26 kg more for a door pickup. Join Saturday's area pickup day, or drop it at the hub."
+- Errors give the fix: "That account number didn't match a bank account. Check the number and the bank."
+- Keep all copy in one file so Igbo and Pidgin translations can be added later.
+
+## 12. Motion
+
+- **Timing:** 150–250 ms with ease-out. Carousels cross-fade over 600–700 ms.
+- **Use motion to explain change:**
+  - a timeline step advancing
+  - the balance counting up when points arrive
+  - the collector marker gliding on the map
+- **One celebration only:** confetti on the Paid screen.
+- **Respect `prefers-reduced-motion`:** turn off auto-advance, confetti and count-ups.
+- **Collector screens:** no motion beyond press feedback.
+
+## 13. Feedback states
+
+- **Loading:** Skeletons shaped like the content.
+- **Toasts:** every form submit gets one. Success uses forest with a green tick; errors use red.
+- **Empty states:** a small illustration, one line and one action. For example: "No pickups yet. Gather your plastic and request your first pickup."
+- **Offline:** a thin banner: "You're offline. We'll retry when you're back."
+- **Confirm dialogs** before:
+  - withdrawing
+  - confirming a weight
+  - raising a dispute
+  - approving a withdrawal
+  - resolving a dispute
+
+## 14. Accessibility
+
+- Meet WCAG AA contrast. Amber always carries dark text; white text on amber is not allowed.
+- Show visible focus rings: 3 px `leaf` with a 2 px offset.
+- Give every input a real label, not just a placeholder. Show errors next to the field and announce them.
+- Everything must work without hover. Carousels can be operated by keyboard and expose "Slide n" labels.
+- Status is never shown by colour alone.
+
+## 15. Physical brand
+
+- **EcoCyclers sack:** one standard size, green with the logo and two amber bands, printed "Fill me with bottles. We pay." The app's estimate counts in these sacks.
+- **Collector vest:** amber, with the logo and staff ID.
+- **Hub signboard:** shows today's prices, matching `/prices/current`.
+
+## 16. Hand-off to build
+
+1. Set up `design/theme.css` (daisyUI theme `plasticash` with prefix `d-`, plus the shadcn variables) and the three fonts.
+2. Build the shared components first: Button, StatusBadge, MoneyDisplay, Stepper, Timeline, WeightTable, Carousel, EmptyState, AppShell (sidebar + bottom nav) and OpsShell.
+3. Build the routes in `specs/06-build-order.md` order, checking each one against the mockup at both 360 px and 1280 px.
+4. Swap the photo placeholders for the shot list in section 10 as the photos come in.
+
+**Assets:**
+- `design/logo/` holds the logo SVGs.
+- `design/mockups/index.html` is the mockup source.
+- `design/mockups/png/` holds all 40 screens.
+- The Figma file is https://www.figma.com/design/1Q7WdEhbVsIjEm3saoBtoj. It has the brand system plus the earlier phone-app screens, not the web app layouts.

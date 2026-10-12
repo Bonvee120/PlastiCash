@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=API_DIR / ".env", extra="ignore")
 
     database_url: str = ""
-    test_database_url: str = "postgresql+psycopg://postgres:postgres@localhost:5433/plasticash_test"
+    test_database_url: str = "postgresql+asyncpg://postgres:postgres@localhost:5433/plasticash_test"
 
     supabase_url: str = ""
     supabase_jwt_secret: str = ""

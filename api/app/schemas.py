@@ -1,11 +1,13 @@
 """Request and response models. Database tables live in models.py."""
+from datetime import datetime
+from decimal import Decimal
 from typing import Literal
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from app.areas import AREAS
-from app.models import AccountType, Profile, Role
+from app.models import AccountType, LedgerEntry, LedgerType, Material, Price, Profile, Role, Withdrawal, WithdrawalStatus
 from app.phone import normalize_ng_phone
 
 OrgType = Literal["company", "school", "NGO", "church", "estate", "other"]
@@ -134,3 +136,104 @@ class MeOut(BaseModel):
             verified_picker=p.verified_picker,
             bank=bank,
         )
+
+
+def points(amount_kobo: int) -> Decimal:
+    """1 point = ₦1 = 100 kobo. Responses carry both amount_kobo and points (docs/specs/02-api.md)."""
+    return Decimal(amount_kobo) / 100
+
+
+class PriceOut(BaseModel):
+    id: UUID
+    material: Material
+    price_kobo_per_kg: int
+    points_per_kg: Decimal
+    kg_per_full_sack: Decimal
+    items_per_kg: int | None
+    co2_kg_saved_per_kg: Decimal
+    effective_from: datetime
+    set_by: UUID | None
+
+    @classmethod
+    def from_price(cls, p: Price) -> "PriceOut":
+        return cls(
+            id=p.id,
+            material=p.material,
+            price_kobo_per_kg=p.price_kobo_per_kg,
+            points_per_kg=points(p.price_kobo_per_kg),
+            kg_per_full_sack=p.kg_per_full_sack,
+            items_per_kg=p.items_per_kg,
+            co2_kg_saved_per_kg=p.co2_kg_saved_per_kg,
+            effective_from=p.effective_from,
+            set_by=p.set_by,
+        )
+
+
+# ----- Wallet and withdrawals -----
+
+
+class WithdrawalCreate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    amount_kobo: int = Field(gt=0)
+
+
+class RejectBody(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    reason: str = Field(min_length=1, max_length=300)
+
+
+class WithdrawalOut(BaseModel):
+    id: UUID
+    user_id: UUID
+    amount_kobo: int
+    points: Decimal
+    status: WithdrawalStatus
+    bank_name: str
+    account_name: str
+    account_number_last4: str
+    failure_reason: str | None
+    created_at: datetime
+    reviewed_at: datetime | None
+    paid_at: datetime | None
+
+    @classmethod
+    def from_withdrawal(cls, w: Withdrawal) -> "WithdrawalOut":
+        return cls(
+            id=w.id,
+            user_id=w.user_id,
+            amount_kobo=w.amount_kobo,
+            points=points(w.amount_kobo),
+            status=w.status,
+            bank_name=w.bank_name,
+            account_name=w.account_name,
+            account_number_last4=w.account_number[-4:],
+            failure_reason=w.failure_reason,
+            created_at=w.created_at,
+            reviewed_at=w.reviewed_at,
+            paid_at=w.paid_at,
+        )
+
+
+class LedgerEntryOut(BaseModel):
+    id: UUID
+    type: LedgerType
+    amount_kobo: int
+    points: Decimal
+    pickup_id: UUID | None
+    withdrawal_id: UUID | None
+    note: str | None
+    created_at: datetime
+
+    @classmethod
+    def from_entry(cls, e: LedgerEntry) -> "LedgerEntryOut":
+        return cls(
+            id=e.id, type=e.type, amount_kobo=e.amount_kobo, points=points(e.amount_kobo), pickup_id=e.pickup_id,
+            withdrawal_id=e.withdrawal_id, note=e.note, created_at=e.created_at,
+        )
+
+
+class WalletOut(BaseModel):
+    balance_kobo: int
+    points: Decimal
+    entries: list[LedgerEntryOut]
+    total_entries: int

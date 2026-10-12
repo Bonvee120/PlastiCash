@@ -43,7 +43,7 @@ Rules:
 | Feedback | Sonner toasts, shadcn Skeleton | Every form submit toasts |
 | Maps | Leaflet + OpenStreetMap (react-leaflet) | Client-only component |
 | QR | `qrcode` (show), `html5-qrcode` (scan) | Collector scans with phone camera |
-| Backend | Python 3.12, FastAPI, SQLModel, Alembic | Docker on Render |
+| Backend | Python 3.12, FastAPI (async), SQLModel `AsyncSession` on `asyncpg`, Alembic (async env) | Docker on Render |
 | Database | Supabase Postgres 15+ | Alembic owns the `public` schema |
 | Auth | Supabase Auth | JWT verified by FastAPI |
 | Realtime | Supabase Realtime (postgres_changes) | `pickups` only, RLS-filtered |
@@ -51,7 +51,7 @@ Rules:
 | SMS | Termii | OTP and reminders, behind `SMS_ENABLED` flag |
 | Media | Cloudinary | Signed uploads, auto format/width |
 | PDF | WeasyPrint | System libs installed in the Docker image |
-| Tests | pytest, httpx, respx | Real Postgres via docker compose |
+| Tests | pytest, pytest-asyncio, httpx `AsyncClient`, respx | Real Postgres via docker compose |
 
 ## 3. Authentication and authorization
 

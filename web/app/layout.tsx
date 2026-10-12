@@ -1,24 +1,36 @@
-import type { Metadata } from "next";
-import { Inter, Plus_Jakarta_Sans } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Bricolage_Grotesque, Geist_Mono, Plus_Jakarta_Sans } from "next/font/google";
+
 import { Toaster } from "@/components/ui/sonner";
 
 import "./globals.css";
 
-const inter = Inter({
-  variable: "--font-inter",
+// Fonts (docs/DESIGN_BRIEF.md §5.4): display and balances, UI and body, numbers and codes.
+const bricolage = Bricolage_Grotesque({
+  variable: "--font-bricolage",
   subsets: ["latin"],
-  weight: ["400", "500"],
+  weight: ["600", "700", "800"],
 });
 
 const jakarta = Plus_Jakarta_Sans({
   variable: "--font-jakarta",
   subsets: ["latin"],
-  weight: ["600", "700"],
+  weight: ["400", "500", "600", "700"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
 });
 
 export const metadata: Metadata = {
   title: "PlastiCash by EcoCyclers",
-  description: "Sell your plastic waste in Enugu by weight and get paid to your bank.",
+  description: "Your plastic is money. Sell your plastic in Enugu by weight and get paid to your bank.",
+};
+
+export const viewport: Viewport = {
+  themeColor: "#052E16",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -26,11 +38,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="en"
       data-theme="plasticash"
-      className={`${inter.variable} ${jakarta.variable} h-full antialiased`}
+      className={`${bricolage.variable} ${jakarta.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="flex min-h-full flex-col">
         {children}
-        <Toaster position="top-center" richColors />
+        <Toaster />
       </body>
     </html>
   );

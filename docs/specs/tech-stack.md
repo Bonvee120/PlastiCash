@@ -41,11 +41,11 @@ Cron (every 15 min, X-Cron-Secret) ──▶ FastAPI /jobs/reminders
 |---|---|---|
 | Language | Python 3.12 | |
 | Framework | FastAPI | Base URL `/api/v1`, JSON in and out |
-| ORM and migrations | SQLModel, Alembic | Alembic owns the `public` schema; Supabase schemas excluded |
-| DB driver | psycopg | `postgresql+psycopg://` URLs |
+| ORM and migrations | SQLModel (`AsyncSession`), Alembic (async env) | Alembic owns the `public` schema; Supabase schemas excluded |
+| DB access | Async: `async def` endpoints and dependencies, `asyncpg` driver | `postgresql+asyncpg://` URLs. asyncpg, not async psycopg: psycopg can't use Windows' default event loop. Use Supabase's session pooler (port 5432) or the direct connection; the transaction pooler (6543) breaks asyncpg's prepared statements |
 | HTTP client | httpx | Mocked with respx in tests |
 | PDF | WeasyPrint | System libraries installed in the Docker image |
-| Tests | pytest, httpx, respx | Real Postgres, never SQLite |
+| Tests | pytest, pytest-asyncio, httpx `AsyncClient`, respx | Real Postgres, never SQLite. Async tests share one event loop per session |
 | Runtime | Docker (`python:3.12-slim`) | `uvicorn app.main:app --host 0.0.0.0 --port $PORT` |
 
 ### Data (Supabase)

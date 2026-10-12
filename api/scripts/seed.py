@@ -12,6 +12,7 @@ Money follows the app rules: amounts are integer kobo, item amount = round_half_
 and every COMPLETED pickup has exactly one PICKUP_CREDIT.
 """
 import argparse
+import asyncio
 import sys
 from collections.abc import Callable
 from datetime import date, datetime, timedelta, timezone
@@ -20,7 +21,9 @@ from uuid import UUID, uuid4
 
 import httpx
 from sqlalchemy import func
-from sqlmodel import Session, create_engine, select
+from sqlalchemy.ext.asyncio import create_async_engine
+from sqlmodel import select
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 from app.config import get_settings
 from app.models import (
@@ -83,7 +86,7 @@ def ago(days: float = 0, hours: float = 0) -> datetime:
     return NOW - timedelta(days=days, hours=hours)
 
 
-def seed(session: Session, user_ids: dict[str, UUID]) -> dict[str, int]:
+async def seed(session: AsyncSession, user_ids: dict[str, UUID]) -> dict[str, int]:
     """Insert all demo rows in the caller's transaction. Returns row counts."""
     # ----- people -----
     people: dict[str, Profile] = {}
@@ -111,7 +114,7 @@ def seed(session: Session, user_ids: dict[str, UUID]) -> dict[str, int]:
         p.bank_name, p.bank_code, p.account_number, p.account_name = bank
         p.paystack_recipient_code = f"RCP_seed_{key}"
     session.add_all(people.values())
-    session.flush()
+    await session.flush()
     admin, ifeanyi, amaka = people["admin"], people["ifeanyi"], people["amaka"]
 
     # ----- prices (versioned) -----
@@ -137,12 +140,12 @@ def seed(session: Session, user_ids: dict[str, UUID]) -> dict[str, int]:
             set_by=admin.id,
         )
     session.add_all(prices.values())
-    session.flush()
+    await session.flush()
 
     # ----- pickups -----
     pickups: list[Pickup] = []
 
-    def add_pickup(
+    async def add_pickup(
         user: str,
         status: PickupStatus,
         days: float,
@@ -207,7 +210,7 @@ def seed(session: Session, user_ids: dict[str, UUID]) -> dict[str, int]:
             pickup.under_minimum = channel == PickupChannel.DOOR and total_kg < 50
 
         session.add(pickup)
-        session.flush()
+        await session.flush()
         session.add_all(rows)
 
         if status == PickupStatus.COMPLETED:
@@ -221,7 +224,7 @@ def seed(session: Session, user_ids: dict[str, UUID]) -> dict[str, int]:
                     created_at=pickup.confirmed_at,
                 )
             )
-        session.flush()
+        await session.flush()
         pickups.append(pickup)
         return pickup
 
@@ -229,56 +232,56 @@ def seed(session: Session, user_ids: dict[str, UUID]) -> dict[str, int]:
     PET, PLASTIC, SACHET, CAN, TIN = Material.PET, Material.PLASTIC, Material.SACHET, Material.CAN, Material.TIN
 
     # COMPLETED (7): door and hub, one at the old PET price, one under the 50 kg minimum
-    add_pickup("chinaza", P.COMPLETED, 40, collector=ifeanyi, sacks="5.5", confirmed_via=ConfirmedVia.APP,
+    await add_pickup("chinaza", P.COMPLETED, 40, collector=ifeanyi, sacks="5.5", confirmed_via=ConfirmedVia.APP,
                items=[(PET, "52.40", "1.20", "Wet bottles")], price_for=lambda m: old_pet)
-    add_pickup("chinaza", P.COMPLETED, 10, channel=S.HUB, collector=amaka, confirmed_via=ConfirmedVia.APP,
+    await add_pickup("chinaza", P.COMPLETED, 10, channel=S.HUB, collector=amaka, confirmed_via=ConfirmedVia.APP,
                items=[(PET, "18.50"), (CAN, "4.20")])
-    add_pickup("emeka", P.COMPLETED, 12, channel=S.HUB, collector=amaka, confirmed_via=ConfirmedVia.OTP,
+    await add_pickup("emeka", P.COMPLETED, 12, channel=S.HUB, collector=amaka, confirmed_via=ConfirmedVia.OTP,
                items=[(PET, "85.00"), (SACHET, "30.00", "2.00", "Sand and water in sachets")])
-    add_pickup("emeka", P.COMPLETED, 5, channel=S.HUB, collector=amaka, confirmed_via=ConfirmedVia.OTP,
+    await add_pickup("emeka", P.COMPLETED, 5, channel=S.HUB, collector=amaka, confirmed_via=ConfirmedVia.OTP,
                items=[(PLASTIC, "60.50"), (TIN, "12.00")])
-    add_pickup("greenhills", P.COMPLETED, 20, collector=ifeanyi, sacks="18", confirmed_via=ConfirmedVia.APP,
+    await add_pickup("greenhills", P.COMPLETED, 20, collector=ifeanyi, sacks="18", confirmed_via=ConfirmedVia.APP,
                scheduled_date=ago(days=19).date(), items=[(PET, "140.00"), (PLASTIC, "45.00")])
-    add_pickup("coalcity", P.COMPLETED, 15, collector=ifeanyi, sacks="27", confirmed_via=ConfirmedVia.AUTO,
+    await add_pickup("coalcity", P.COMPLETED, 15, collector=ifeanyi, sacks="27", confirmed_via=ConfirmedVia.AUTO,
                scheduled_date=ago(days=14).date(), reminders_sent=3, last_reminder_at=ago(days=13),
                items=[(PET, "210.00"), (CAN, "25.50"), (SACHET, "40.00")])
-    add_pickup("ngozi", P.COMPLETED, 8, collector=ifeanyi, sacks="3", pooled=True, confirmed_via=ConfirmedVia.APP,
+    await add_pickup("ngozi", P.COMPLETED, 8, collector=ifeanyi, sacks="3", pooled=True, confirmed_via=ConfirmedVia.APP,
                scheduled_date=ago(days=7).date(), items=[(PET, "32.75")])
 
     # DISPUTED (1)
-    add_pickup("ngozi", P.DISPUTED, 3, collector=ifeanyi, sacks="6", scheduled_date=ago(days=2).date(),
+    await add_pickup("ngozi", P.DISPUTED, 3, collector=ifeanyi, sacks="6", scheduled_date=ago(days=2).date(),
                items=[(PET, "55.00")], dispute_photo_url=DEMO_PHOTO, dispute_claimed_kg=Decimal("60.00"),
                dispute_reason="I weighed 6 full sacks at home before pickup", disputed_at=ago(days=2))
 
     # AWAITING_CONFIRMATION (2)
-    add_pickup("chinaza", P.AWAITING_CONFIRMATION, 1, collector=ifeanyi, sacks="5.5",
+    await add_pickup("chinaza", P.AWAITING_CONFIRMATION, 1, collector=ifeanyi, sacks="5.5",
                scheduled_date=ago(days=0).date(), reminders_sent=1, last_reminder_at=ago(hours=20),
                items=[(PET, "50.50"), (PLASTIC, "6.00")])
-    add_pickup("greenhills", P.AWAITING_CONFIRMATION, 0.2, collector=ifeanyi, sacks="10",
+    await add_pickup("greenhills", P.AWAITING_CONFIRMATION, 0.2, collector=ifeanyi, sacks="10",
                scheduled_date=ago(days=0).date(), items=[(PET, "95.00")])
 
     # EN_ROUTE (1): collector location stored only while EN_ROUTE
-    add_pickup("coalcity", P.EN_ROUTE, 2, collector=ifeanyi, sacks="20", scheduled_date=NOW.date(),
+    await add_pickup("coalcity", P.EN_ROUTE, 2, collector=ifeanyi, sacks="20", scheduled_date=NOW.date(),
                collector_lat=Decimal("6.452100"), collector_lng=Decimal("7.510500"), collector_location_at=ago(hours=0.05))
 
     # ASSIGNED (3)
     tomorrow = (NOW + timedelta(days=1)).date()
-    add_pickup("greenhills", P.ASSIGNED, 1, collector=ifeanyi, sacks="12", scheduled_date=tomorrow)
-    add_pickup("coalcity", P.ASSIGNED, 1, collector=ifeanyi, sacks="25", scheduled_date=tomorrow)
-    add_pickup("chinaza", P.ASSIGNED, 2, collector=ifeanyi, sacks="5", scheduled_date=tomorrow)
+    await add_pickup("greenhills", P.ASSIGNED, 1, collector=ifeanyi, sacks="12", scheduled_date=tomorrow)
+    await add_pickup("coalcity", P.ASSIGNED, 1, collector=ifeanyi, sacks="25", scheduled_date=tomorrow)
+    await add_pickup("chinaza", P.ASSIGNED, 2, collector=ifeanyi, sacks="5", scheduled_date=tomorrow)
 
     # REQUESTED (4): one pooled under-50 kg request
-    add_pickup("chinaza", P.REQUESTED, 0.5, sacks="2", pooled=True, estimate_note="2 rice sacks of bottles")
-    add_pickup("ngozi", P.REQUESTED, 0.3, sacks="6")
-    add_pickup("greenhills", P.REQUESTED, 0.2, sacks="12")
-    add_pickup("coalcity", P.REQUESTED, 0.1, sacks="20")
+    await add_pickup("chinaza", P.REQUESTED, 0.5, sacks="2", pooled=True, estimate_note="2 rice sacks of bottles")
+    await add_pickup("ngozi", P.REQUESTED, 0.3, sacks="6")
+    await add_pickup("greenhills", P.REQUESTED, 0.2, sacks="12")
+    await add_pickup("coalcity", P.REQUESTED, 0.1, sacks="20")
 
     # CANCELLED (2)
-    add_pickup("ngozi", P.CANCELLED, 25, sacks="5", cancelled_reason="Changed my mind")
-    add_pickup("chinaza", P.CANCELLED, 18, sacks="5", cancelled_reason="Duplicate request")
+    await add_pickup("ngozi", P.CANCELLED, 25, sacks="5", cancelled_reason="Changed my mind")
+    await add_pickup("chinaza", P.CANCELLED, 18, sacks="5", cancelled_reason="Duplicate request")
 
     # ----- withdrawals: PAID, PENDING, FAILED (with reversal) -----
-    def add_withdrawal(user: str, naira: int, status: WithdrawalStatus, days: float, **fields) -> Withdrawal:
+    async def add_withdrawal(user: str, naira: int, status: WithdrawalStatus, days: float, **fields) -> Withdrawal:
         owner = people[user]
         w = Withdrawal(
             user_id=owner.id,
@@ -293,19 +296,19 @@ def seed(session: Session, user_ids: dict[str, UUID]) -> dict[str, int]:
             **fields,
         )
         session.add(w)
-        session.flush()
+        await session.flush()
         session.add(LedgerEntry(user_id=owner.id, type=LedgerType.WITHDRAWAL_HOLD, amount_kobo=-w.amount_kobo,
                                 withdrawal_id=w.id, created_at=w.created_at))
         if status == WithdrawalStatus.FAILED:
             session.add(LedgerEntry(user_id=owner.id, type=LedgerType.WITHDRAWAL_REVERSAL, amount_kobo=w.amount_kobo,
                                     withdrawal_id=w.id, created_at=ago(days=days - 1)))
-        session.flush()
+        await session.flush()
         return w
 
-    add_withdrawal("chinaza", 5_000, WithdrawalStatus.PAID, 9, reviewed_by=admin.id, reviewed_at=ago(days=8.9),
+    await add_withdrawal("chinaza", 5_000, WithdrawalStatus.PAID, 9, reviewed_by=admin.id, reviewed_at=ago(days=8.9),
                    paystack_transfer_code="TRF_seed_paid", paid_at=ago(days=8.8))
-    add_withdrawal("greenhills", 20_000, WithdrawalStatus.PENDING, 1)
-    add_withdrawal("emeka", 3_000, WithdrawalStatus.FAILED, 4, reviewed_by=admin.id, reviewed_at=ago(days=3.9),
+    await add_withdrawal("greenhills", 20_000, WithdrawalStatus.PENDING, 1)
+    await add_withdrawal("emeka", 3_000, WithdrawalStatus.FAILED, 4, reviewed_by=admin.id, reviewed_at=ago(days=3.9),
                    paystack_transfer_code="TRF_seed_failed", failure_reason="Could not resolve account (Paystack test)")
 
     # ----- bales (total per material stays under raw stock) -----
@@ -320,10 +323,10 @@ def seed(session: Session, user_ids: dict[str, UUID]) -> dict[str, int]:
     ]:
         session.add(Bale(code=code, material=material, weight_kg=Decimal(kg), status=status, created_by=admin.id,
                          created_at=ago(days=12), **extra))
-    session.flush()
+    await session.flush()
 
     return {
-        table.__tablename__: session.exec(select(func.count()).select_from(table)).one()
+        table.__tablename__: (await session.exec(select(func.count()).select_from(table))).one()
         for table in (Profile, Price, Pickup, PickupItem, LedgerEntry, Withdrawal, Bale)
     }
 
@@ -355,6 +358,26 @@ def create_auth_users(supabase_url: str, service_key: str, password: str) -> dic
     return ids
 
 
+async def count_profiles(url: str) -> int:
+    engine = create_async_engine(url)
+    try:
+        async with AsyncSession(engine) as session:
+            return (await session.exec(select(func.count()).select_from(Profile))).one()
+    finally:
+        await engine.dispose()
+
+
+async def seed_database(url: str, user_ids: dict[str, UUID]) -> dict[str, int]:
+    engine = create_async_engine(url)
+    try:
+        async with AsyncSession(engine, expire_on_commit=False) as session:
+            counts = await seed(session, user_ids)
+            await session.commit()
+            return counts
+    finally:
+        await engine.dispose()
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--test", action="store_true", help="seed TEST_DATABASE_URL without Supabase Auth")
@@ -376,15 +399,11 @@ def main() -> None:
             sys.exit("Missing: " + ", ".join(missing))
         url = settings.database_url
 
-    engine = create_engine(url)
-    with Session(engine) as session:
-        if session.exec(select(func.count()).select_from(Profile)).one():
-            sys.exit("profiles is not empty; refusing to seed. Seed only a fresh database.")
-        if not args.test:
-            user_ids = create_auth_users(settings.supabase_url, settings.supabase_service_role_key, password)
-        counts = seed(session, user_ids)
-        session.commit()
-    engine.dispose()
+    if asyncio.run(count_profiles(url)):
+        sys.exit("profiles is not empty; refusing to seed. Seed only a fresh database.")
+    if not args.test:
+        user_ids = create_auth_users(settings.supabase_url, settings.supabase_service_role_key, password)
+    counts = asyncio.run(seed_database(url, user_ids))
 
     print("Seeded:", ", ".join(f"{table} {n}" for table, n in counts.items()))
     print("Logins: <key>@example.com, e.g. admin@, ifeanyi@ (collector), chinaza@, greenhills@ (organization)")

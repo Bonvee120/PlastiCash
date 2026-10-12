@@ -12,7 +12,7 @@ from uuid import UUID
 import jwt
 from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from sqlmodel import Session
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 from app.config import get_settings
 from app.db import get_session
@@ -63,7 +63,9 @@ def decode_token(token: str) -> dict:
 
 
 def get_auth_user(credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(bearer)]) -> AuthUser:
-    """Any valid Supabase user, even one without a profile yet (sign-up step 2)."""
+    """Any valid Supabase user, even one without a profile yet (sign-up step 2).
+    A plain `def` on purpose: fetching the JWKS keys (on a cache miss) is blocking network I/O, and FastAPI runs
+    `def` dependencies in a worker thread, so the event loop isn't stalled."""
     if credentials is None:
         raise unauthorized()
     claims = decode_token(credentials.credentials)
@@ -74,11 +76,11 @@ def get_auth_user(credentials: Annotated[HTTPAuthorizationCredentials | None, De
     return AuthUser(id=user_id, email=claims.get("email"))
 
 
-def get_current_profile(
+async def get_current_profile(
     auth_user: Annotated[AuthUser, Depends(get_auth_user)],
-    session: Annotated[Session, Depends(get_session)],
+    session: Annotated[AsyncSession, Depends(get_session)],
 ) -> Profile:
-    profile = session.get(Profile, auth_user.id)
+    profile = await session.get(Profile, auth_user.id)
     if profile is None:
         raise ApiError(404, "PROFILE_NOT_FOUND", "Finish signing up to continue.")
     if not profile.is_active:
