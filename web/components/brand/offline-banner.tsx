@@ -25,7 +25,7 @@ export function OfflineBanner() {
   }, [router]);
   if (online) return null;
   return (
-    <div role="status" className="sticky top-0 z-50 flex items-center justify-center gap-2 bg-ink px-4 py-2 text-sm font-semibold text-white">
+    <div role="status" className="sticky top-0 z-50 flex items-center justify-center gap-2 bg-[#0F172A] px-4 py-2 text-sm font-semibold text-white">
       <WifiOff className="size-4" aria-hidden /> You&apos;re offline. We&apos;ll retry when you&apos;re back.
     </div>
   );

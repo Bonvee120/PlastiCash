@@ -42,7 +42,7 @@ const Toaster = (props: ToasterProps) => {
           toast:
             "!rounded-2xl !border-0 !bg-forest !text-white !shadow-toast !font-sans !text-[15px] !gap-3 !p-3.5",
           error: "!bg-danger",
-          description: "!text-mint",
+          description: "!text-[#DCFCE7]",
         },
       }}
       {...props}

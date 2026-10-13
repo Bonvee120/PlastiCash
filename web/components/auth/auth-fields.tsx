@@ -80,7 +80,7 @@ export function GoogleButton({ next = "/app" }: { next?: string }) {
       type="button"
       onClick={signIn}
       disabled={pending}
-      className="d-btn d-btn-block border border-border bg-white font-semibold text-ink shadow-none hover:border-slate-400 hover:bg-slate-50"
+      className="d-btn d-btn-block border border-border bg-card font-semibold text-ink shadow-none hover:border-slate-400 hover:bg-slate-50"
     >
       {pending ? <Loader2 className="size-5 animate-spin" aria-hidden /> : <GoogleMark />}
       Continue with Google

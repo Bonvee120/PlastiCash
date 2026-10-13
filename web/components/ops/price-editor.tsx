@@ -69,7 +69,7 @@ export function PriceEditor({ current }: { current: PriceVersion[] }) {
               type="button"
               onClick={() => pick(m.value)}
               aria-pressed={material === m.value}
-              className={`flex flex-col gap-1 rounded-2xl border bg-white p-4 text-left ${material === m.value ? "border-2 border-primary" : "border-border"}`}
+              className={`flex flex-col gap-1 rounded-2xl border bg-card p-4 text-left ${material === m.value ? "border-2 border-primary" : "border-border"}`}
             >
               <span className="eyebrow text-muted-foreground">{m.label}</span>
               <b className="tabular text-2xl">{p ? naira(p.price_kobo_per_kg) : "–"}</b>
@@ -79,7 +79,7 @@ export function PriceEditor({ current }: { current: PriceVersion[] }) {
         })}
       </div>
 
-      <section className="flex flex-col gap-3 rounded-2xl border border-border bg-white p-4">
+      <section className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-4">
         <h2 className="text-lg font-bold">New version</h2>
         <Field id="material" label="Material">
           <select id="material" value={material} onChange={(e) => pick(e.target.value as Material)} className={selectClass}>

@@ -213,7 +213,7 @@ export function PushToggle({ dark = false }: { dark?: boolean }) {
         aria-pressed={on}
         className={cn(
           "flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold",
-          dark ? "bg-white/10 text-white hover:bg-white/15" : "bg-mist text-primary-dark",
+          dark ? "bg-white/10 text-white hover:bg-white/15" : "bg-mist text-primary-ink",
         )}
       >
         {pending ? <Loader2 className="size-4 animate-spin" aria-hidden /> : on ? <Bell className="size-4" aria-hidden /> : <BellOff className="size-4" aria-hidden />}

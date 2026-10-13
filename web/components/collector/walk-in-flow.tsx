@@ -92,7 +92,7 @@ export function WalkInFlow({ prices }: { prices: CurrentPrice[] }) {
           aria-invalid={!!error}
           className="tabular h-14 text-xl"
         />
-        {error && <p className="text-sm font-semibold text-danger">{error}</p>}
+        {error && <p className="text-sm font-semibold text-bad">{error}</p>}
         <Btn type="submit" variant="primary" block className="d-btn-collector" disabled={!phone.trim() || pending}>
           {pending ? "Searching…" : "Find customer"}
         </Btn>

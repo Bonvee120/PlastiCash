@@ -19,7 +19,7 @@ export function WalletCard({ wallet }: { wallet: Wallet }) {
       <LogoMark variant="white" size={180} className="pointer-events-none absolute -top-4 -right-8 rotate-[-14deg] opacity-[0.08]" />
       <div className="flex items-center justify-between">
         <span className="eyebrow text-[#BBF7D0]">Wallet balance</span>
-        <span className="tabular rounded-full bg-white/12 px-2.5 py-1 text-xs text-mint">1 pt = ₦1</span>
+        <span className="tabular rounded-full bg-white/12 px-2.5 py-1 text-xs text-[#DCFCE7]">1 pt = ₦1</span>
       </div>
       <MoneyDisplay kobo={wallet.balance_kobo} size="xl" dark />
       <div className="flex gap-2.5">
@@ -36,7 +36,7 @@ export function WalletCard({ wallet }: { wallet: Wallet }) {
 
 export function RequestCta() {
   return (
-    <Card className="flex-row items-center gap-4 border-[#FDE68A] bg-cream">
+    <Card className="flex-row items-center gap-4 border-warn-line bg-cream">
       <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-amber text-heading">
         <Truck className="size-6" aria-hidden />
       </span>
@@ -54,13 +54,13 @@ export function RequestCta() {
 export function ImpactStats({ impact }: { impact: Impact }) {
   const stats = [
     { label: "recycled", value: Number(impact.total_kg).toLocaleString("en-NG"), unit: "kg", icon: Scale, tone: "bg-mint text-primary" },
-    { label: "CO₂ saved", value: Number(impact.co2_kg).toLocaleString("en-NG"), unit: "kg", icon: Cloud, tone: "bg-[#E0F2FE] text-[#0369A1]" },
-    { label: "pickups", value: String(impact.pickups), unit: "", icon: Truck, tone: "bg-cream text-[#B45309]" },
+    { label: "CO₂ saved", value: Number(impact.co2_kg).toLocaleString("en-NG"), unit: "kg", icon: Cloud, tone: "bg-sky-soft text-sky" },
+    { label: "pickups", value: String(impact.pickups), unit: "", icon: Truck, tone: "bg-cream text-warn" },
   ];
   return (
     <div className="grid grid-cols-3 gap-3.5">
       {stats.map(({ label, value, unit, icon: Icon, tone }) => (
-        <div key={label} className="flex min-w-0 flex-col gap-2 rounded-2xl border border-border bg-white p-3.5">
+        <div key={label} className="flex min-w-0 flex-col gap-2 rounded-2xl border border-border bg-card p-3.5">
           <span className={cn("grid size-8 place-items-center rounded-[10px]", tone)}>
             <Icon className="size-[17px]" aria-hidden />
           </span>
@@ -156,12 +156,12 @@ export function RecentActivity({ entries }: { entries: LedgerEntry[] }) {
       ) : (
         <ul>
           {entries.map((e) => (
-            <li key={e.id} className="flex items-center gap-3 border-t border-[#F1F5F9] px-[18px] py-3">
+            <li key={e.id} className="flex items-center gap-3 border-t border-subtle px-[18px] py-3">
               <div className="min-w-0 flex-1">
                 <b className="block truncate text-sm">{entryLabel(e)}</b>
                 <small className="tabular text-[11px] text-muted-foreground">{dateTime(e.created_at)}</small>
               </div>
-              <span className={cn("tabular text-[15px] font-semibold", e.amount_kobo >= 0 ? "text-primary" : "text-[#B45309]")}>
+              <span className={cn("tabular text-[15px] font-semibold", e.amount_kobo >= 0 ? "text-primary" : "text-warn")}>
                 {e.amount_kobo >= 0 ? "+" : "−"}
                 {pts(Math.abs(e.amount_kobo))}
               </span>

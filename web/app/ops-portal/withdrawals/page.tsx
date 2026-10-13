@@ -50,7 +50,7 @@ async function Tabs({ searchParams }: { searchParams: PageProps<"/ops-portal/wit
           key={t.status}
           href={`/ops-portal/withdrawals?status=${t.status}`}
           aria-current={current === t.status ? "page" : undefined}
-          className={cn("rounded-full px-3 py-1.5 text-sm font-semibold", current === t.status ? "bg-primary text-white" : "bg-white text-slate-600 ring-1 ring-border")}
+          className={cn("rounded-full px-3 py-1.5 text-sm font-semibold", current === t.status ? "bg-primary text-primary-foreground" : "bg-card text-slate-600 ring-1 ring-border")}
         >
           {t.label}
         </Link>

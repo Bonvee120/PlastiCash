@@ -52,11 +52,11 @@ export function QrScanner({ onCode, busy }: { onCode: (code: string) => void; bu
   return (
     <div className="flex flex-col gap-3">
       {cameraError ? (
-        <p className="flex items-start gap-2 rounded-xl bg-cream p-3 text-sm text-[#92400E]">
+        <p className="flex items-start gap-2 rounded-xl bg-cream p-3 text-sm text-warn-strong">
           <CameraOff className="mt-0.5 size-4 shrink-0" aria-hidden /> {cameraError}
         </p>
       ) : (
-        <div id={elementId} className="aspect-square w-full overflow-hidden rounded-2xl bg-ink" />
+        <div id={elementId} className="aspect-square w-full overflow-hidden rounded-2xl bg-black" />
       )}
       <form
         className="flex flex-col gap-2"

@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils";
 export type BankOption = { name: string; code: string };
 
 const selectClass =
-  "h-13 w-full rounded-input border border-input bg-white px-3.5 text-base font-medium outline-none focus-visible:border-2 focus-visible:border-primary aria-invalid:border-2 aria-invalid:border-destructive";
+  "h-13 w-full rounded-input border border-input bg-card px-3.5 text-base font-medium outline-none focus-visible:border-2 focus-visible:border-primary aria-invalid:border-2 aria-invalid:border-destructive";
 
 // ----- Profile: PATCH /me with only the fields that changed -----
 
@@ -255,7 +255,7 @@ function Field({ id, label, hint, error, children }: { id: string; label: string
     <div className="flex flex-col gap-2">
       <Label htmlFor={id}>{label}</Label>
       {children}
-      {(error || hint) && <p className={cn("text-sm", error ? "text-danger" : "text-muted-foreground")}>{error ?? hint}</p>}
+      {(error || hint) && <p className={cn("text-sm", error ? "text-bad" : "text-muted-foreground")}>{error ?? hint}</p>}
     </div>
   );
 }

@@ -83,7 +83,7 @@ export function PickupDetail({ initial }: { initial: Pickup }) {
           <Card className="gap-0 overflow-hidden p-0">
             <div className="relative">
               <LiveMap home={home} collector={position} />
-              <span className="absolute top-3 left-3 z-[400] flex items-center gap-1.5 rounded-full bg-heading px-3 py-1.5 text-xs font-bold text-white">
+              <span className="absolute top-3 left-3 z-[400] flex items-center gap-1.5 rounded-full bg-forest px-3 py-1.5 text-xs font-bold text-white">
                 <Clock className="size-3.5 text-gold" aria-hidden />
                 {position ? `${pickup.collector_first_name ?? "Your collector"} is on the way` : "Waiting for the collector's location"}
               </span>
@@ -214,7 +214,7 @@ function ConfirmOrDispute({ pickup }: { pickup: Pickup }) {
   return (
     <Card className="gap-4">
       {left && (
-        <span className="tabular flex w-fit items-center gap-1.5 rounded-full bg-cream px-3 py-1.5 text-xs font-semibold text-[#92400E]">
+        <span className="tabular flex w-fit items-center gap-1.5 rounded-full bg-cream px-3 py-1.5 text-xs font-semibold text-warn-strong">
           <Clock className="size-3.5" aria-hidden /> Auto-confirms in {left.hours} h {left.minutes} m
         </span>
       )}
@@ -298,7 +298,7 @@ function DisputeForm({ pickup, onCancel }: { pickup: Pickup; onCancel: () => voi
       <fieldset className="flex flex-col gap-2">
         <legend className="mb-2 text-sm font-semibold">What&apos;s wrong?</legend>
         {REASONS.map((r) => (
-          <label key={r} className={cn("flex cursor-pointer items-center gap-2.5 rounded-xl border bg-white p-3 text-sm", reason === r ? "border-2 border-primary p-[11px]" : "border-border")}>
+          <label key={r} className={cn("flex cursor-pointer items-center gap-2.5 rounded-xl border bg-card p-3 text-sm", reason === r ? "border-2 border-primary p-[11px]" : "border-border")}>
             <input type="radio" name="reason" value={r} checked={reason === r} onChange={() => setReason(r)} className="accent-primary" />
             {r}
           </label>
@@ -313,7 +313,7 @@ function DisputeForm({ pickup, onCancel }: { pickup: Pickup; onCancel: () => voi
         <Label htmlFor="details">Anything else (optional)</Label>
         <Input id="details" value={details} maxLength={300} onChange={(e) => setDetails(e.target.value)} />
       </div>
-      <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-dashed border-input bg-white p-3 text-sm">
+      <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-dashed border-input bg-card p-3 text-sm">
         {uploading ? <Loader2 className="size-5 animate-spin text-primary" aria-hidden /> : <Camera className="size-5 text-primary" aria-hidden />}
         {photoUrl ? "Photo added. Tap to change it." : "Add your photo of the plastic (required)"}
         <input type="file" accept="image/*" capture="environment" className="sr-only" onChange={(e) => onPhoto(e.target.files?.[0])} disabled={uploading} />

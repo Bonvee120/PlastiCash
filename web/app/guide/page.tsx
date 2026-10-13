@@ -72,11 +72,11 @@ async function Prices() {
           <Card key={value} className="gap-2">
             <h2 className="text-lg font-bold">{label}</h2>
             <p className="text-sm text-muted-foreground">{hint}</p>
-            <p className="tabular font-display text-3xl font-extrabold tracking-[-0.03em] text-primary-dark">
+            <p className="tabular font-display text-3xl font-extrabold tracking-[-0.03em] text-primary-ink">
               {naira(perKg)}
               <small className="ml-1 text-base font-semibold text-muted-foreground">/ kg</small>
             </p>
-            <ul className="tabular space-y-1 border-t border-[#F1F5F9] pt-2 text-sm">
+            <ul className="tabular space-y-1 border-t border-subtle pt-2 text-sm">
               {p.items_per_kg && (
                 <li>
                   About <b>{p.items_per_kg}</b> {value === "SACHET" ? "sachets" : "items"} = 1 kg = <b>{naira(perKg)}</b>

@@ -44,7 +44,7 @@ async function List({ searchParams }: { searchParams: PageProps<"/app/pickups">[
             key={f}
             href={f === "all" ? "/app/pickups" : `/app/pickups?show=${f}`}
             aria-current={filter === f ? "page" : undefined}
-            className={cn("rounded-full px-4 py-1.5 text-sm font-semibold", filter === f ? "bg-primary text-white" : "bg-white text-slate-600 ring-1 ring-border")}
+            className={cn("rounded-full px-4 py-1.5 text-sm font-semibold", filter === f ? "bg-primary text-primary-foreground" : "bg-card text-slate-600 ring-1 ring-border")}
           >
             {FILTERS[f]}
           </Link>
@@ -60,9 +60,9 @@ async function List({ searchParams }: { searchParams: PageProps<"/app/pickups">[
         [...months.entries()].map(([month, rows]) => (
           <section key={month} aria-label={month} className="flex flex-col gap-2">
             <h3 className="eyebrow text-muted-foreground">{month}</h3>
-            <ul className="overflow-hidden rounded-2xl border border-border bg-white">
+            <ul className="overflow-hidden rounded-2xl border border-border bg-card">
               {rows.map((p) => (
-                <li key={p.id} className="border-t border-[#F1F5F9] first:border-t-0">
+                <li key={p.id} className="border-t border-subtle first:border-t-0">
                   <Link href={`/app/pickups/${p.id}`} className="flex items-center gap-3 px-4 py-3.5 hover:bg-mist">
                     <div className="min-w-0 flex-1">
                       <b className="block text-sm">

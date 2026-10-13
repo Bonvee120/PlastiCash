@@ -58,7 +58,7 @@ export function PhotoCarousel({ slides, interval = 4500 }: { slides: Slide[]; in
               <br />
               <span className="text-gold">{slide.highlight}</span>
             </p>
-            <p className="mt-3.5 max-w-[420px] text-mint">{slide.line}</p>
+            <p className="mt-3.5 max-w-[420px] text-[#DCFCE7]">{slide.line}</p>
           </div>
         </div>
       ))}

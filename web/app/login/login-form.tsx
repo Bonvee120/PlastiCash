@@ -60,7 +60,7 @@ export function LoginForm() {
       {searchParams.get("loggedOut") && (
         <p
           role="status"
-          className="flex items-center gap-2 rounded-lg bg-primary-light px-3 py-2 text-sm text-primary-dark"
+          className="flex items-center gap-2 rounded-lg bg-primary-light px-3 py-2 text-sm text-primary-ink"
         >
           <CircleCheck className="size-4 shrink-0" aria-hidden />
           You&apos;re logged out. Log in again any time.

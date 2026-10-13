@@ -103,7 +103,7 @@ export function JobFlow({ initial, prices }: { initial: CollectorPickup; prices:
       )}
 
       {job.status === "DISPUTED" && (
-        <p className="rounded-xl bg-cream px-3 py-3 text-base text-[#92400E]">
+        <p className="rounded-xl bg-cream px-3 py-3 text-base text-warn-strong">
           The customer disputed the weight. EcoCyclers will review your photo and decide.
         </p>
       )}
@@ -212,7 +212,7 @@ function SharingNote({ state }: { state: Sharing | null }) {
   }
   if (state === "denied" || state === "unsupported") {
     return (
-      <p className="flex items-start gap-2 rounded-xl bg-cream px-3 py-2.5 text-sm text-[#92400E]">
+      <p className="flex items-start gap-2 rounded-xl bg-cream px-3 py-2.5 text-sm text-warn-strong">
         <TriangleAlert className="mt-0.5 size-4 shrink-0" aria-hidden /> Location is off, so the customer can&apos;t see you coming. Allow location for
         this site in your browser.
       </p>

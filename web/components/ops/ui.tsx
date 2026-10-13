@@ -29,26 +29,26 @@ export function StatCard({ label, value, hint, tone }: { label: string; value: R
   return (
     <div
       className={cn(
-        "flex flex-col gap-1 rounded-2xl border bg-white p-4",
-        tone === "alert" ? "border-[#FCA5A5]" : tone === "warn" ? "border-[#FDE68A]" : "border-border",
+        "flex flex-col gap-1 rounded-2xl border bg-card p-4",
+        tone === "alert" ? "border-bad-line" : tone === "warn" ? "border-warn-line" : "border-border",
       )}
     >
       <span className="eyebrow text-muted-foreground">{label}</span>
-      <b className={cn("tabular text-2xl font-bold", tone === "alert" && "text-[#B91C1C]")}>{value}</b>
+      <b className={cn("tabular text-2xl font-bold", tone === "alert" && "text-bad")}>{value}</b>
       {hint && <span className="text-xs text-muted-foreground">{hint}</span>}
     </div>
   );
 }
 
 export const selectClass =
-  "h-11 rounded-input border border-input bg-white px-3 text-sm font-medium outline-none focus-visible:border-2 focus-visible:border-primary";
+  "h-11 rounded-input border border-input bg-card px-3 text-sm font-medium outline-none focus-visible:border-2 focus-visible:border-primary";
 
 export function Field({ id, label, hint, error, children }: { id: string; label: string; hint?: string; error?: string; children: ReactNode }) {
   return (
     <div className="flex flex-col gap-1.5">
       <Label htmlFor={id}>{label}</Label>
       {children}
-      {(error || hint) && <p className={cn("text-xs", error ? "text-danger" : "text-muted-foreground")}>{error ?? hint}</p>}
+      {(error || hint) && <p className={cn("text-xs", error ? "text-bad" : "text-muted-foreground")}>{error ?? hint}</p>}
     </div>
   );
 }

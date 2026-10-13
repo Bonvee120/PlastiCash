@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { Logo } from "@/components/brand/logo";
+import { ThemeToggle } from "@/components/brand/theme";
 import { PhotoCarousel, WELCOME_SLIDES } from "@/components/brand/photo-carousel";
 import { cn } from "@/lib/utils";
 
@@ -19,7 +20,7 @@ type Props = {
 // on a phone a forest header with the logo, then the form on a rounded sheet.
 export function AuthCard({ title, description, children, footer, step }: Props) {
   return (
-    <div className="flex flex-1 flex-col bg-canvas lg:grid lg:min-h-svh lg:grid-cols-[600px_1fr] lg:bg-white">
+    <div className="flex flex-1 flex-col bg-canvas lg:grid lg:min-h-svh lg:grid-cols-[600px_1fr] lg:bg-card">
       <div className="hidden lg:block">
         <PhotoCarousel slides={WELCOME_SLIDES} />
       </div>
@@ -32,13 +33,15 @@ export function AuthCard({ title, description, children, footer, step }: Props) 
         <Link href="/" aria-label="PlastiCash home">
           <Logo variant="white" size={36} />
         </Link>
+        <ThemeToggle dark className="ml-auto" />
       </div>
 
-      <main className="relative -mt-9 flex flex-1 flex-col gap-5 rounded-t-[28px] bg-canvas px-4 pt-7 pb-10 lg:mt-0 lg:rounded-none lg:bg-white lg:px-[72px] lg:pt-10">
-        <div className="hidden lg:flex">
+      <main className="relative -mt-9 flex flex-1 flex-col gap-5 rounded-t-[28px] bg-canvas px-4 pt-7 pb-10 lg:mt-0 lg:rounded-none lg:bg-card lg:px-[72px] lg:pt-10">
+        <div className="hidden items-center justify-between lg:flex">
           <Link href="/" aria-label="PlastiCash home">
             <Logo size={38} />
           </Link>
+          <ThemeToggle />
         </div>
 
         <div className="mx-auto flex w-full max-w-[440px] flex-col gap-6 lg:mt-10">

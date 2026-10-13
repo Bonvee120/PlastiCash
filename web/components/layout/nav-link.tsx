@@ -137,7 +137,7 @@ export function UserBottomNav() {
   return (
     <nav
       aria-label="Main"
-      className="fixed inset-x-0 bottom-0 z-20 flex items-center justify-between border-t border-border bg-white px-3 pt-2.5 pb-5 lg:hidden"
+      className="fixed inset-x-0 bottom-0 z-20 flex items-center justify-between border-t border-border bg-card px-3 pt-2.5 pb-5 lg:hidden"
     >
       <BottomNavLink item={home} exact />
       <BottomNavLink item={{ href: "/app/request", label: "Request", icon: Plus }} raised />

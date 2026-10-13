@@ -48,7 +48,7 @@ async function Overview() {
       </div>
 
       <div className="grid items-start gap-5 xl:grid-cols-2">
-        <section className="overflow-hidden rounded-2xl border border-border bg-white">
+        <section className="overflow-hidden rounded-2xl border border-border bg-card">
           <h2 className="px-4 pt-4 pb-1 text-lg font-bold">Estimate accuracy</h2>
           <p className="px-4 pb-3 text-sm text-muted-foreground">Actual kg ÷ estimated kg on completed door pickups, worst first.</p>
           {stats.estimate_accuracy.length === 0 ? (
@@ -71,7 +71,7 @@ async function Overview() {
                     <TableCell className="text-right">{row.pickups}</TableCell>
                     <TableCell className="text-right">{kg(row.estimated_kg)}</TableCell>
                     <TableCell className="text-right">{kg(row.actual_kg)}</TableCell>
-                    <TableCell className={cn("text-right font-semibold", Number(row.accuracy) < LOW && "text-[#B45309]")}>
+                    <TableCell className={cn("text-right font-semibold", Number(row.accuracy) < LOW && "text-warn")}>
                       {Math.round(Number(row.accuracy) * 100)}%
                     </TableCell>
                   </TableRow>
@@ -81,7 +81,7 @@ async function Overview() {
           )}
         </section>
 
-        <section className="overflow-hidden rounded-2xl border border-border bg-white">
+        <section className="overflow-hidden rounded-2xl border border-border bg-card">
           <h2 className="px-4 pt-4 pb-1 text-lg font-bold">Disputes per collector</h2>
           <p className="px-4 pb-3 text-sm text-muted-foreground">All time. A high share is worth a look at their scale photos.</p>
           <Table>

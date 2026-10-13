@@ -48,19 +48,19 @@ export function BtnLink({ variant, size, block, className, ...props }: BtnProps 
 // ----- Card -----
 
 export function Card({ className, ...props }: ComponentProps<"section">) {
-  return <section {...props} className={cn("flex flex-col gap-3 rounded-2xl border border-border bg-white p-[18px]", className)} />;
+  return <section {...props} className={cn("flex flex-col gap-3 rounded-2xl border border-border bg-card p-[18px]", className)} />;
 }
 
 // ----- StatusBadge: label + icon, never colour alone (§5.3) -----
 
 const STATUS: Record<PickupStatus, { label: string; icon: LucideIcon; className: string }> = {
-  REQUESTED: { label: "Requested", icon: Clock, className: "bg-[#F1F5F9] text-[#475569]" },
-  ASSIGNED: { label: "Assigned", icon: UserCheck, className: "bg-[#DBEAFE] text-[#1D4ED8]" },
-  EN_ROUTE: { label: "On the way", icon: Truck, className: "bg-[#E0E7FF] text-[#4338CA]" },
-  AWAITING_CONFIRMATION: { label: "Please confirm", icon: Scale, className: "bg-cream text-[#B45309]" },
-  DISPUTED: { label: "Under review", icon: AlertTriangle, className: "bg-[#FEE2E2] text-[#B91C1C]" },
+  REQUESTED: { label: "Requested", icon: Clock, className: "bg-muted text-slate-600" },
+  ASSIGNED: { label: "Assigned", icon: UserCheck, className: "bg-info-soft text-info" },
+  EN_ROUTE: { label: "On the way", icon: Truck, className: "bg-route-soft text-route" },
+  AWAITING_CONFIRMATION: { label: "Please confirm", icon: Scale, className: "bg-cream text-warn" },
+  DISPUTED: { label: "Under review", icon: AlertTriangle, className: "bg-bad-soft text-bad" },
   COMPLETED: { label: "Paid", icon: CheckCircle2, className: "bg-mint text-primary" },
-  CANCELLED: { label: "Cancelled", icon: Ban, className: "bg-[#F1F5F9] text-[#94A3B8]" },
+  CANCELLED: { label: "Cancelled", icon: Ban, className: "bg-muted text-slate-400" },
 };
 
 export function statusLabel(status: PickupStatus) {
@@ -160,7 +160,7 @@ export function Timeline({ status, compact = false }: { status: PickupStatus; co
               <span
                 className={cn(
                   "grid size-6 shrink-0 place-items-center rounded-full",
-                  done && "bg-primary text-white",
+                  done && "bg-primary text-primary-foreground",
                   current && "bg-amber text-heading ring-4 ring-amber/25",
                   !done && !current && "bg-border text-white",
                 )}
@@ -205,7 +205,7 @@ export function Stepper({ steps, current }: { steps: string[]; current: number }
               <i
                 className={cn(
                   "tabular grid size-7 place-items-center rounded-full text-[13px] font-bold not-italic",
-                  i < current ? "bg-mint text-primary" : i === current ? "bg-primary text-white" : "bg-muted text-muted-foreground",
+                  i < current ? "bg-mint text-primary" : i === current ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground",
                 )}
               >
                 {i < current ? <Check className="size-3.5" strokeWidth={3} aria-hidden /> : i + 1}
@@ -224,7 +224,7 @@ export function Stepper({ steps, current }: { steps: string[]; current: number }
 
 export function EmptyState({ icon: Icon, text, action }: { icon: LucideIcon; text: string; action?: ReactNode }) {
   return (
-    <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-border bg-white px-6 py-10 text-center">
+    <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-border bg-card px-6 py-10 text-center">
       <span className="grid size-12 place-items-center rounded-xl bg-mint text-primary">
         <Icon className="size-6" aria-hidden />
       </span>

@@ -61,8 +61,8 @@ async function ImpactData() {
         </Card>
       </div>
       <div className="flex flex-col gap-5">
-        <Card className="gap-1 border-[#FDE68A] bg-cream">
-          <span className="eyebrow text-[#92400E]">Points earned</span>
+        <Card className="gap-1 border-warn-line bg-cream">
+          <span className="eyebrow text-warn-strong">Points earned</span>
           <Money kobo={impact.earned_kobo} className="text-2xl font-bold whitespace-normal" />
           <span className="text-sm text-muted-foreground">from {impact.pickups} completed pickups</span>
         </Card>

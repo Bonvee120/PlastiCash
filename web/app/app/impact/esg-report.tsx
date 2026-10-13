@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const selectClass =
-  "h-12 w-full rounded-input border border-input bg-white px-3 text-base font-medium outline-none focus-visible:border-2 focus-visible:border-primary";
+  "h-12 w-full rounded-input border border-input bg-card px-3 text-base font-medium outline-none focus-visible:border-2 focus-visible:border-primary";
 
 // ESG report for organizations: pick a month (or the whole year) and download the PDF (03-screens-and-routes.md).
 export function EsgReport() {

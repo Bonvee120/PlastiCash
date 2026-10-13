@@ -42,7 +42,7 @@ export function DisputeCard({ pickup }: { pickup: AdminPickup }) {
   }
 
   return (
-    <section className="flex flex-col gap-4 rounded-2xl border border-[#FCA5A5] bg-white p-5">
+    <section className="flex flex-col gap-4 rounded-2xl border border-bad-line bg-card p-5">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h2 className="text-xl font-bold">
           {pickup.user_name} · <span className="tabular">{ref(pickup.id)}</span>

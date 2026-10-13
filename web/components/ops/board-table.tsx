@@ -25,11 +25,11 @@ export function BoardTable({ pickups, collectors }: { pickups: AdminPickup[]; co
   const [cancelling, setCancelling] = useState<AdminPickup | null>(null);
 
   if (pickups.length === 0) {
-    return <p className="rounded-2xl border border-dashed border-border bg-white p-8 text-center text-muted-foreground">No pickups match these filters.</p>;
+    return <p className="rounded-2xl border border-dashed border-border bg-card p-8 text-center text-muted-foreground">No pickups match these filters.</p>;
   }
 
   return (
-    <section className="overflow-hidden rounded-2xl border border-border bg-white">
+    <section className="overflow-hidden rounded-2xl border border-border bg-card">
       <Table>
         <TableHeader>
           <TableRow>
@@ -112,10 +112,10 @@ function Flags({ pickup }: { pickup: AdminPickup }) {
   const accuracy = pickup.user_estimate_accuracy === null ? null : Number(pickup.user_estimate_accuracy);
   return (
     <span className="mt-1 flex flex-wrap gap-1">
-      {pickup.pooled && <span className="rounded bg-[#DBEAFE] px-1.5 py-0.5 text-[11px] font-bold text-[#1D4ED8]">Pool</span>}
-      {pickup.under_minimum && <span className="rounded bg-cream px-1.5 py-0.5 text-[11px] font-bold text-[#B45309]">Under minimum</span>}
+      {pickup.pooled && <span className="rounded bg-info-soft px-1.5 py-0.5 text-[11px] font-bold text-info">Pool</span>}
+      {pickup.under_minimum && <span className="rounded bg-cream px-1.5 py-0.5 text-[11px] font-bold text-warn">Under minimum</span>}
       {accuracy !== null && accuracy < LOW_ACCURACY && (
-        <span className="rounded bg-cream px-1.5 py-0.5 text-[11px] font-bold text-[#B45309]" title="Past actual kg ÷ estimated kg">
+        <span className="rounded bg-cream px-1.5 py-0.5 text-[11px] font-bold text-warn" title="Past actual kg ÷ estimated kg">
           Low estimates ({Math.round(accuracy * 100)}%)
         </span>
       )}

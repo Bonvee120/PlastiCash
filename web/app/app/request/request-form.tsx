@@ -27,7 +27,7 @@ function lagosToday() {
 }
 
 const selectClass =
-  "h-13 w-full rounded-input border border-input bg-white px-3.5 text-base font-medium outline-none focus-visible:border-2 focus-visible:border-primary";
+  "h-13 w-full rounded-input border border-input bg-card px-3.5 text-base font-medium outline-none focus-visible:border-2 focus-visible:border-primary";
 
 export function RequestForm({
   prices,
@@ -179,12 +179,12 @@ export function RequestForm({
                     aria-pressed={on}
                     onClick={() => toggle(m.value)}
                     className={cn(
-                      "relative flex flex-col items-start gap-1.5 rounded-2xl border bg-white p-3.5 text-left transition-colors",
+                      "relative flex flex-col items-start gap-1.5 rounded-2xl border bg-card p-3.5 text-left transition-colors",
                       on ? "border-2 border-primary bg-mist p-[13px]" : "border-border hover:border-primary/50",
                     )}
                   >
                     {on && (
-                      <span className="absolute top-2.5 right-2.5 grid size-[22px] place-items-center rounded-full bg-primary text-white">
+                      <span className="absolute top-2.5 right-2.5 grid size-[22px] place-items-center rounded-full bg-primary text-primary-foreground">
                         <Check className="size-3.5" strokeWidth={3.4} aria-hidden />
                       </span>
                     )}
@@ -252,7 +252,7 @@ export function RequestForm({
                   {HUB.address}, {HUB.hours}. We weigh it while you wait and pay the same.
                 </Option>
                 {choice === "hub" && (
-                  <p className="rounded-xl bg-mist px-3 py-2 text-sm text-primary-dark">
+                  <p className="rounded-xl bg-mist px-3 py-2 text-sm text-primary-ink">
                     No request needed: bring it to {HUB.address} and give the collector your phone number.
                   </p>
                 )}
@@ -269,7 +269,7 @@ export function RequestForm({
             <p className="text-sm text-muted-foreground">It helps us send the right vehicle. One clear photo of the pile is enough.</p>
             <label
               className={cn(
-                "flex min-h-52 cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl border-2 border-dashed bg-white text-center",
+                "flex min-h-52 cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl border-2 border-dashed bg-card text-center",
                 photoUrl ? "border-primary" : "border-input",
               )}
             >
@@ -346,7 +346,7 @@ export function RequestForm({
                       onClick={() => setSlot(w)}
                       className={cn(
                         "rounded-xl border px-2 py-2.5 text-sm font-semibold",
-                        slot === w ? "border-2 border-primary bg-mist text-primary-dark" : "border-border bg-white",
+                        slot === w ? "border-2 border-primary bg-mist text-primary-ink" : "border-border bg-card",
                       )}
                     >
                       {w === "MORNING" ? "Morning" : "Afternoon"}
@@ -458,7 +458,7 @@ function Counter({ value, step, label, onChange }: { value: number; step: number
         <span className="tabular min-w-14 text-center font-semibold" aria-live="polite">
           {value}
         </span>
-        <button type="button" aria-label={`More ${label}`} onClick={() => onChange(+(value + step).toFixed(1))} className="grid size-11 place-items-center rounded-xl bg-primary text-white">
+        <button type="button" aria-label={`More ${label}`} onClick={() => onChange(+(value + step).toFixed(1))} className="grid size-11 place-items-center rounded-xl bg-primary text-primary-foreground">
           <Plus className="size-4" aria-hidden />
         </button>
       </div>
@@ -485,9 +485,9 @@ function Option({
       type="button"
       aria-pressed={on}
       onClick={onClick}
-      className={cn("flex items-start gap-3 rounded-2xl border bg-white p-3.5 text-left", on ? "border-2 border-primary bg-mist p-[13px]" : "border-border")}
+      className={cn("flex items-start gap-3 rounded-2xl border bg-card p-3.5 text-left", on ? "border-2 border-primary bg-mist p-[13px]" : "border-border")}
     >
-      <span className={cn("grid size-10 shrink-0 place-items-center rounded-xl", on ? "bg-primary text-white" : "bg-muted text-muted-foreground")}>
+      <span className={cn("grid size-10 shrink-0 place-items-center rounded-xl", on ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground")}>
         <Icon className="size-5" aria-hidden />
       </span>
       <span>

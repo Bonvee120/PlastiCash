@@ -15,8 +15,8 @@ import { cn } from "@/lib/utils";
 
 const KG = /^\d{1,5}(\.\d{1,2})?$/;
 const TONE: Record<Bale["status"], string> = {
-  IN_STORE: "bg-[#DBEAFE] text-[#1D4ED8]",
-  PROCESSED: "bg-cream text-[#B45309]",
+  IN_STORE: "bg-info-soft text-info",
+  PROCESSED: "bg-cream text-warn",
   SOLD: "bg-mint text-primary",
 };
 
@@ -34,7 +34,7 @@ export function CreateBale({ materials }: { materials: Stock["materials"] }) {
   }
 
   return (
-    <section className="flex flex-wrap items-end gap-3 rounded-2xl border border-border bg-white p-4">
+    <section className="flex flex-wrap items-end gap-3 rounded-2xl border border-border bg-card p-4">
       <h2 className="w-full text-lg font-bold">New bale</h2>
       <Field id="bale-material" label="Material">
         <select id="bale-material" value={material} onChange={(e) => setMaterial(e.target.value as Material)} className={selectClass}>
@@ -60,11 +60,11 @@ export function BalesTable({ bales }: { bales: Bale[] }) {
   const [selling, setSelling] = useState<Bale | null>(null);
 
   if (bales.length === 0) {
-    return <p className="rounded-2xl border border-dashed border-border bg-white p-8 text-center text-muted-foreground">No bales yet.</p>;
+    return <p className="rounded-2xl border border-dashed border-border bg-card p-8 text-center text-muted-foreground">No bales yet.</p>;
   }
 
   return (
-    <section className="overflow-hidden rounded-2xl border border-border bg-white">
+    <section className="overflow-hidden rounded-2xl border border-border bg-card">
       <h2 className="px-4 pt-4 pb-3 text-lg font-bold">Bales</h2>
       <Table>
         <TableHeader>

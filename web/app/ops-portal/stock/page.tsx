@@ -37,11 +37,11 @@ async function StockData() {
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-5">
         {stock.materials.map((m) => (
-          <section key={m.material} className="flex flex-col gap-2 rounded-2xl border border-border bg-white p-4">
+          <section key={m.material} className="flex flex-col gap-2 rounded-2xl border border-border bg-card p-4">
             <h2 className="font-bold">{materialLabel(m.material)}</h2>
             <b className="tabular text-2xl">{kg(m.raw_stock_kg)}</b>
             <span className="text-xs text-muted-foreground">raw stock of {kg(m.raw_in_kg)} in</span>
-            <dl className="tabular grid grid-cols-3 gap-1 border-t border-[#F1F5F9] pt-2 text-center text-xs">
+            <dl className="tabular grid grid-cols-3 gap-1 border-t border-subtle pt-2 text-center text-xs">
               <div>
                 <dt className="text-muted-foreground">In store</dt>
                 <dd className="font-bold">{balesOf(m.material, "IN_STORE")}</dd>

@@ -126,7 +126,7 @@ export function WeighForm({
                 onClick={() => toggle(m.value)}
                 className={cn(
                   "flex min-h-12 items-center gap-1.5 rounded-full border px-4 text-base font-semibold",
-                  on ? "border-primary bg-primary text-white" : "border-border bg-white",
+                  on ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card",
                 )}
               >
                 {on && <Check className="size-4" strokeWidth={3} aria-hidden />}
@@ -142,7 +142,7 @@ export function WeighForm({
         const error = tried ? errors[i] : null;
         const id = `w-${m.value}`;
         return (
-          <section key={m.value} className="flex flex-col gap-3 rounded-2xl border border-border bg-white p-4">
+          <section key={m.value} className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-4">
             <div className="flex items-baseline justify-between">
               <b className="text-lg">{m.label}</b>
               <span className="tabular text-sm text-muted-foreground">₦{(priceOf.get(m.value) ?? 0) / 100}/kg</span>
@@ -188,12 +188,12 @@ export function WeighForm({
                 />
               </div>
             )}
-            {error && <p className="text-sm font-semibold text-danger">{error}</p>}
+            {error && <p className="text-sm font-semibold text-bad">{error}</p>}
           </section>
         );
       })}
 
-      <section className="flex flex-col gap-3 rounded-2xl border border-border bg-white p-4">
+      <section className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-4">
         <b className="text-lg">Photo of the scale</b>
         {photoUrl && (
           // eslint-disable-next-line @next/next/no-img-element -- Cloudinary already resizes it
@@ -218,7 +218,7 @@ export function WeighForm({
         </label>
       </section>
 
-      <div className="fixed inset-x-0 bottom-0 z-10 mx-auto w-full max-w-md border-t border-border bg-white p-3">
+      <div className="fixed inset-x-0 bottom-0 z-10 mx-auto w-full max-w-md border-t border-border bg-card p-3">
         <div className="mb-2 flex items-baseline justify-between px-1">
           <span className="tabular text-sm text-muted-foreground">{(totalKg / 100).toFixed(2)} kg net</span>
           <b className="tabular text-lg">{money(totalKobo)}</b>

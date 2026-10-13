@@ -1,6 +1,7 @@
 /*
  * PlastiCash design tokens (docs/DESIGN_BRIEF.md §5): shadcn/ui variables, brand colours, fonts, radius, shadows,
- * d-btn sizes. Imported by web/app/globals.css after Tailwind. Light mode only for the MVP.
+ * d-btn sizes. Imported by web/app/globals.css after Tailwind. Light and dark (added 13 Oct 2026): colours that change
+ * with the theme are variables set under :root (light) and [data-theme="plasticash-dark"] (dark) below.
  * The daisyUI plugin and its `plasticash` theme sit in web/app/globals.css, because `@plugin "daisyui"` must
  * resolve from web/node_modules. Keep the hex values there identical to the ones here.
  * Fonts come from next/font in web/app/layout.tsx as --font-bricolage, --font-jakarta and --font-geist-mono.
@@ -32,19 +33,37 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
 
-  /* Brand names from the brief (§5.2), e.g. bg-forest, text-heading, bg-mint, text-gold */
+  /* Brand names from the brief (§5.2), e.g. bg-forest, text-heading, bg-mint, text-gold.
+     Fixed in both themes: forest (dark brand areas), primary-dark (gradients), leaf, amber, gold, danger. */
   --color-primary-dark: #14532D;
   --color-forest: #052E16;
-  --color-heading: #0B3B20;
   --color-leaf: #22C55E;
-  --color-mint: #DCFCE7;
-  --color-mist: #F0FDF4;
   --color-amber: #F59E0B;
   --color-gold: #FBBF24;
-  --color-cream: #FEF3C7;
-  --color-ink: #0F172A;
-  --color-canvas: #F8FAFC;
   --color-danger: #DC2626;
+  /* Change with the theme */
+  --color-heading: var(--heading);
+  --color-mint: var(--mint);
+  --color-mist: var(--mist);
+  --color-cream: var(--cream);
+  --color-ink: var(--ink);
+  --color-canvas: var(--canvas);
+  --color-primary-ink: var(--primary-ink); /* dark green text on mint/mist */
+  --color-mint-line: var(--mint-line);
+  /* Status tones: text colour, soft background, line */
+  --color-warn: var(--warn);
+  --color-warn-strong: var(--warn-strong);
+  --color-warn-line: var(--warn-line);
+  --color-bad: var(--bad);
+  --color-bad-soft: var(--bad-soft);
+  --color-bad-line: var(--bad-line);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-route: var(--route);
+  --color-route-soft: var(--route-soft);
+  --color-sky: var(--sky);
+  --color-sky-soft: var(--sky-soft);
+  --color-subtle: var(--subtle); /* hairlines between rows */
 
   /* Shape (§5.6) */
   --radius-sm: 8px;
@@ -84,6 +103,87 @@
   --input: #CBD5E1;
   --ring: #22C55E; /* leaf focus ring */
   --radius: 0.75rem;
+
+  --heading: #0B3B20;
+  --mint: #DCFCE7;
+  --mist: #F0FDF4;
+  --cream: #FEF3C7;
+  --ink: #0F172A;
+  --canvas: #F8FAFC;
+  --primary-ink: #14532D;
+  --mint-line: #BBF7D0;
+  --warn: #B45309;
+  --warn-strong: #92400E;
+  --warn-line: #FDE68A;
+  --bad: #B91C1C;
+  --bad-soft: #FEE2E2;
+  --bad-line: #FCA5A5;
+  --info: #1D4ED8;
+  --info-soft: #DBEAFE;
+  --route: #4338CA;
+  --route-soft: #E0E7FF;
+  --sky: #0369A1;
+  --sky-soft: #E0F2FE;
+  --subtle: #F1F5F9;
+}
+
+/* Dark theme: deep green-black surfaces, brighter green for actions and links (with dark text on green buttons),
+   soft dark versions of the status tones. The forest brand areas, toasts and the QR code look the same. */
+[data-theme="plasticash-dark"] {
+  color-scheme: dark;
+  --background: #0B1410;
+  --foreground: #E2E8F0;
+  --card: #111C17;
+  --card-foreground: #E2E8F0;
+  --popover: #15221B;
+  --popover-foreground: #E2E8F0;
+  --primary: #22C55E;
+  --primary-foreground: #052E16;
+  --secondary: #14341F;
+  --secondary-foreground: #DCFCE7;
+  --muted: #1A2620;
+  --muted-foreground: #94A3B8;
+  --accent: #12261B;
+  --accent-foreground: #DCFCE7;
+  --destructive: #F87171;
+  --border: #24332B;
+  --input: #33473C;
+  --ring: #4ADE80;
+
+  --heading: #ECFDF5;
+  --mint: #14341F;
+  --mist: #0F2418;
+  --cream: #2E2108;
+  --ink: #E5E7EB;
+  --canvas: #0B1410;
+  --primary-ink: #86EFAC;
+  --mint-line: #1F5133;
+  --warn: #FBBF24;
+  --warn-strong: #FCD34D;
+  --warn-line: #713F12;
+  --bad: #FCA5A5;
+  --bad-soft: #3B1515;
+  --bad-line: #7F1D1D;
+  --info: #93C5FD;
+  --info-soft: #172554;
+  --route: #A5B4FC;
+  --route-soft: #1E1B4B;
+  --sky: #7DD3FC;
+  --sky-soft: #082F49;
+  --subtle: #1A2620;
+
+  /* Tailwind greys used directly for secondary text */
+  --color-slate-50: #15221B;
+  --color-slate-400: #64748B;
+  --color-slate-600: #A3B1C2;
+  --color-slate-700: #CBD5E1;
+}
+/* Map tiles are light images: dim and invert them in dark mode (markers keep their colours). */
+[data-theme="plasticash-dark"] .leaflet-tile-pane {
+  filter: invert(1) hue-rotate(180deg) brightness(0.85) contrast(0.9);
+}
+[data-theme="plasticash-dark"] .leaflet-container {
+  background: #1A2620; /* before the tiles load */
 }
 
 @layer base {
@@ -142,7 +242,7 @@
   box-shadow: var(--shadow-primary);
 }
 .d-btn.d-btn-outline {
-  background-color: #FFFFFF !important;
+  background-color: var(--card) !important;
   color: var(--color-ink) !important;
   border-color: transparent !important;
   box-shadow: inset 0 0 0 1.5px var(--input) !important;
@@ -161,10 +261,10 @@
   background-color: rgb(255 255 255 / 0.22) !important;
 }
 .d-btn.d-btn-danger {
-  background-color: #FFFFFF !important;
-  color: #B91C1C !important;
+  background-color: var(--card) !important;
+  color: var(--bad) !important;
   border-color: transparent !important;
-  box-shadow: inset 0 0 0 1.5px #FCA5A5 !important;
+  box-shadow: inset 0 0 0 1.5px var(--bad-line) !important;
 }
 
 /* Numbers, kg, refs and codes: Geist Mono with tabular figures */

@@ -24,11 +24,11 @@ export function UsersTable({ rows, meId }: { rows: UserRow[]; meId: string }) {
   const { pending, run } = useAdminAction();
 
   if (rows.length === 0) {
-    return <p className="rounded-2xl border border-dashed border-border bg-white p-8 text-center text-muted-foreground">No one matches.</p>;
+    return <p className="rounded-2xl border border-dashed border-border bg-card p-8 text-center text-muted-foreground">No one matches.</p>;
   }
 
   return (
-    <section className="overflow-hidden rounded-2xl border border-border bg-white">
+    <section className="overflow-hidden rounded-2xl border border-border bg-card">
       <Table>
         <TableHeader>
           <TableRow>
@@ -52,7 +52,7 @@ export function UsersTable({ rows, meId }: { rows: UserRow[]; meId: string }) {
                     {u.verified_picker && <BadgeCheck className="size-4 text-primary" aria-label="Verified picker" />}
                   </b>
                   {u.name !== u.full_name && <span className="text-xs text-muted-foreground">{u.full_name}</span>}
-                  {!u.is_active && <span className="ml-1 rounded bg-[#FEE2E2] px-1.5 py-0.5 text-[11px] font-bold text-[#B91C1C]">Deactivated</span>}
+                  {!u.is_active && <span className="ml-1 rounded bg-bad-soft px-1.5 py-0.5 text-[11px] font-bold text-bad">Deactivated</span>}
                 </TableCell>
                 <TableCell>{ROLE_LABEL[u.role]}</TableCell>
                 <TableCell className="text-sm">

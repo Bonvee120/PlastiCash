@@ -85,7 +85,7 @@ async function BoardData({ searchParams }: { searchParams: PageProps<"/ops-porta
         <StatCard label="Raw stock" value={kg(stats.raw_stock_kg)} />
       </div>
 
-      <section className="rounded-2xl border border-border bg-white p-4">
+      <section className="rounded-2xl border border-border bg-card p-4">
         <h2 className="text-lg font-bold">Waiting requests by area</h2>
         <p className="mb-3 text-sm text-muted-foreground">
           Estimated kg of REQUESTED pickups, for planning pooled area days. Amber: under {POOL_MIN_KG} kg.

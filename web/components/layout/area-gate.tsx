@@ -27,7 +27,7 @@ export async function AreaGate({ role, children }: { role: Role; children: React
 function InactiveNotice({ message }: { message: string }) {
   return (
     <main className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center gap-4 p-4 text-center">
-      <CircleAlert className="mx-auto size-10 text-danger" aria-hidden />
+      <CircleAlert className="mx-auto size-10 text-bad" aria-hidden />
       <h1 className="text-[26px] font-bold">Account deactivated</h1>
       <p className="text-muted-foreground">{message}</p>
       <LogoutButton />

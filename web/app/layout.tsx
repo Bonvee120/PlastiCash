@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Geist_Mono, Plus_Jakarta_Sans } from "next/font/google";
 
 import { OfflineBanner } from "@/components/brand/offline-banner";
+import { ThemeProvider } from "@/components/brand/theme";
 import { Toaster } from "@/components/ui/sonner";
 
 import { SITE_DESCRIPTION, SITE_URL } from "@/lib/site";
@@ -46,20 +47,26 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#052E16",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#052E16" },
+    { media: "(prefers-color-scheme: dark)", color: "#0B1410" },
+  ],
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
+    // data-theme is set by next-themes before paint (light, dark or the device's), hence suppressHydrationWarning.
     <html
       lang="en"
-      data-theme="plasticash"
+      suppressHydrationWarning
       className={`${bricolage.variable} ${jakarta.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
-        <OfflineBanner />
-        {children}
-        <Toaster />
+        <ThemeProvider>
+          <OfflineBanner />
+          {children}
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );

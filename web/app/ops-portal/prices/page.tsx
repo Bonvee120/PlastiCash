@@ -27,7 +27,7 @@ async function Prices() {
   return (
     <>
       <PriceEditor current={[...latest.values()]} />
-      <section className="overflow-hidden rounded-2xl border border-border bg-white">
+      <section className="overflow-hidden rounded-2xl border border-border bg-card">
         <h2 className="px-4 pt-4 pb-3 text-lg font-bold">History</h2>
         <Table>
           <TableHeader>

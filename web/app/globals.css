@@ -45,5 +45,45 @@
   --noise: 0;
 }
 
+@plugin "daisyui/theme" {
+  name: "plasticash-dark";
+  default: false;
+  prefersdark: false; /* next-themes picks the theme (it follows the device unless the user chose one) */
+  color-scheme: dark;
+
+  --color-base-100: #111C17;
+  --color-base-200: #0B1410;
+  --color-base-300: #24332B;
+  --color-base-content: #E2E8F0;
+  --color-primary: #22C55E;
+  --color-primary-content: #052E16;
+  --color-secondary: #14341F;
+  --color-secondary-content: #DCFCE7;
+  --color-accent: #F59E0B;
+  --color-accent-content: #0B3B20;
+  --color-neutral: #052E16;
+  --color-neutral-content: #FFFFFF;
+  --color-info: #93C5FD;
+  --color-info-content: #0B1410;
+  --color-success: #22C55E;
+  --color-success-content: #052E16;
+  --color-warning: #F59E0B;
+  --color-warning-content: #0B3B20;
+  --color-error: #F87171;
+  --color-error-content: #0B1410;
+
+  --radius-selector: 9999px;
+  --radius-field: 14px;
+  --radius-box: 20px;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+}
+
+/* Tailwind's dark: variant follows the same attribute next-themes sets (shadcn components use dark: classes). */
+@custom-variant dark (&:where([data-theme="plasticash-dark"], [data-theme="plasticash-dark"] *));
+
 /* All other design tokens live in the repo's design/theme.css (docs/DESIGN_BRIEF.md). */
 @import "../../design/theme.css";

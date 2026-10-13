@@ -15,7 +15,7 @@ const INITIAL: DetailsState = { attempt: 0, values: {}, fieldErrors: {}, message
 
 // Native <select> styled like the shadcn Input: easiest to use on a cheap Android phone.
 const selectClass =
-  "h-13 w-full rounded-input border border-input bg-white px-3.5 text-base font-medium outline-none focus-visible:border-2 focus-visible:border-primary aria-invalid:border-2 aria-invalid:border-destructive";
+  "h-13 w-full rounded-input border border-input bg-card px-3.5 text-base font-medium outline-none focus-visible:border-2 focus-visible:border-primary aria-invalid:border-2 aria-invalid:border-destructive";
 
 export function DetailsForm({ defaultFullName = "" }: { defaultFullName?: string }) {
   const [state, action, pending] = useActionState(createProfile, {
@@ -166,7 +166,7 @@ function TypeOption({
   return (
     <label
       className={cn(
-        "relative flex cursor-pointer flex-col gap-2 rounded-2xl border bg-white p-4 transition-colors",
+        "relative flex cursor-pointer flex-col gap-2 rounded-2xl border bg-card p-4 transition-colors",
         "has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-leaf",
         checked ? "border-2 border-primary bg-mist p-[15px]" : "border-border hover:border-primary/50",
       )}
@@ -180,11 +180,11 @@ function TypeOption({
         className="sr-only"
       />
       {checked && (
-        <span className="absolute top-2.5 right-2.5 grid size-[22px] place-items-center rounded-full bg-primary text-white">
+        <span className="absolute top-2.5 right-2.5 grid size-[22px] place-items-center rounded-full bg-primary text-primary-foreground">
           <Check className="size-3.5" strokeWidth={3.4} aria-hidden />
         </span>
       )}
-      <span className={cn("grid size-10 place-items-center rounded-xl", checked ? "bg-primary text-white" : "bg-muted text-muted-foreground")}>
+      <span className={cn("grid size-10 place-items-center rounded-xl", checked ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground")}>
         <Icon className="size-5" aria-hidden />
       </span>
       <b className="text-base">{title}</b>
@@ -211,7 +211,7 @@ function Field({
       <Label htmlFor={id}>{label}</Label>
       {children}
       {error ? (
-        <p className="text-sm text-danger" role="alert">
+        <p className="text-sm text-bad" role="alert">
           {error}
         </p>
       ) : (

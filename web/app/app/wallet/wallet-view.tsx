@@ -22,11 +22,11 @@ const FILTERS = { all: "All", earned: "Earned", withdrawals: "Withdrawals" } as 
 type Filter = keyof typeof FILTERS;
 
 const W_STATUS: Record<Withdrawal["status"], { label: string; tone: string }> = {
-  PENDING: { label: "Waiting for approval", tone: "bg-cream text-[#B45309]" },
-  PROCESSING: { label: "Sending", tone: "bg-[#DBEAFE] text-[#1D4ED8]" },
+  PENDING: { label: "Waiting for approval", tone: "bg-cream text-warn" },
+  PROCESSING: { label: "Sending", tone: "bg-info-soft text-info" },
   PAID: { label: "Paid", tone: "bg-mint text-primary" },
-  FAILED: { label: "Failed, money returned", tone: "bg-[#FEE2E2] text-[#B91C1C]" },
-  REJECTED: { label: "Rejected, money returned", tone: "bg-[#FEE2E2] text-[#B91C1C]" },
+  FAILED: { label: "Failed, money returned", tone: "bg-bad-soft text-bad" },
+  REJECTED: { label: "Rejected, money returned", tone: "bg-bad-soft text-bad" },
 };
 
 export function WalletView({ wallet, withdrawals, bank }: { wallet: Wallet; withdrawals: Withdrawal[]; bank: Me["bank"] }) {
@@ -45,8 +45,8 @@ export function WalletView({ wallet, withdrawals, bank }: { wallet: Wallet; with
   return (
     <div className="flex flex-col gap-5 lg:grid lg:grid-cols-[380px_1fr] lg:items-start">
       <div className="flex flex-col gap-5">
-        <Card className="gap-4 border-[#FDE68A] bg-cream">
-          <span className="eyebrow text-[#92400E]">Balance</span>
+        <Card className="gap-4 border-warn-line bg-cream">
+          <span className="eyebrow text-warn-strong">Balance</span>
           <MoneyDisplay kobo={wallet.balance_kobo} size="xl" />
         </Card>
         <BankRow bank={bank} />
@@ -56,13 +56,13 @@ export function WalletView({ wallet, withdrawals, bank }: { wallet: Wallet; with
             <h3 className="px-[18px] pt-4 pb-2 text-[17px] font-bold">Withdrawals</h3>
             <ul>
               {withdrawals.map((w) => (
-                <li key={w.id} className="flex items-center gap-3 border-t border-[#F1F5F9] px-[18px] py-3 text-sm">
+                <li key={w.id} className="flex items-center gap-3 border-t border-subtle px-[18px] py-3 text-sm">
                   <div className="min-w-0 flex-1">
                     <b className="tabular block">{money(w.amount_kobo)}</b>
                     <small className="tabular text-[11px] text-muted-foreground">
                       {dateTime(w.created_at)} · {w.bank_name} •••• {w.account_number_last4}
                     </small>
-                    {w.failure_reason && <small className="block text-[11px] text-[#B91C1C]">{w.failure_reason}</small>}
+                    {w.failure_reason && <small className="block text-[11px] text-bad">{w.failure_reason}</small>}
                   </div>
                   <span className={cn("rounded-full px-2.5 py-1 text-xs font-bold", W_STATUS[w.status].tone)}>{W_STATUS[w.status].label}</span>
                 </li>
@@ -83,7 +83,7 @@ export function WalletView({ wallet, withdrawals, bank }: { wallet: Wallet; with
                 role="tab"
                 aria-selected={filter === f}
                 onClick={() => setFilter(f)}
-                className={cn("rounded-full px-3 py-1 text-sm font-semibold", filter === f ? "bg-primary text-white" : "bg-muted text-slate-600")}
+                className={cn("rounded-full px-3 py-1 text-sm font-semibold", filter === f ? "bg-primary text-primary-foreground" : "bg-muted text-slate-600")}
               >
                 {FILTERS[f]}
               </button>
@@ -119,7 +119,7 @@ export function WalletView({ wallet, withdrawals, bank }: { wallet: Wallet; with
 
 function EntryRow({ entry, balance }: { entry: LedgerEntry; balance: number }) {
   return (
-    <tr className="border-t border-[#F1F5F9]">
+    <tr className="border-t border-subtle">
       <td className="px-[18px] py-3">
         {entry.pickup_id ? (
           <Link href={`/app/pickups/${entry.pickup_id}`} className="font-semibold hover:text-primary">
@@ -131,7 +131,7 @@ function EntryRow({ entry, balance }: { entry: LedgerEntry; balance: number }) {
         <small className="tabular block text-[11px] text-muted-foreground sm:hidden">{dateTime(entry.created_at)}</small>
       </td>
       <td className="tabular hidden px-2 py-3 text-muted-foreground sm:table-cell">{dateTime(entry.created_at)}</td>
-      <td className={cn("tabular px-2 py-3 text-right font-semibold", entry.amount_kobo >= 0 ? "text-primary" : "text-[#B45309]")}>
+      <td className={cn("tabular px-2 py-3 text-right font-semibold", entry.amount_kobo >= 0 ? "text-primary" : "text-warn")}>
         {entry.amount_kobo >= 0 ? "+" : "−"}
         {pts(Math.abs(entry.amount_kobo)).replace(" pts", "")}
       </td>
@@ -204,7 +204,7 @@ function WithdrawForm({ balance, bank }: { balance: number; bank: Me["bank"] }) 
                 key={k}
                 type="button"
                 onClick={() => setNaira(String(k / 100))}
-                className="tabular rounded-full bg-mist px-3 py-1.5 text-sm font-semibold text-primary-dark ring-1 ring-[#BBF7D0]"
+                className="tabular rounded-full bg-mist px-3 py-1.5 text-sm font-semibold text-primary-ink ring-1 ring-mint-line"
               >
                 {k === balance ? `All (${naira(k)})` : naira(k)}
               </button>
@@ -220,7 +220,7 @@ function WithdrawForm({ balance, bank }: { balance: number; bank: Me["bank"] }) 
               aria-invalid={!!error}
               className="tabular"
             />
-            <p className={cn("text-sm", error ? "text-danger" : "text-muted-foreground")}>{error ?? "Minimum ₦1,000."}</p>
+            <p className={cn("text-sm", error ? "text-bad" : "text-muted-foreground")}>{error ?? "Minimum ₦1,000."}</p>
           </div>
           <Btn variant="accent" block disabled={!naira_ || !!error} onClick={() => setAsking(true)}>
             Withdraw

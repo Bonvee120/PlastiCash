@@ -15,11 +15,11 @@ import { dateTime, money } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 const TONE: Record<AdminWithdrawal["status"], string> = {
-  PENDING: "bg-cream text-[#B45309]",
-  PROCESSING: "bg-[#DBEAFE] text-[#1D4ED8]",
+  PENDING: "bg-cream text-warn",
+  PROCESSING: "bg-info-soft text-info",
   PAID: "bg-mint text-primary",
-  FAILED: "bg-[#FEE2E2] text-[#B91C1C]",
-  REJECTED: "bg-[#FEE2E2] text-[#B91C1C]",
+  FAILED: "bg-bad-soft text-bad",
+  REJECTED: "bg-bad-soft text-bad",
 };
 
 export function WithdrawalQueue({ rows }: { rows: AdminWithdrawal[] }) {
@@ -58,11 +58,11 @@ export function WithdrawalQueue({ rows }: { rows: AdminWithdrawal[] }) {
   }
 
   if (rows.length === 0) {
-    return <p className="rounded-2xl border border-dashed border-border bg-white p-8 text-center text-muted-foreground">Nothing here.</p>;
+    return <p className="rounded-2xl border border-dashed border-border bg-card p-8 text-center text-muted-foreground">Nothing here.</p>;
   }
 
   return (
-    <section className="overflow-hidden rounded-2xl border border-border bg-white">
+    <section className="overflow-hidden rounded-2xl border border-border bg-card">
       {pending.length > 0 && (
         <div className="flex flex-wrap items-center gap-3 border-b border-border px-4 py-3">
           <span className="text-sm text-muted-foreground">
@@ -122,7 +122,7 @@ export function WithdrawalQueue({ rows }: { rows: AdminWithdrawal[] }) {
               <TableCell className="tabular text-sm">{dateTime(w.created_at)}</TableCell>
               <TableCell>
                 <span className={cn("rounded-full px-2.5 py-1 text-xs font-bold", TONE[w.status])}>{w.status.toLowerCase()}</span>
-                {w.failure_reason && <span className="mt-1 block max-w-56 text-xs text-[#B91C1C]">{w.failure_reason}</span>}
+                {w.failure_reason && <span className="mt-1 block max-w-56 text-xs text-bad">{w.failure_reason}</span>}
               </TableCell>
               <TableCell className="text-right whitespace-nowrap">
                 {w.status === "PENDING" && (

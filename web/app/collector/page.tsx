@@ -51,7 +51,7 @@ async function Day() {
               <Link
                 href={`/collector/pickups/${job.id}`}
                 className={cn(
-                  "flex items-center gap-3 rounded-2xl border bg-white p-4",
+                  "flex items-center gap-3 rounded-2xl border bg-card p-4",
                   job.id === next?.id ? "border-2 border-primary" : "border-border",
                   DONE.includes(job.status) && "opacity-70",
                 )}
@@ -60,7 +60,7 @@ async function Day() {
                 <span className="min-w-0 flex-1">
                   <span className="flex flex-wrap items-center gap-2">
                     <b className="text-base">{job.customer_name || "Customer"}</b>
-                    {job.id === next?.id && <span className="rounded bg-primary px-1.5 py-0.5 text-[11px] font-extrabold text-white">NEXT</span>}
+                    {job.id === next?.id && <span className="rounded bg-primary px-1.5 py-0.5 text-[11px] font-extrabold text-primary-foreground">NEXT</span>}
                   </span>
                   <span className="mt-0.5 flex items-center gap-1 text-sm text-slate-700">
                     <MapPin className="size-3.5 shrink-0" aria-hidden />
@@ -84,7 +84,7 @@ async function Day() {
 
 function Stat({ value, label }: { value: string; label: string }) {
   return (
-    <div className="rounded-xl border border-border bg-white px-2 py-3">
+    <div className="rounded-xl border border-border bg-card px-2 py-3">
       <b className="tabular block text-lg">{value}</b>
       <span className="text-xs text-muted-foreground">{label}</span>
     </div>

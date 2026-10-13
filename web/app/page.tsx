@@ -248,9 +248,9 @@ async function PriceCards() {
         if (!p) return null;
         const top = m.value === "PET"; // PET is the core material (strongest demand)
         return (
-          <div key={m.value} className={cn("flex flex-col gap-1 rounded-2xl border p-4", top ? "border-forest bg-forest text-white" : "border-border bg-white")}>
+          <div key={m.value} className={cn("flex flex-col gap-1 rounded-2xl border p-4", top ? "border-forest bg-forest text-white" : "border-border bg-card")}>
             <span className={cn("eyebrow", top ? "text-[#86EFAC]" : "text-muted-foreground")}>{m.label}</span>
-            <b className={cn("tabular text-3xl font-bold", top ? "text-gold" : "text-primary-dark")}>{naira(p.price_kobo_per_kg)}</b>
+            <b className={cn("tabular text-3xl font-bold", top ? "text-gold" : "text-primary-ink")}>{naira(p.price_kobo_per_kg)}</b>
             <small className={top ? "text-[#BBF7D0]" : "text-muted-foreground"}>
               {p.items_per_kg ? `≈ ${p.items_per_kg} ${m.value === "SACHET" ? "sachets" : "items"} = 1 kg` : m.hint}
             </small>
@@ -291,7 +291,7 @@ function Section({ id, eyebrow, title, children }: { id?: string; eyebrow: strin
 
 function Fact({ icon: Icon, value, source, children }: { icon: typeof Waves; value: string; source?: ReactNode; children: ReactNode }) {
   return (
-    <div className="flex flex-col gap-2 rounded-2xl border border-border bg-white p-5">
+    <div className="flex flex-col gap-2 rounded-2xl border border-border bg-card p-5">
       <span className="grid size-10 place-items-center rounded-xl bg-mint text-primary">
         <Icon className="size-5" aria-hidden />
       </span>
@@ -312,9 +312,9 @@ function Cite({ href, children }: { href: string; children: ReactNode }) {
 
 function Step({ n, icon: Icon, title, children }: { n: number; icon: typeof Waves; title: string; children: ReactNode }) {
   return (
-    <li className="flex flex-col gap-2 rounded-2xl border border-border bg-white p-5">
+    <li className="flex flex-col gap-2 rounded-2xl border border-border bg-card p-5">
       <span className="flex items-center gap-2">
-        <span className="tabular grid size-8 place-items-center rounded-full bg-primary text-sm font-bold text-white">{n}</span>
+        <span className="tabular grid size-8 place-items-center rounded-full bg-primary text-sm font-bold text-primary-foreground">{n}</span>
         <Icon className="size-5 text-primary" aria-hidden />
       </span>
       <b className="text-lg">{title}</b>
@@ -325,9 +325,9 @@ function Step({ n, icon: Icon, title, children }: { n: number; icon: typeof Wave
 
 function Audience({ icon: Icon, title, points }: { icon: typeof Waves; title: string; points: string[] }) {
   return (
-    <div className="flex flex-col gap-3 rounded-2xl border border-border bg-white p-6">
+    <div className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-6">
       <span className="flex items-center gap-3">
-        <span className="grid size-10 place-items-center rounded-xl bg-cream text-[#B45309]">
+        <span className="grid size-10 place-items-center rounded-xl bg-cream text-warn">
           <Icon className="size-5" aria-hidden />
         </span>
         <b className="text-xl">{title}</b>
@@ -345,8 +345,8 @@ function Audience({ icon: Icon, title, points }: { icon: typeof Waves; title: st
 
 function Stat({ value, label }: { value: string; label: string }) {
   return (
-    <div className="flex flex-col gap-1 rounded-2xl bg-white p-5">
-      <b className="tabular font-display text-[26px] font-extrabold tracking-[-0.03em] break-words text-primary-dark lg:text-3xl">{value}</b>
+    <div className="flex flex-col gap-1 rounded-2xl bg-card p-5">
+      <b className="tabular font-display text-[26px] font-extrabold tracking-[-0.03em] break-words text-primary-ink lg:text-3xl">{value}</b>
       <span className="text-sm text-muted-foreground">{label}</span>
     </div>
   );
@@ -354,7 +354,7 @@ function Stat({ value, label }: { value: string; label: string }) {
 
 function Faq({ q, children }: { q: string; children: ReactNode }) {
   return (
-    <details className="group rounded-2xl border border-border bg-white p-4 open:pb-5">
+    <details className="group rounded-2xl border border-border bg-card p-4 open:pb-5">
       <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-base font-bold [&::-webkit-details-marker]:hidden">
         {q}
         <span className="text-primary transition-transform group-open:rotate-45" aria-hidden>
