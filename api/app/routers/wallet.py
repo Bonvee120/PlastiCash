@@ -1,16 +1,18 @@
 """The signed-in user's wallet and withdrawals. Users only ever see their own (CLAUDE.md rule 8)."""
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Response
 from sqlalchemy import func
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from app.auth import UserProfile
 from app.db import get_session
-from app.models import LedgerEntry, Withdrawal
+from app.errors import ApiError
+from app.models import AccountType, LedgerEntry, Withdrawal
 from app.schemas import ImpactOut, LedgerEntryOut, WalletOut, WithdrawalCreate, WithdrawalOut, points
-from app.services import impact, ledger, withdrawals
+from app.services import esg, impact, ledger, withdrawals
+from app.services.pickups import lagos_today
 
 router = APIRouter(tags=["wallet"])
 
@@ -62,3 +64,22 @@ async def my_withdrawals(me: UserProfile, session: SessionDep) -> list[Withdrawa
 async def my_impact(me: UserProfile, session: SessionDep) -> ImpactOut:
     data = await impact.for_user(session, me.id)
     return ImpactOut(**data, earned_points=points(data["earned_kobo"]))
+
+
+@router.get("/reports/esg", response_class=Response, responses={200: {"content": {"application/pdf": {}}}})
+async def esg_report(
+    me: UserProfile,
+    session: SessionDep,
+    year: Annotated[int, Query(ge=2024, le=2100)],
+    month: Annotated[int | None, Query(ge=1, le=12)] = None,
+) -> Response:
+    """Monthly (or yearly, without `month`) recycling report as a PDF. Organization accounts only (test 17)."""
+    if me.account_type != AccountType.ORGANIZATION:
+        raise ApiError(403, "ORGANIZATIONS_ONLY", "ESG reports are for organization accounts.")
+    data = await esg.report_data(session, me, year, month, lagos_today())
+    pdf = esg.render_pdf(data)
+    return Response(
+        content=pdf,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="plasticash-esg-{data["slug"]}.pdf"'},
+    )

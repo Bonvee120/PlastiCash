@@ -22,6 +22,8 @@ Free tiers to know about: Supabase pauses inactive free projects, and Render's f
 ```
 DATABASE_URL=postgresql+asyncpg://...        # Supabase connection string (session pooler port 5432, or direct)
 TEST_DATABASE_URL=postgresql+asyncpg://postgres:postgres@localhost:5433/plasticash_test
+DB_POOL_SIZE=5                                # optional; pool + overflow must stay under the
+DB_MAX_OVERFLOW=5                             # Supabase session pooler limit (15 clients)
 SUPABASE_URL=https://xxxx.supabase.co
 SUPABASE_JWT_SECRET=                          # only if the project uses legacy HS256 JWTs; else JWKS is used
 SUPABASE_SERVICE_ROLE_KEY=                    # server only: creating collector accounts

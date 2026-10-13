@@ -134,3 +134,19 @@ One entry per day: what was done, what broke, what's next.
 - Kenzy: enable transfers on the Paystack business; fix `CLOUDINARY_CLOUD_NAME` (Step 7 note). Deactivate or keep the "Test Collector" login made in the browser run.
 - "Add to pool" on the board (brief) needs an API action that doesn't exist yet; pooled requests are shown with a Pool badge.
 - Step 9 (impact, ESG PDF, reminders job).
+
+**Done (Step 9)**
+- 9.1 `/app/impact`: points earned, kg recycled, CO₂ saved, pickups, kg-by-material bars (API `GET /impact` and test 20 were done in step 6).
+- 9.2 `GET /reports/esg?year=&month=` (`services/esg.py`): ORGANIZATION accounts only (403 otherwise, test 17); completed pickups confirmed in the period, Lagos time (1 Oct 00:30 Lagos counts for October); kg by material, CO₂ avoided, pickup count, certificate line (only when something was recycled); every database value HTML-escaped; future periods refused. WeasyPrint 70.0 is imported only when a PDF is made, so without Pango the API answers 503 `PDF_UNAVAILABLE` instead of failing to start. Web: ESG card on `/app/impact` for organizations (month or whole year), downloaded through the route handler `/app/impact/esg`, which adds the user's token server side.
+- 9.3 `POST /jobs/reminders` (`services/reminders.py`, `routers/jobs.py`): `X-Cron-Secret` compared in constant time, refused when no secret is set; reminders at 2, 12 and 24 h after weighing (a late run sends one, not three); auto-confirm at 48 h through `pickup_state.transition` (confirmed_via AUTO, credited once, code cleared); each pickup in its own locked transaction; the counter is saved before the SMS goes out.
+- Tests: `tests/test_reminders.py` (8, test 9 including two overlapping runs on real connections; mutation check: without the row lock both runs send the reminder) and `tests/test_esg.py` (9, test 17). 271 pass on Windows, where the PDF render test skips; all ESG and reminder tests pass inside the Docker image, PDF render included.
+- Live: the Docker image (WeasyPrint, Pango, HarfBuzz) served Green Hills School's 2026 report (185 kg, 206.5 kg CO₂, 1 pickup) and an October report; Chinaza got 403. The job on Supabase: wrong secret 401; first run 2 reminders, second run none.
+
+**Broke (Step 9)**
+- The API returned 500 on every page: `EMAXCONNSESSION max clients reached in session mode ... pool_size: 15`. Supabase's session pooler allows 15 clients for the whole project, and SQLAlchemy's default pool (5 + 10 overflow) let one API process take all 15 when a page load and Next's prefetches came together. The engine is now capped at `DB_POOL_SIZE=5` + `DB_MAX_OVERFLOW=5`, and extra requests wait for a free connection (documented in `05-setup-and-env.md` and `.env.example`). Force-stopping API processes today also left pooler slots counted for a while, so the second API (Docker, port 8002) only got a connection once the host API was stopped. For production: one API instance, pool ≤ 10; consider the transaction pooler later.
+- WeasyPrint can't load on Windows (no Pango); PDFs are checked in the Docker image instead. `uv pip install weasyprint` took over 10 minutes here.
+- WeasyPrint warned that HarfBuzz-Subset will be required; added `libharfbuzz-subset0` to the Dockerfile.
+
+**Next**
+- Kenzy: set up the cron (cron-job.org or GitHub Actions) to POST `/api/v1/jobs/reminders` every 15 min with `X-Cron-Secret` once deployed.
+- Step 10 (landing page, polish, deploy).

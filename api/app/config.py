@@ -13,6 +13,9 @@ class Settings(BaseSettings):
 
     database_url: str = ""
     test_database_url: str = "postgresql+asyncpg://postgres:postgres@localhost:5433/plasticash_test"
+    # Connections per API process; keep pool + overflow under the Supabase session pooler limit (15 on this plan).
+    db_pool_size: int = 5
+    db_max_overflow: int = 5
 
     supabase_url: str = ""
     supabase_jwt_secret: str = ""
