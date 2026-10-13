@@ -148,10 +148,20 @@ export function UserBottomNav() {
   );
 }
 
-export function OpsNav() {
+export type OpsCounts = { pickups: number; disputes: number; withdrawals: number };
+
+// Pickups (waiting requests), Disputes (red when any are open) and Withdrawals (pending) carry counts (§6.4).
+export function OpsNav({ counts }: { counts?: OpsCounts }) {
+  const withCounts = OPS_NAV.map((item) => {
+    if (!counts) return item;
+    if (item.href === "/ops-portal/pickups") return { ...item, count: counts.pickups };
+    if (item.href === "/ops-portal/disputes") return { ...item, count: counts.disputes, alert: counts.disputes > 0 };
+    if (item.href === "/ops-portal/withdrawals") return { ...item, count: counts.withdrawals };
+    return item;
+  });
   return (
     <nav aria-label="Ops portal" className="flex gap-1 overflow-x-auto lg:flex-col lg:overflow-visible">
-      {OPS_NAV.map((item) => (
+      {withCounts.map((item) => (
         <OpsLink key={item.href} item={item} exact={item.href === "/ops-portal"} />
       ))}
     </nav>

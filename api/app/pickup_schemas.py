@@ -301,6 +301,8 @@ class AdminPickupOut(_PickupBase):
     collector_name: str | None
     dispute_photo_url: str | None
     resolved_kg: Decimal | None
+    # The customer's past actual kg ÷ estimated kg (completed door pickups); set on the board only.
+    user_estimate_accuracy: Decimal | None = None
 
     @classmethod
     def build(cls, p: Pickup, items: list[PickupItem], user_name: str, collector_name: str | None) -> "AdminPickupOut":

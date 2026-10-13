@@ -16,7 +16,8 @@ import {
   UserSidebarNav,
 } from "@/components/layout/nav-link";
 import { Skeleton } from "@/components/ui/skeleton";
-import { get } from "@/lib/api";
+import type { Stats } from "@/lib/admin-types";
+import { api, get } from "@/lib/api";
 import { money } from "@/lib/format";
 import { greeting, type Me } from "@/lib/me";
 import type { Wallet } from "@/lib/types";
@@ -270,7 +271,9 @@ export function OpsShell({ me, children }: { me: Me; children: ReactNode }) {
         >
           <Logo variant="white" size={30} subline="Ops portal" />
         </Link>
-        <OpsNav />
+        <Suspense fallback={<OpsNav />}>
+          <OpsNavWithCounts />
+        </Suspense>
         <div className="mt-auto hidden flex-col gap-3 pt-6 lg:flex">
           <p className="text-[13px] text-[#86EFAC]">{greeting(me)}</p>
           <LogoutButton dark />
@@ -278,6 +281,21 @@ export function OpsShell({ me, children }: { me: Me; children: ReactNode }) {
       </aside>
       <div className="flex min-w-0 flex-1 flex-col">{children}</div>
     </div>
+  );
+}
+
+async function OpsNavWithCounts() {
+  const result = await api<Stats>("/admin/stats");
+  if (!result.ok) return <OpsNav />;
+  const stats = result.data;
+  return (
+    <OpsNav
+      counts={{
+        pickups: stats.waiting_requests,
+        disputes: stats.open_disputes,
+        withdrawals: stats.pending_withdrawals.count,
+      }}
+    />
   );
 }
 

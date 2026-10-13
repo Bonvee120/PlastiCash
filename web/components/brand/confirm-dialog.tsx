@@ -15,6 +15,7 @@ export function ConfirmDialog({
   confirmLabel,
   onConfirm,
   pending = false,
+  disabled = false,
   tone = "primary",
 }: {
   open: boolean;
@@ -25,6 +26,7 @@ export function ConfirmDialog({
   confirmLabel: string;
   onConfirm: () => void;
   pending?: boolean;
+  disabled?: boolean;
   tone?: "primary" | "danger";
 }) {
   return (
@@ -39,7 +41,7 @@ export function ConfirmDialog({
           <Btn variant="outline" className="flex-1" onClick={() => onOpenChange(false)} disabled={pending}>
             Not now
           </Btn>
-          <Btn variant={tone === "danger" ? "danger" : "primary"} className="flex-1" onClick={onConfirm} disabled={pending}>
+          <Btn variant={tone === "danger" ? "danger" : "primary"} className="flex-1" onClick={onConfirm} disabled={pending || disabled}>
             {pending ? "Please wait…" : confirmLabel}
           </Btn>
         </DialogFooter>

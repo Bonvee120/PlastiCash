@@ -10,6 +10,7 @@ from sqlalchemy import func
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
+from app.admin_schemas import AdminWithdrawalOut
 from app.auth import AdminProfile, require_admin
 from app.db import get_session
 from app.errors import ApiError
@@ -17,7 +18,7 @@ from app.models import Material, Pickup, PickupStatus, Price, Profile, Role, Wit
 from app.pickup_schemas import AdminBoardOut, AdminPickupOut, AreaTotal, AssignIn, CancelIn, ResolveIn
 from app.schemas import PriceOut, RejectBody, WithdrawalOut
 from app.schemas import display_name
-from app.services import paystack, pickups, withdrawals
+from app.services import paystack, pickups, stats, withdrawals
 from app.services.pickup_state import transition
 from app.services.paystack import PaystackError
 
@@ -38,13 +39,19 @@ async def price_history(session: SessionDep, material: Material | None = None) -
 # ----- Withdrawals -----
 
 
-@router.get("/withdrawals", response_model=list[WithdrawalOut])
-async def withdrawal_queue(session: SessionDep, status: WithdrawalStatus | None = None) -> list[WithdrawalOut]:
-    """Review queue, oldest first (first in, first paid)."""
-    query = select(Withdrawal).order_by(Withdrawal.created_at)
+@router.get("/withdrawals", response_model=list[AdminWithdrawalOut])
+async def withdrawal_queue(session: SessionDep, status: WithdrawalStatus | None = None) -> list[AdminWithdrawalOut]:
+    """Review queue, oldest first (first in, first paid), with each customer's name."""
+    query = select(Withdrawal).order_by(Withdrawal.created_at).limit(500)
     if status is not None:
         query = query.where(Withdrawal.status == status)
-    return [WithdrawalOut.from_withdrawal(w) for w in (await session.exec(query)).all()]
+    rows = (await session.exec(query)).all()
+    people = await pickups.names(session, {w.user_id for w in rows})
+    return [
+        AdminWithdrawalOut(**WithdrawalOut.from_withdrawal(w).model_dump(),
+                           user_name=display_name(people[w.user_id]) or people[w.user_id].full_name)
+        for w in rows
+    ]
 
 
 @router.post("/withdrawals/{withdrawal_id}/approve", response_model=WithdrawalOut)
@@ -122,6 +129,10 @@ async def pickup_board(
     if day:
         query = query.where((Pickup.scheduled_date == day) | (Pickup.preferred_date == day))
     rows = (await session.exec(query)).all()
+    views = await _admin_views(session, list(rows))
+    accuracy = {u: stats.ratio(est, act) for u, _, est, act in await stats.accuracy(session, {p.user_id for p in rows})}
+    for view in views:
+        view.user_estimate_accuracy = accuracy.get(view.user_id)
     totals = await session.exec(
         select(Pickup.area, func.count(), func.count().filter(Pickup.pooled), func.coalesce(func.sum(Pickup.estimated_kg), 0))
         .where(Pickup.status == PickupStatus.REQUESTED)
@@ -129,7 +140,7 @@ async def pickup_board(
         .order_by(func.coalesce(func.sum(Pickup.estimated_kg), 0).desc())
     )
     return AdminBoardOut(
-        pickups=await _admin_views(session, list(rows)),
+        pickups=views,
         area_totals=[AreaTotal(area=a or "Unknown", requests=n, pooled=pooled, estimated_kg=Decimal(kg))
                      for a, n, pooled, kg in totals.all()],
     )

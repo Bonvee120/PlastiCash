@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import get_settings
 from app.errors import install_error_handlers
-from app.routers import admin, collector, me, pickups, prices, wallet, webhooks
+from app.routers import admin, admin_ops, collector, me, pickups, prices, wallet, webhooks
 
 app = FastAPI(title="PlastiCash API")
 install_error_handlers(app)
@@ -30,5 +30,6 @@ api.include_router(pickups.router)
 api.include_router(collector.router)
 api.include_router(wallet.router)
 api.include_router(admin.router)
+api.include_router(admin_ops.router)
 api.include_router(webhooks.router)
 app.include_router(api)

@@ -116,3 +116,21 @@ One entry per day: what was done, what broke, what's next.
 - Open questions: brief §9 prices (PET ₦180, cans ₦250...) differ from the seed (PET ₦185, cans ₦400...); which is right? `NEXT_PUBLIC_WHATSAPP_NUMBER` is not set. Withdraw confirm should be a Drawer on phones (brief), now a Dialog.
 - 0.1: 2 real conversations with evidence and a price board photo; then the final, named sign-off of `RESEARCH.md`.
 - Remove the ngrok test webhook URL from the Paystack dashboard once the tunnel is closed.
+
+## 2026-10-13
+
+**Done**
+- Step 8 API (`app/routers/admin_ops.py`, ADMIN guard on the router, so test 16 covers every new route): `GET /admin/stats` (kg and pickup credits this month in Lagos time, pending withdrawals, open disputes, waiting requests, raw stock, estimate accuracy per customer, disputes per collector); `POST /admin/prices` (new version, `set_by` = admin); `GET /admin/users?role=&q=` with balances; `PATCH /admin/users/{id}` (active, verified picker for customers only, role; an admin can't deactivate or demote themselves); `POST /admin/collectors` (Supabase login with the service role key, then the COLLECTOR profile with the same id; phone checked first, login deleted again if the profile can't be saved); `POST /admin/ledger/adjustments` (note required, profile row locked, can't go below zero); `GET /admin/stock`, `POST /admin/bales` (code `PET-2026-0001`; never heavier than raw stock), `/process`, `/sell`. The board now carries each customer's past estimate accuracy; the withdrawal queue carries the customer's name.
+- `tests/test_admin_ops.py` (15 tests) including required test 19 and a real race: two simultaneous bales can't use the same kilos (per-material advisory lock). Mutation check: without the lock the race test fails. 255 tests pass.
+- Step 8 web (`/ops-portal`): overview with stats and the accuracy and disputes tables; sidebar counts (waiting pickups, open disputes in red, pending withdrawals); pickups board with filters, estimated-kg bars per area (amber under 50 kg), flags (pool, under minimum, low estimates), assign (collector and date) and cancel; disputes with both photos side by side, the claim, final kg per material and "Resolve and pay N pts"; prices with current cards, a new-version form prefilled from the current one, and history; withdrawals by status with bulk approve and reject with a reason; users and collectors with search, verify picker, adjust balance, role, deactivate/reactivate and create collector; stock with cards per material, real loss %, revenue, new bale, process and sell.
+- Browser run as admin (production build, Supabase): assigned PC-E454 to Ifeanyi; resolved Ngozi's dispute PC-3203 at 56 kg = 10,360 pts; added a TIN price version (same price, sack 15 kg); rejected a duplicate ₦1,000 withdrawal (money back); approved one (Paystack refused, see Broke; FAILED and money back); adjusted Emeka +100 and −100 pts; verified-picker toggle; deactivated and reactivated Ngozi; created bale PET-2026-0004 (10 kg), processed, sold for ₦2,500; created collector "Test Collector" (test.collector@example.com) and the same phone again was refused.
+
+**Broke**
+- Paystack refuses every transfer from this account: "You cannot initiate third party payouts as a starter business." The approve flow handled it as designed (FAILED, money returned to the wallet). The Paystack business needs to be allowed to make transfers (business verification/upgrade in the Paystack dashboard) before payouts can work, even in test mode.
+- After an admin action the table showed the old row for several seconds (the page reloads with several Supabase round trips from here), so a second click could act on stale data; Emeka's verified badge was toggled twice that way. Now every action keeps its buttons and dialog in "Please wait…" until the refreshed data is on screen.
+- The background servers were stopped for low memory; the old Next process kept port 3001, so the new one failed with `EADDRINUSE`. Stopped it by PID.
+
+**Next**
+- Kenzy: enable transfers on the Paystack business; fix `CLOUDINARY_CLOUD_NAME` (Step 7 note). Deactivate or keep the "Test Collector" login made in the browser run.
+- "Add to pool" on the board (brief) needs an API action that doesn't exist yet; pooled requests are shown with a Pool badge.
+- Step 9 (impact, ESG PDF, reminders job).
