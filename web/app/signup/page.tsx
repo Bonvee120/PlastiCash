@@ -5,7 +5,11 @@ import { AuthCard } from "@/components/auth/auth-card";
 
 import { SignupForm } from "./signup-form";
 
-export const metadata: Metadata = { title: "Sign up · PlastiCash" };
+export const metadata: Metadata = {
+  title: "Sign up",
+  description: "Create a PlastiCash account to sell your plastic in Enugu by weight and withdraw to your bank.",
+  alternates: { canonical: "/signup" },
+};
 
 // Step 1: email and password. Step 2 (Individual or Organization details) comes after the first login.
 export default function SignupPage() {

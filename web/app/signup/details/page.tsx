@@ -9,7 +9,7 @@ import { loadMe, ROLE_HOME } from "@/lib/me";
 
 import { DetailsForm } from "./details-form";
 
-export const metadata: Metadata = { title: "Finish signing up · PlastiCash" };
+export const metadata: Metadata = { title: "Finish signing up", robots: { index: false, follow: false } };
 
 // Sign-up step 2 (after email + password and the first login): Individual or Organization details.
 export default function DetailsPage() {

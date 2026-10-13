@@ -1,5 +1,7 @@
 "use server";
 
+import { updateTag } from "next/cache";
+
 import type { ActionResult } from "@/lib/actions";
 import type { AdminPickup, AdminWithdrawal, Bale, PriceVersion, UserRow } from "@/lib/admin-types";
 import { api } from "@/lib/api";
@@ -31,7 +33,9 @@ export async function addPrice(body: {
   items_per_kg: number | null;
   co2_kg_saved_per_kg: string;
 }) {
-  return call<PriceVersion>("/admin/prices", "POST", body);
+  const result = await call<PriceVersion>("/admin/prices", "POST", body);
+  if (result.ok) updateTag("prices"); // the landing page and guide show the new price right away
+  return result;
 }
 
 export async function approveWithdrawal(id: string) {

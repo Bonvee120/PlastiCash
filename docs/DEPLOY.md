@@ -29,6 +29,8 @@ The free instance sleeps after 15 idle minutes; the first request after that tak
    - `NEXT_PUBLIC_API_URL` = `https://<your-api>.onrender.com/api/v1`
    - `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` (same lowercase cloud name)
    - optional: `NEXT_PUBLIC_HUB_ADDRESS`, `NEXT_PUBLIC_WHATSAPP_NUMBER` (international format, e.g. 2348031234567)
+   - `NEXT_PUBLIC_SITE_URL` once you have your own domain (canonical links, sitemap, social cards); until then Vercel's production URL is used
+   - The landing page and guide are prerendered during the build with prices from the API, so deploy the API (step 1) first.
 4. Deploy.
 
 **Check:** the Vercel URL shows the landing page with live prices and the impact totals.

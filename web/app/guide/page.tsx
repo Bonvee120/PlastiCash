@@ -4,12 +4,16 @@ import { Suspense } from "react";
 import { BtnLink, Card } from "@/components/brand/ui";
 import { SiteFooter, SiteHeader } from "@/components/public/site-chrome";
 import { Skeleton } from "@/components/ui/skeleton";
-import { get } from "@/lib/api";
 import { naira } from "@/lib/format";
+import { getCurrentPrices } from "@/lib/public-data";
 import { HUB } from "@/lib/site";
-import { MATERIALS, type CurrentPrice } from "@/lib/types";
+import { MATERIALS } from "@/lib/types";
 
-export const metadata: Metadata = { title: "How much is my plastic? · PlastiCash" };
+export const metadata: Metadata = {
+  title: "Bottle guide: how much is my plastic worth?",
+  description: "Today's price per kg for PET bottles, hard plastic, sachets, cans and tins in Enugu, how many items make a kilo and what a full sack is worth.",
+  alternates: { canonical: "/guide" },
+};
 
 // Public page: bottles per kg and the sack guide, at today's prices (03-screens-and-routes.md).
 export default function GuidePage() {
@@ -54,7 +58,8 @@ export default function GuidePage() {
 }
 
 async function Prices() {
-  const prices = await get<CurrentPrice[]>("/prices/current");
+  const prices = await getCurrentPrices();
+  if (!prices) return <p className="text-muted-foreground">Prices are not available right now. Try again shortly.</p>;
   const byMaterial = new Map(prices.map((p) => [p.material, p]));
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

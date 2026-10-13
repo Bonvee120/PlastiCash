@@ -12,11 +12,11 @@ import { LogoutButton } from "@/components/auth/logout-button";
 import { Logo, LogoMark } from "@/components/brand/logo";
 import {
   OpsNav,
+  type OpsCounts,
   UserBottomNav,
   UserSidebarNav,
 } from "@/components/layout/nav-link";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { Stats } from "@/lib/admin-types";
 import { api, get } from "@/lib/api";
 import { money } from "@/lib/format";
 import { greeting, type Me } from "@/lib/me";
@@ -285,18 +285,9 @@ export function OpsShell({ me, children }: { me: Me; children: ReactNode }) {
 }
 
 async function OpsNavWithCounts() {
-  const result = await api<Stats>("/admin/stats");
-  if (!result.ok) return <OpsNav />;
-  const stats = result.data;
-  return (
-    <OpsNav
-      counts={{
-        pickups: stats.waiting_requests,
-        disputes: stats.open_disputes,
-        withdrawals: stats.pending_withdrawals.count,
-      }}
-    />
-  );
+  // One cheap query; the full /admin/stats is only for the overview page.
+  const result = await api<OpsCounts>("/admin/counts");
+  return result.ok ? <OpsNav counts={result.data} /> : <OpsNav />;
 }
 
 // ----- Placeholder for pages that later steps build -----

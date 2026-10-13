@@ -1,4 +1,5 @@
 import { connection } from "next/server";
+import { cache } from "react";
 
 import { createClient } from "@/lib/supabase/server";
 
@@ -43,9 +44,13 @@ export async function api<T>(path: string, init: { method?: string; body?: unkno
   };
 }
 
+// GETs deduplicated within one server request (React cache): the layout's /me and a page's /me are one API call.
+// Each call is a round trip to the API and on to the database, so duplicates cost real time.
+export const apiGet = cache((path: string) => api<unknown>(path));
+
 // For pages: the data or an error (caught by app/error.tsx with a friendly retry screen).
 export async function get<T>(path: string): Promise<T> {
-  const result = await api<T>(path);
+  const result = (await apiGet(path)) as ApiResult<T>;
   if (!result.ok) throw new Error(`GET ${path} failed: ${result.status} ${result.error.code}`);
   return result.data;
 }

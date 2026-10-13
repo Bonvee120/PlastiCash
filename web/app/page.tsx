@@ -5,25 +5,48 @@ import { Suspense, type ReactNode } from "react";
 
 import { SiteFooter, SiteHeader } from "@/components/public/site-chrome";
 import { Skeleton } from "@/components/ui/skeleton";
-import { api } from "@/lib/api";
 import { AREAS } from "@/lib/areas";
 import { naira } from "@/lib/format";
-import { HUB } from "@/lib/site";
-import { MATERIALS, type CurrentPrice } from "@/lib/types";
+import { getCurrentPrices, getImpactTotals } from "@/lib/public-data";
+import { HUB, SITE_DESCRIPTION, SITE_URL, WHATSAPP_URL } from "@/lib/site";
+import { MATERIALS } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "PlastiCash by EcoCyclers · Your plastic is money",
-  description: "Sell your plastic in Enugu by weight. A collector weighs it in front of you, you confirm, and you withdraw to your bank.",
+  title: { absolute: "PlastiCash by EcoCyclers · Sell your plastic in Enugu for cash" },
+  alternates: { canonical: "/" },
 };
 
-type Totals = { kg_recycled: string; points_paid_kobo: number; co2_kg: string; pickups: number };
+// Landing page (03-screens-and-routes.md, DESIGN_BRIEF.md §9). Prices and totals come from the public API through
+// lib/public-data.ts (cached, so the page is prerendered); if the API is down the page still renders, without numbers.
+// Structured data for search engines: the EcoCyclers hub as a local recycling centre (schema.org RecyclingCenter).
+const JSON_LD = {
+  "@context": "https://schema.org",
+  "@type": "RecyclingCenter",
+  name: "EcoCyclers (PlastiCash)",
+  description: SITE_DESCRIPTION,
+  url: SITE_URL,
+  logo: `${SITE_URL}/icon.svg`,
+  image: `${SITE_URL}/opengraph-image`,
+  address: { "@type": "PostalAddress", streetAddress: HUB.address, addressLocality: "Enugu", addressRegion: "Enugu", addressCountry: "NG" },
+  areaServed: { "@type": "City", name: "Enugu" },
+  openingHoursSpecification: {
+    "@type": "OpeningHoursSpecification",
+    dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+    opens: "08:00",
+    closes: "17:00",
+  },
+  ...(WHATSAPP_URL ? { sameAs: [WHATSAPP_URL] } : {}),
+};
 
-// Landing page (03-screens-and-routes.md, DESIGN_BRIEF.md §9). Live prices and totals come from the public API;
-// if the API is down the page still renders, without numbers.
 export default function LandingPage() {
   return (
     <div className="flex min-h-svh flex-col bg-canvas">
+      <script
+        type="application/ld+json"
+        // Static object from this file; "<" escaped so the JSON can never close the script tag.
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD).replace(/</g, "\\u003c") }}
+      />
       <section className="relative overflow-hidden text-white" style={{ background: "linear-gradient(160deg, #052E16 0%, #14532D 55%, #166534 100%)" }}>
         <SiteHeader dark />
         <div className="mx-auto grid max-w-[1280px] items-center gap-10 px-4 pt-6 pb-16 lg:grid-cols-[1.1fr_1fr] lg:px-[72px] lg:pt-14 lg:pb-24">
@@ -183,13 +206,8 @@ export default function LandingPage() {
   );
 }
 
-async function prices(): Promise<CurrentPrice[] | null> {
-  const result = await api<CurrentPrice[]>("/prices/current");
-  return result.ok ? result.data : null;
-}
-
 async function PriceBoard() {
-  const list = await prices();
+  const list = await getCurrentPrices();
   return (
     <div className="rounded-3xl border border-white/15 bg-white/10 p-6 backdrop-blur">
       <div className="mb-4 flex items-center justify-between">
@@ -221,7 +239,7 @@ async function PriceBoard() {
 }
 
 async function PriceCards() {
-  const list = await prices();
+  const list = await getCurrentPrices();
   if (!list) return <p className="text-muted-foreground">Prices are not available right now. Try again shortly.</p>;
   return (
     <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
@@ -244,9 +262,8 @@ async function PriceCards() {
 }
 
 async function ImpactBand() {
-  const result = await api<Totals>("/impact/total");
-  if (!result.ok) return <p className="text-muted-foreground">Totals are not available right now.</p>;
-  const t = result.data;
+  const t = await getImpactTotals();
+  if (!t) return <p className="text-muted-foreground">Totals are not available right now.</p>;
   const number = (v: string | number) => Number(v).toLocaleString("en-NG", { maximumFractionDigits: 0 });
   return (
     <div className="grid grid-cols-1 gap-4 min-[420px]:grid-cols-2 md:grid-cols-4">

@@ -4,8 +4,7 @@ import { Suspense } from "react";
 
 import { WalkInFlow } from "@/components/collector/walk-in-flow";
 import { Skeleton } from "@/components/ui/skeleton";
-import { get } from "@/lib/api";
-import type { CurrentPrice } from "@/lib/types";
+import { pricesOrThrow } from "@/lib/public-data";
 
 // Hub walk-in: find the customer by phone, weigh, then the SMS code (spec 03).
 export default function HubWalkInPage() {
@@ -23,6 +22,6 @@ export default function HubWalkInPage() {
 }
 
 async function Flow() {
-  const prices = await get<CurrentPrice[]>("/prices/current");
+  const prices = await pricesOrThrow();
   return <WalkInFlow prices={prices} />;
 }

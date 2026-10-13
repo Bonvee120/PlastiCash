@@ -322,3 +322,14 @@ async def test_withdrawal_queue_shows_the_customer(client: AsyncClient, session:
     await session.flush()
     queue = (await client.get(f"{API}/withdrawals?status=PENDING", headers=bearer(admin.id))).json()
     assert [(w["user_name"], w["account_number_last4"]) for w in queue] == [("Chinaza", "6789")]
+
+
+async def test_sidebar_counts(client: AsyncClient, session: AsyncSession, admin) -> None:
+    before = (await client.get(f"{API}/counts", headers=bearer(admin.id))).json()
+    owner = await make_user(session, "Owner")
+    session.add(Pickup(user_id=owner.id, area="GRA"))
+    session.add(Withdrawal(user_id=owner.id, amount_kobo=100_000, status=WithdrawalStatus.PENDING, bank_name="GTB",
+                           account_number="0123456789", account_name="OWNER", paystack_recipient_code="RCP_test"))
+    await session.flush()
+    after = (await client.get(f"{API}/counts", headers=bearer(admin.id))).json()
+    assert {k: after[k] - before[k] for k in after} == {"pickups": 1, "disputes": 0, "withdrawals": 1}

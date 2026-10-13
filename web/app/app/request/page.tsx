@@ -2,9 +2,8 @@ import { Suspense } from "react";
 
 import { PageTitle } from "@/components/brand/ui";
 import { Skeleton } from "@/components/ui/skeleton";
-import { get } from "@/lib/api";
 import { loadMe } from "@/lib/me";
-import type { CurrentPrice } from "@/lib/types";
+import { pricesOrThrow } from "@/lib/public-data";
 
 import { RequestForm } from "./request-form";
 
@@ -20,7 +19,7 @@ export default function RequestPage() {
 }
 
 async function Form() {
-  const [prices, state] = await Promise.all([get<CurrentPrice[]>("/prices/current"), loadMe()]);
+  const [prices, state] = await Promise.all([pricesOrThrow(), loadMe()]);
   const me = state.kind === "ok" ? state.me : null;
   return <RequestForm prices={prices} defaults={{ address: me?.address ?? "", area: me?.area ?? "" }} />;
 }

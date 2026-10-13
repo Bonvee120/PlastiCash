@@ -1,4 +1,4 @@
-import { api } from "@/lib/api";
+import { apiGet, type ApiResult } from "@/lib/api";
 
 export type Role = "USER" | "COLLECTOR" | "ADMIN";
 
@@ -35,7 +35,7 @@ export type MeState =
   | { kind: "inactive"; message: string };
 
 export async function loadMe(): Promise<MeState> {
-  const result = await api<Me>("/me");
+  const result = (await apiGet("/me")) as ApiResult<Me>;
   if (result.ok) return { kind: "ok", me: result.data };
   if (result.status === 401) return { kind: "logged-out" };
   if (result.status === 404 && result.error.code === "PROFILE_NOT_FOUND") return { kind: "no-profile" };

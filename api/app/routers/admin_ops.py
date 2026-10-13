@@ -33,32 +33,33 @@ SessionDep = Annotated[AsyncSession, Depends(get_session)]
 # ----- Stats -----
 
 
+@router.get("/counts")
+async def sidebar_counts(session: SessionDep) -> dict[str, int]:
+    """Badges for the ops sidebar on every page: one query instead of the whole dashboard."""
+    return await stats.counts(session)
+
+
 @router.get("/stats", response_model=StatsOut)
 async def dashboard(session: SessionDep) -> StatsOut:
+    """Three queries in total: the single numbers, estimate accuracy (with names), disputes per collector."""
     since = stats.month_start()
-    count, amount = await stats.pending_withdrawals(session)
-    paid = await stats.points_paid(session, since)
-    raw_in, baled = await stock.raw_in(session), await stock.baled(session)
-
-    accuracy = await stats.accuracy(session)
-    people = {
-        p.id: p
-        for p in (await session.exec(select(Profile).where(Profile.id.in_({a[0] for a in accuracy})))).all()
-    } if accuracy else {}
+    head = await stats.headline(session, since)
     rows = sorted(
-        (UserAccuracy(user_id=u, name=display_name(people[u]) or people[u].full_name, pickups=n, estimated_kg=est,
-                      actual_kg=act, accuracy=stats.ratio(est, act)) for u, n, est, act in accuracy),
+        (UserAccuracy(user_id=p.id, name=display_name(p) or p.full_name, pickups=n, estimated_kg=est, actual_kg=act,
+                      accuracy=stats.ratio(est, act))
+         for p, n, est, act in await stats.accuracy_with_profiles(session)),
         key=lambda r: r.accuracy,
     )
+    count, amount = head["pending"]
     return StatsOut(
         month_start=since,
-        kg_this_month=await stats.kg_this_month(session, since),
-        points_paid_kobo=paid,
-        points_paid=points(paid),
+        kg_this_month=head["kg_this_month"],
+        points_paid_kobo=head["points_paid_kobo"],
+        points_paid=points(head["points_paid_kobo"]),
         pending_withdrawals=PendingWithdrawals(count=count, amount_kobo=amount),
-        open_disputes=await stats.count_status(session, PickupStatus.DISPUTED),
-        waiting_requests=await stats.count_status(session, PickupStatus.REQUESTED),
-        raw_stock_kg=sum(raw_in.values(), Decimal("0")) - sum(baled.values(), Decimal("0")),
+        open_disputes=head["open_disputes"],
+        waiting_requests=head["waiting_requests"],
+        raw_stock_kg=head["raw_stock_kg"],
         estimate_accuracy=rows[:10],
         disputes_per_collector=[
             CollectorDisputes(collector_id=c, name=name, weighed=w, disputes=d)

@@ -5,8 +5,9 @@ import { Suspense } from "react";
 
 import { JobFlow } from "@/components/collector/job-flow";
 import { Skeleton } from "@/components/ui/skeleton";
-import { api, get } from "@/lib/api";
-import type { CollectorPickup, CurrentPrice } from "@/lib/types";
+import { api } from "@/lib/api";
+import { pricesOrThrow } from "@/lib/public-data";
+import type { CollectorPickup } from "@/lib/types";
 
 export default function JobPage({ params }: PageProps<"/collector/pickups/[id]">) {
   return (
@@ -25,7 +26,7 @@ async function Job({ params }: { params: PageProps<"/collector/pickups/[id]">["p
   const { id } = await params;
   const [result, prices] = await Promise.all([
     api<CollectorPickup>(`/collector/pickups/${id}`),
-    get<CurrentPrice[]>("/prices/current"),
+    pricesOrThrow(),
   ]);
   if (!result.ok && (result.status === 404 || result.status === 422)) notFound();
   if (!result.ok) throw new Error(`GET /collector/pickups/${id} failed: ${result.status}`);
