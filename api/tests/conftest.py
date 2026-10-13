@@ -158,3 +158,27 @@ async def client(session: AsyncSession) -> AsyncIterator[AsyncClient]:
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         yield client
     app.dependency_overrides.clear()
+
+
+@pytest.fixture(autouse=True)
+def no_redis(monkeypatch) -> None:
+    """Tests run without Redis unless they ask for the `redis` fixture, so counts and caches never leak between them
+    (api/.env may point at a real local Redis)."""
+    from app import ratelimit, redis_client
+
+    monkeypatch.setattr(redis_client, "get_redis", lambda: None)
+    monkeypatch.setattr(ratelimit, "get_redis", lambda: None)
+
+
+@pytest_asyncio.fixture
+async def redis(monkeypatch):
+    """A fresh in-memory Redis (fakeredis) for this test, wired into the rate limiter and the caches."""
+    from fakeredis import FakeAsyncRedis
+
+    from app import ratelimit, redis_client
+
+    fake = FakeAsyncRedis(decode_responses=True)
+    monkeypatch.setattr(redis_client, "get_redis", lambda: fake)
+    monkeypatch.setattr(ratelimit, "get_redis", lambda: fake)
+    yield fake
+    await fake.aclose()

@@ -8,6 +8,18 @@ const nextConfig: NextConfig = {
   partialPrefetching: true,
   reactCompiler: true,
   // Browsers still ask for /favicon.ico; the icon is app/icon.svg (the PlastiCash mark).
+  // The service worker must always be fresh, or a fix to it could take a day to reach browsers.
+  async headers() {
+    return [
+      {
+        source: "/sw.js",
+        headers: [
+          { key: "Cache-Control", value: "no-cache, no-store, must-revalidate" },
+          { key: "Content-Type", value: "application/javascript; charset=utf-8" },
+        ],
+      },
+    ];
+  },
   async redirects() {
     return [{ source: "/favicon.ico", destination: "/icon.svg", permanent: true }];
   },

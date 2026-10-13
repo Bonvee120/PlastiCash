@@ -16,6 +16,7 @@ from app.pickup_schemas import CollectorPickupOut, LocationIn, OtpIn, ScanIn, Us
 from app.schemas import display_name
 from app.services import pickups, termii
 from app.services.pickup_state import transition
+from app.ratelimit import HOUR, MINUTE, rate_limit
 
 router = APIRouter(prefix="/collector", tags=["collector"], dependencies=[Depends(require_collector)])
 
@@ -87,14 +88,20 @@ async def weigh(pickup_id: UUID, body: WeighIn, me: CollectorProfile, session: S
     return WeighOut(pickup=await _view(session, pickup), sms_sent=sent)
 
 
-@router.post("/pickups/{pickup_id}/otp", response_model=CollectorPickupOut)
+@router.post(
+    "/pickups/{pickup_id}/otp", response_model=CollectorPickupOut,
+    dependencies=[Depends(rate_limit("otp", 20, 10 * MINUTE))],
+)
 async def confirm_with_code(pickup_id: UUID, body: OtpIn, me: CollectorProfile, session: SessionDep) -> CollectorPickupOut:
     pickup = await pickups.confirm_with_code(session, pickup_id, me, body.code)
     await session.commit()
     return await _view(session, pickup)
 
 
-@router.post("/pickups/{pickup_id}/resend-otp", response_model=WeighOut)
+@router.post(
+    "/pickups/{pickup_id}/resend-otp", response_model=WeighOut,
+    dependencies=[Depends(rate_limit("resend-otp", 10, HOUR))],
+)
 async def resend_code(pickup_id: UUID, me: CollectorProfile, session: SessionDep) -> WeighOut:
     pickup, code = await pickups.resend_code(session, pickup_id, me)
     await session.commit()
@@ -102,7 +109,7 @@ async def resend_code(pickup_id: UUID, me: CollectorProfile, session: SessionDep
     return WeighOut(pickup=await _view(session, pickup), sms_sent=sent)
 
 
-@router.get("/users/search", response_model=UserSearchOut)
+@router.get("/users/search", response_model=UserSearchOut, dependencies=[Depends(rate_limit("phone-search", 60, HOUR))])
 async def search_user(phone: str, me: CollectorProfile, session: SessionDep) -> UserSearchOut:
     """Hub walk-in: find the customer by phone. Name and id only."""
     user = await pickups.find_user_by_phone(session, phone)

@@ -12,6 +12,7 @@ from typing import Any
 import httpx
 
 from app.config import get_settings
+from app.redis_client import cache_get, cache_set
 
 BASE_URL = "https://api.paystack.co"
 TIMEOUT = httpx.Timeout(20.0, connect=5.0)
@@ -51,12 +52,16 @@ async def _call(method: str, path: str, **kwargs: Any) -> Any:
 
 
 async def list_banks() -> list[dict]:
-    """Nigerian banks [{name, code}], cached for a day."""
+    """Nigerian banks [{name, code}], cached for a day: in this process, and in Redis so a restart (or the free
+    plan waking up) doesn't call Paystack again."""
     global _banks_cache
     if _banks_cache and time.monotonic() - _banks_cache[0] < _BANKS_TTL_SECONDS:
         return _banks_cache[1]
-    data = await _call("GET", "/bank", params={"country": "nigeria", "currency": "NGN", "perPage": 100})
-    banks = [{"name": bank["name"], "code": bank["code"]} for bank in data if bank.get("active", True)]
+    banks = await cache_get("paystack:banks")
+    if banks is None:
+        data = await _call("GET", "/bank", params={"country": "nigeria", "currency": "NGN", "perPage": 100})
+        banks = [{"name": bank["name"], "code": bank["code"]} for bank in data if bank.get("active", True)]
+        await cache_set("paystack:banks", banks, _BANKS_TTL_SECONDS)
     _banks_cache = (time.monotonic(), banks)
     return banks
 

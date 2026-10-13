@@ -7,9 +7,9 @@ You need: the repo pushed to GitHub (`Bonvee120/PlastiCash`), and accounts on Re
 
 ## 1. API on Render
 
-1. Render → **New → Blueprint** → choose the GitHub repo. Render reads `render.yaml` and proposes the service `plasticash-api`.
+1. Render → **New → Blueprint** → choose the GitHub repo. Render reads `render.yaml` and proposes `plasticash-api` and the Redis store `plasticash-redis` (Key Value, free); `REDIS_URL` is connected for you.
 2. Fill in the values marked "sync: false", copying them from your `api/.env`:
-   `DATABASE_URL`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `PAYSTACK_SECRET_KEY`, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, `TERMII_API_KEY`, `TERMII_SENDER_ID`, `TERMII_BASE_URL`, `OTP_SECRET`, `CRON_SECRET`.
+   `DATABASE_URL`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `PAYSTACK_SECRET_KEY`, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, `TERMII_API_KEY`, `TERMII_SENDER_ID`, `TERMII_BASE_URL`, `OTP_SECRET`, `CRON_SECRET`, `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`.
    For `FRONTEND_ORIGIN` type `http://localhost:3000` for now; step 3 sets the real one.
    - `CLOUDINARY_CLOUD_NAME` must be the lowercase cloud name from the Cloudinary dashboard (see LOG.md, Step 7).
 3. Apply. The first build takes a few minutes (WeasyPrint's libraries). On start, `RUN_MIGRATIONS=1` runs `alembic upgrade head` (the free plan has no pre-deploy step).

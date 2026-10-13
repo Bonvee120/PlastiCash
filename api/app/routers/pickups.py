@@ -2,7 +2,7 @@
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, BackgroundTasks, Depends, Query
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
@@ -12,8 +12,9 @@ from app.errors import ApiError
 from app.models import Pickup, PickupStatus, Profile
 from app.pickup_schemas import CancelIn, DisputeIn, PickupCreate, UploadSignatureIn, UserPickupOut
 from app.schemas import display_name
-from app.services import cloudinary, pickups
+from app.services import cloudinary, pickups, push
 from app.services.pickup_state import transition
+from app.ratelimit import DAY, HOUR, rate_limit
 
 router = APIRouter(tags=["pickups"])
 
@@ -35,16 +36,23 @@ async def _view(session: AsyncSession, pickup: Pickup) -> UserPickupOut:
     )
 
 
-@router.post("/uploads/signature")
+@router.post("/uploads/signature", dependencies=[Depends(rate_limit("upload", 30, HOUR))])
 async def upload_signature(body: UploadSignatureIn, me: CurrentProfile) -> dict:
     """Signed params for a direct browser upload to Cloudinary (request, weigh or dispute photo)."""
     return cloudinary.signature(body.purpose)
 
 
-@router.post("/pickups", status_code=201, response_model=UserPickupOut)
-async def request_pickup(body: PickupCreate, me: UserProfile, session: SessionDep) -> UserPickupOut:
+@router.post(
+    "/pickups", status_code=201, response_model=UserPickupOut,
+    dependencies=[Depends(rate_limit("request-pickup", 10, DAY))],
+)
+async def request_pickup(
+    body: PickupCreate, me: UserProfile, session: SessionDep, background: BackgroundTasks
+) -> UserPickupOut:
     pickup = await pickups.create_request(session, me, body)
     await session.commit()
+    # Tell the admins' phones after the response is sent, so the customer never waits for it (or fails because of it).
+    background.add_task(push.notify_new_request, session, pickup.id)
     return await _view(session, pickup)
 
 
@@ -81,7 +89,10 @@ async def cancel_pickup(pickup_id: UUID, body: CancelIn, me: UserProfile, sessio
     return await _view(session, pickup)
 
 
-@router.post("/pickups/{pickup_id}/confirm", response_model=UserPickupOut)
+@router.post(
+    "/pickups/{pickup_id}/confirm", response_model=UserPickupOut,
+    dependencies=[Depends(rate_limit("confirm", 30, HOUR))],
+)
 async def confirm_pickup(pickup_id: UUID, me: UserProfile, session: SessionDep) -> UserPickupOut:
     """The user accepts the weight: COMPLETED and the points land in the wallet (once)."""
     await _own(session, pickup_id, me)
@@ -90,7 +101,10 @@ async def confirm_pickup(pickup_id: UUID, me: UserProfile, session: SessionDep) 
     return await _view(session, pickup)
 
 
-@router.post("/pickups/{pickup_id}/dispute", response_model=UserPickupOut)
+@router.post(
+    "/pickups/{pickup_id}/dispute", response_model=UserPickupOut,
+    dependencies=[Depends(rate_limit("dispute", 10, HOUR))],
+)
 async def dispute_pickup(pickup_id: UUID, body: DisputeIn, me: UserProfile, session: SessionDep) -> UserPickupOut:
     await _own(session, pickup_id, me)
     pickup = await transition(

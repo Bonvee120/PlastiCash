@@ -1,5 +1,6 @@
 """Ops portal API, part 2: stats, new price versions, users and collectors, balance adjustments, stock and bales.
 ADMIN only through the router-level guard, like routers/admin.py (required test 16)."""
+from datetime import datetime, timezone
 from decimal import Decimal
 from typing import Annotated
 from uuid import UUID
@@ -11,19 +12,22 @@ from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from app.admin_schemas import (
-    AdjustmentIn, BaleIn, BaleOut, CollectorDisputes, CollectorIn, MaterialStock, PendingWithdrawals, PriceIn, SellIn,
-    StatsOut, StockOut, UserAccuracy, UserPatch, UserRow,
+    AdjustmentIn, BaleIn, BaleOut, CollectorDisputes, CollectorIn, MaterialStock, NewRequest, NewRequestsOut,
+    PendingWithdrawals, PriceIn, SellIn, StatsOut, StockOut, UserAccuracy, UserPatch, UserRow,
 )
 from app.areas import AREAS
 from app.auth import AdminProfile, require_admin
 from app.db import get_session
 from app.errors import ApiError
 from app.models import (
-    AccountType, Bale, BaleStatus, LedgerEntry, Material, PickupStatus, Price, Profile, Role,
+    AccountType, Bale, BaleStatus, LedgerEntry, Material, Pickup, PickupChannel, PickupStatus, Price, Profile, Role,
 )
 from app.phone import normalize_ng_phone
 from app.schemas import LedgerEntryOut, PriceOut, display_name, points
 from app.services import ledger, stats, stock, supabase_admin
+from app.ratelimit import HOUR, rate_limit
+from app.redis_client import cache_delete
+from app.routers.prices import PRICES_CACHE_KEY
 
 router = APIRouter(prefix="/admin", tags=["admin"], dependencies=[Depends(require_admin)])
 
@@ -37,6 +41,30 @@ SessionDep = Annotated[AsyncSession, Depends(get_session)]
 async def sidebar_counts(session: SessionDep) -> dict[str, int]:
     """Badges for the ops sidebar on every page: one query instead of the whole dashboard."""
     return await stats.counts(session)
+
+
+@router.get("/pickups/new", response_model=NewRequestsOut)
+async def new_requests(session: SessionDep, after: datetime | None = None) -> NewRequestsOut:
+    """Pickup requests created after `after`, oldest first (at most 10), for the portal's live alerts. Without
+    `after` it returns no items and a cursor at the newest request, so the first poll never alerts on old ones."""
+    if after is None:
+        newest = (await session.exec(select(func.max(Pickup.created_at)).where(Pickup.channel == PickupChannel.DOOR))).one()
+        return NewRequestsOut(cursor=newest or datetime.now(timezone.utc), items=[])
+    rows = (
+        await session.exec(
+            select(Pickup, Profile)
+            .join(Profile, Profile.id == Pickup.user_id)
+            .where(Pickup.channel == PickupChannel.DOOR, Pickup.created_at > after)
+            .order_by(Pickup.created_at)
+            .limit(10)
+        )
+    ).all()
+    items = [
+        NewRequest(id=p.id, user_name=display_name(u) or u.full_name, area=p.area, estimated_kg=p.estimated_kg,
+                   pooled=p.pooled, created_at=p.created_at)
+        for p, u in rows
+    ]
+    return NewRequestsOut(cursor=items[-1].created_at if items else after, items=items)
 
 
 @router.get("/stats", response_model=StatsOut)
@@ -77,6 +105,7 @@ async def add_price(body: PriceIn, admin: AdminProfile, session: SessionDep) -> 
     price = Price(**body.model_dump(), set_by=admin.id)
     session.add(price)
     await session.commit()
+    await cache_delete(PRICES_CACHE_KEY)  # the next GET /prices/current reads the new version
     await session.refresh(price)
     return PriceOut.from_price(price)
 
@@ -144,7 +173,10 @@ async def update_user(user_id: UUID, body: UserPatch, admin: AdminProfile, sessi
     return _row(profile, (await _balances(session, [profile.id])).get(profile.id, 0))
 
 
-@router.post("/collectors", status_code=201, response_model=UserRow)
+@router.post(
+    "/collectors", status_code=201, response_model=UserRow,
+    dependencies=[Depends(rate_limit("create-collector", 20, HOUR))],
+)
 async def create_collector(body: CollectorIn, session: SessionDep) -> UserRow:
     """Creates the Supabase login (service role key, server side) and the COLLECTOR profile with the same id.
     If the profile can't be saved, the login is deleted again so nothing is left half made."""

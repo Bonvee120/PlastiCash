@@ -14,6 +14,13 @@ services:
     envVars:
       - key: RUN_MIGRATIONS
         value: "1"
+      - key: TRUST_PROXY
+        value: "true" # caller IP from X-Forwarded-For, for the per-IP limit on /estimate
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: plasticash-redis
+          property: connectionString
       - key: DB_POOL_SIZE
         value: "5"
       - key: DB_MAX_OVERFLOW
@@ -50,5 +57,20 @@ services:
         sync: false
       - key: CRON_SECRET
         sync: false
+      - key: VAPID_PUBLIC_KEY
+        sync: false
+      - key: VAPID_PRIVATE_KEY
+        sync: false
+      - key: VAPID_SUBJECT
+        value: mailto:ops@plasticash.app
       - key: FRONTEND_ORIGIN
         sync: false
+
+  # Redis-compatible store for rate limits and caches. Internal connections only (no public access).
+  - type: keyvalue
+    name: plasticash-redis
+    region: frankfurt
+    plan: free
+    maxmemoryPolicy: allkeys-lru
+    ipAllowList: []
+

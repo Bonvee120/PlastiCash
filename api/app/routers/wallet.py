@@ -13,6 +13,7 @@ from app.models import AccountType, LedgerEntry, Withdrawal
 from app.schemas import ImpactOut, LedgerEntryOut, WalletOut, WithdrawalCreate, WithdrawalOut, points
 from app.services import esg, impact, ledger, withdrawals
 from app.services.pickups import lagos_today
+from app.ratelimit import HOUR, rate_limit
 
 router = APIRouter(tags=["wallet"])
 
@@ -45,7 +46,10 @@ async def get_wallet(
     )
 
 
-@router.post("/withdrawals", status_code=201, response_model=WithdrawalOut)
+@router.post(
+    "/withdrawals", status_code=201, response_model=WithdrawalOut,
+    dependencies=[Depends(rate_limit("withdraw", 5, HOUR))],
+)
 async def request_withdrawal(body: WithdrawalCreate, me: UserProfile, session: SessionDep) -> WithdrawalOut:
     withdrawal = await withdrawals.request_withdrawal(session, me.id, body.amount_kobo)
     await session.commit()

@@ -9,6 +9,7 @@ import Link from "next/link";
 import { Suspense, type ReactNode } from "react";
 
 import { LogoutButton } from "@/components/auth/logout-button";
+import { NewRequestAlerts, PushToggle } from "@/components/ops/notifications";
 import { Logo, LogoMark } from "@/components/brand/logo";
 import {
   OpsNav,
@@ -274,7 +275,12 @@ export function OpsShell({ me, children }: { me: Me; children: ReactNode }) {
         <Suspense fallback={<OpsNav />}>
           <OpsNavWithCounts />
         </Suspense>
-        <div className="mt-auto hidden flex-col gap-3 pt-6 lg:flex">
+        {/* New request alerts: pop-up while the portal is open, and push on this device when switched on. */}
+        <NewRequestAlerts />
+        <div className="pt-4 lg:mt-auto lg:pt-6">
+          <PushToggle dark />
+        </div>
+        <div className="hidden flex-col gap-3 pt-4 lg:flex">
           <p className="text-[13px] text-[#86EFAC]">{greeting(me)}</p>
           <LogoutButton dark />
         </div>

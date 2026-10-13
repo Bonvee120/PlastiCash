@@ -95,3 +95,16 @@ Private portal. Every route is `require_admin`.
 ## Health
 
 `GET /health` → `{ok: true}` (used by Render).
+
+## Admin notifications (added 13 Oct 2026)
+
+| Method | Path | Notes |
+|---|---|---|
+| GET | `/push/public-key` | Public. VAPID public key for subscribing, or null while push is off |
+| POST | `/push/subscriptions` | ADMIN. `{endpoint, keys:{p256dh, auth}}` saves this browser (upsert by endpoint) |
+| DELETE | `/push/subscriptions` | `{endpoint}` removes your own browser |
+| POST | `/push/test` | ADMIN. Test notification to your devices |
+| GET | `/admin/pickups/new?after=` | ADMIN. Door requests created after the cursor (max 10) and a new cursor; without `after`, only a cursor. Polled every 20 s by the open ops portal |
+
+`POST /pickups` pushes "New pickup request: <first name>" (area, estimated kg, day; no phone or street) to every active admin's devices after the response is sent; a push failure never fails the request.
+

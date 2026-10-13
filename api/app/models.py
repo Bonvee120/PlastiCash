@@ -441,3 +441,21 @@ class Bale(SQLModel, table=True):
     created_at: datetime | None = Field(default=None, sa_column=now_ts())
     processed_at: datetime | None = Field(default=None, sa_column=ts())
     sold_at: datetime | None = Field(default=None, sa_column=ts())
+
+
+# ===== 8. push_subscriptions (added 13 Oct 2026: admins' browser push for new pickup requests) =====
+
+
+class PushSubscription(SQLModel, table=True):
+    """One browser or device that agreed to receive push notifications (Web Push). The endpoint is the push
+    service's URL for that browser; p256dh and auth are its public keys for encrypting the message."""
+
+    __tablename__ = "push_subscriptions"
+    __table_args__ = (Index("push_subscriptions_profile_idx", "profile_id"),)
+
+    id: UUID | None = Field(default=None, sa_column=uuid_pk())
+    profile_id: UUID = Field(sa_column=fk("profiles.id", nullable=False, ondelete="CASCADE"))
+    endpoint: str = Field(sa_column=txt(nullable=False, unique=True))
+    p256dh: str = Field(sa_column=txt(nullable=False))
+    auth: str = Field(sa_column=txt(nullable=False))
+    created_at: datetime | None = Field(default=None, sa_column=now_ts())

@@ -15,6 +15,7 @@ from app.models import AccountType, Profile, Role
 from app.schemas import BankIn, BankOption, BankResolveOut, MeOut, ProfileCreate, ProfileUpdate
 from app.services import paystack
 from app.services.paystack import PaystackError
+from app.ratelimit import HOUR, rate_limit
 
 router = APIRouter(tags=["me"])
 
@@ -46,7 +47,10 @@ async def save(session: AsyncSession, profile: Profile) -> Profile:
     return profile
 
 
-@router.post("/me/profile", status_code=201, response_model=MeOut)
+@router.post(
+    "/me/profile", status_code=201, response_model=MeOut,
+    dependencies=[Depends(rate_limit("create-profile", 10, HOUR))],
+)
 async def create_profile(
     body: ProfileCreate, auth_user: Annotated[AuthUser, Depends(get_auth_user)], session: SessionDep
 ) -> MeOut:
@@ -111,7 +115,10 @@ async def banks(_: CurrentProfile) -> list[BankOption]:
         raise _paystack_error(error) from None
 
 
-@router.post("/me/bank/resolve", response_model=BankResolveOut)
+@router.post(
+    "/me/bank/resolve", response_model=BankResolveOut,
+    dependencies=[Depends(rate_limit("bank-resolve", 10, HOUR))],
+)
 async def resolve_bank(body: BankIn, _: UserProfile) -> BankResolveOut:
     """Show the account holder's name before saving, so the user can check it's theirs."""
     bank_name = await _bank_name(body.bank_code)
@@ -122,7 +129,7 @@ async def resolve_bank(body: BankIn, _: UserProfile) -> BankResolveOut:
     return BankResolveOut(bank_name=bank_name, account_name=account_name)
 
 
-@router.post("/me/bank", response_model=MeOut)
+@router.post("/me/bank", response_model=MeOut, dependencies=[Depends(rate_limit("bank-save", 5, HOUR))])
 async def save_bank(body: BankIn, profile: UserProfile, session: SessionDep) -> MeOut:
     """Check the account with the bank again (never trust the name from the browser), create the Paystack
     transfer recipient, then save. Withdrawals use a snapshot of these details."""

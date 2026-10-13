@@ -57,7 +57,6 @@ export function WeighForm({
     return sum + Math.max(centi(row.gross) - (row.deduct ? centi(row.deduction) : 0), 0);
   }, 0);
   const errors = picked.map((m) => rowError(rows[m.value]!));
-  const valid = picked.length > 0 && errors.every((e) => !e) && !!photoUrl;
 
   function toggle(material: Material) {
     setRows((current) => {
@@ -86,7 +85,18 @@ export function WeighForm({
 
   async function submit() {
     setTried(true);
-    if (!valid) return toast.error(!photoUrl ? "Take a photo of the scale." : "Check the weights.");
+    if (picked.length === 0) return toast.error("Tap what you weighed first.");
+    // Name the material and the problem, and bring that box into view: the red note under it can be off-screen.
+    const bad = picked.findIndex((_, i) => errors[i]);
+    if (bad >= 0) {
+      const m = picked[bad]!;
+      toast.error(`${m.label}: ${errors[bad]}`);
+      const input = document.getElementById(`w-${m.value}`);
+      input?.scrollIntoView({ behavior: "smooth", block: "center" });
+      input?.focus({ preventScroll: true });
+      return;
+    }
+    if (!photoUrl) return toast.error("Take a photo of the scale.");
     setPending(true);
     const items = picked.map(({ value }) => {
       const row = rows[value]!;

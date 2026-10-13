@@ -69,3 +69,31 @@ export async function processBale(id: string) {
 export async function sellBale(id: string, buyer: string, sale_price_kobo: number) {
   return call<Bale>(`/admin/bales/${id}/sell`, "POST", { buyer, sale_price_kobo });
 }
+
+// ----- Notifications for new pickup requests -----
+
+export type NewRequest = { id: string; user_name: string; area: string | null; estimated_kg: string | null; pooled: boolean; created_at: string };
+
+export async function pollNewRequests(after: string | null) {
+  return call<{ cursor: string; items: NewRequest[] }>(
+    `/admin/pickups/new${after ? `?after=${encodeURIComponent(after)}` : ""}`,
+    "GET",
+  );
+}
+
+export async function pushPublicKey() {
+  return call<{ public_key: string | null }>("/push/public-key", "GET");
+}
+
+export async function savePushSubscription(subscription: { endpoint: string; keys: { p256dh: string; auth: string } }) {
+  return call<null>("/push/subscriptions", "POST", subscription);
+}
+
+export async function deletePushSubscription(endpoint: string) {
+  return call<null>("/push/subscriptions", "DELETE", { endpoint });
+}
+
+export async function sendTestPush() {
+  return call<{ sent: number }>("/push/test", "POST");
+}
+

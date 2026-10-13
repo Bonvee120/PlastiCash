@@ -91,3 +91,10 @@ The login and sign-up pages have "Continue with Google". Until it is switched on
 
 A new Google user lands on sign-up step 2 (Individual or Organization) with their name filled in; the API takes the email from the Google-backed token as usual.
 
+## Redis (rate limits and caches)
+
+- Local: `docker compose up -d redis` and `REDIS_URL=redis://127.0.0.1:6379/0` in `api/.env`. Empty `REDIS_URL` turns it off; the API works the same without limits or caches.
+- Production: Render Key Value `plasticash-redis` (free, Frankfurt, internal only) from `render.yaml`; `REDIS_URL` is filled in by Render. `TRUST_PROXY=true` so the per-IP limit sees the caller's IP.
+- Limits (per signed-in user unless noted): create profile 10/h, bank check 10/h, bank save 5/h, withdrawal 5/h, pickup request 10/day, photo upload 30/h, confirm 30/h, dispute 10/h, collector code 20/10 min, code resend 10/h, phone lookup 60/h, create collector 20/h, public estimate 120/10 min per IP. Over the limit: 429 `RATE_LIMITED` with `Retry-After`.
+- Caches: current prices (10 min; cleared when an admin adds a price), impact totals (5 min), Paystack bank list (1 day).
+

@@ -33,6 +33,14 @@ class Settings(BaseSettings):
 
     otp_secret: str = ""
     cron_secret: str = ""
+    # Web Push (VAPID) for admin notifications; push is off while the private key is empty.
+    vapid_public_key: str = ""
+    vapid_private_key: str = ""
+    vapid_subject: str = "mailto:ops@plasticash.app"
+    # Redis for rate limits and caches; empty = off (the API works without it). Local: redis://127.0.0.1:6379/0
+    redis_url: str = ""
+    # Behind Render's proxy the caller's IP comes from X-Forwarded-For.
+    trust_proxy: bool = False
 
     frontend_origin: str = "http://localhost:3000"
     min_withdrawal_kobo: int = 100_000

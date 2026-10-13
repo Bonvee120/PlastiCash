@@ -7,9 +7,12 @@ pydantic-settings==2.15.0
 alembic==1.20.0
 pyjwt[crypto]==2.15.1
 httpx==0.28.1
+redis==8.1.0  # rate limits and caches (Render Key Value in production)
+pywebpush==2.5.0  # browser push for admin notifications (Web Push, VAPID)
 weasyprint==70.0  # ESG PDF; needs Pango/HarfBuzz from the system (see Dockerfile)
 
 # tests
 pytest==9.1.1
 pytest-asyncio==1.4.0
 respx==0.23.1
+fakeredis==2.39.0

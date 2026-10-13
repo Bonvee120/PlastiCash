@@ -177,3 +177,21 @@ class StockOut(BaseModel):
     @staticmethod
     def money(kobo: int) -> Decimal:
         return points(kobo)
+
+
+# ----- New request alerts (ops portal, while open) -----
+
+
+class NewRequest(BaseModel):
+    id: UUID
+    user_name: str
+    area: str | None
+    estimated_kg: Decimal | None
+    pooled: bool
+    created_at: datetime
+
+
+class NewRequestsOut(BaseModel):
+    cursor: datetime  # pass back as `after` next time
+    items: list[NewRequest]
+

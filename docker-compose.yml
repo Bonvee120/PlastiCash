@@ -21,3 +21,17 @@ services:
       interval: 2s
       timeout: 3s
       retries: 15
+
+  # Redis for rate limiting and caching (production: Render Key Value). Local only, no password.
+  redis:
+    image: redis:7.4-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--save", "", "--appendonly", "no", "--maxmemory", "64mb", "--maxmemory-policy", "allkeys-lru"]
+    ports:
+      - "127.0.0.1:6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+

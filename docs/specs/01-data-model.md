@@ -186,6 +186,20 @@ Balance: `SELECT COALESCE(SUM(amount_kobo),0) FROM ledger_entries WHERE user_id 
 
 Raw stock per material = sum of `pickup_items.net_kg` for COMPLETED pickups − sum of `bales.weight_kg` for that material. Admin cannot create a bale heavier than raw stock.
 
+## 8. `push_subscriptions` (added 13 Oct 2026)
+
+Browser push for admins: one row per browser or device that turned on notifications for new pickup requests.
+
+| Column | Type | Notes |
+|---|---|---|
+| id | uuid PK | |
+| profile_id | uuid FK profiles, on delete cascade | the admin |
+| endpoint | text unique | the push service's URL for that browser |
+| p256dh, auth | text | the browser's keys for encrypting messages |
+| created_at | timestamptz | |
+
+RLS on with no policy and no grants for `anon`/`authenticated`: only FastAPI reads it. Rows the push service reports as gone (404/410) are deleted.
+
 ## Row Level Security
 
 Enable RLS on **all 7 tables** in an Alembic migration (`op.execute`). FastAPI connects as the database owner, so RLS doesn't block it. The browser only needs Realtime on `pickups`, so add only these policies:
