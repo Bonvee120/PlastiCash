@@ -1,0 +1,54 @@
+# Render Blueprint for the API (docs/DEPLOY.md). Secret values are entered in the Render dashboard (sync: false);
+# none are stored in this file.
+services:
+  - type: web
+    name: plasticash-api
+    runtime: docker
+    rootDir: api
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    region: frankfurt # next to Supabase eu-west-1 (tech-stack.md §8)
+    plan: free # no pre-deploy step on free: RUN_MIGRATIONS=1 migrates at container start
+    healthCheckPath: /api/v1/health
+    autoDeploy: true
+    envVars:
+      - key: RUN_MIGRATIONS
+        value: "1"
+      - key: DB_POOL_SIZE
+        value: "5"
+      - key: DB_MAX_OVERFLOW
+        value: "5"
+      - key: MIN_WITHDRAWAL_KOBO
+        value: "100000"
+      - key: DOOR_MIN_KG
+        value: "50"
+      - key: AUTO_CONFIRM_HOURS
+        value: "48"
+      - key: SMS_ENABLED
+        value: "false"
+      - key: DATABASE_URL
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: PAYSTACK_SECRET_KEY
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: TERMII_API_KEY
+        sync: false
+      - key: TERMII_SENDER_ID
+        sync: false
+      - key: TERMII_BASE_URL
+        sync: false
+      - key: OTP_SECRET
+        sync: false
+      - key: CRON_SECRET
+        sync: false
+      - key: FRONTEND_ORIGIN
+        sync: false

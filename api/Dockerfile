@@ -13,4 +13,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT}"]
+# Render's free plan has no pre-deploy step, so with RUN_MIGRATIONS=1 the schema is migrated when the container
+# starts (one instance only). A failed migration stops the start instead of serving an old schema.
+CMD ["sh", "-c", "if [ \"$RUN_MIGRATIONS\" = 1 ]; then alembic upgrade head || exit 1; fi; exec uvicorn app.main:app --host 0.0.0.0 --port ${PORT}"]

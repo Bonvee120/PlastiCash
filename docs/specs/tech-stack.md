@@ -135,6 +135,7 @@ The docs don't decide these. Choose them at the step shown, then record the choi
 | Versions of Next.js, Tailwind, daisyUI, shadcn/ui | Step 1 | **Decided (1.3):** Next.js 16.4, React 19.3, Tailwind CSS 4, daisyUI 5.7 (prefix set in `app/globals.css` with `@plugin "daisyui" { prefix: "d-"; }`), shadcn CLI 4.21 with the `base-nova` style (Base UI primitives) |
 | Linter and formatter (web and api) | Step 1 | **Web (1.3):** ESLint 9 with `eslint-config-next`. Formatter and API linter still open |
 | Web Supabase client package | Step 3 | **Decided (3.3):** `@supabase/ssr` 0.12 with `@supabase/supabase-js` 2. Next.js 16 renamed `middleware.ts` to `proxy.ts` (same behaviour); the session check lives in `web/proxy.ts` and `web/lib/supabase/proxy.ts`. `create-next-app` 16.4 turns on Cache Components, so pages that read cookies render inside `<Suspense>` with a Skeleton |
-| Chart library for `/app/impact` | Step 9 | Keep the user dashboard under ~500 KB |
-| Cron service: cron-job.org or GitHub Actions | Step 10 | Both are allowed by the docs |
+| Chart library for `/app/impact` | Step 9 | **Decided (9.1):** none; kg by material are CSS bars (no extra bundle) |
+| Cron service: cron-job.org or GitHub Actions | Step 10 | **Decided (10.3):** GitHub Actions, `.github/workflows/reminders.yml`, every 15 min, secrets `API_URL` and `CRON_SECRET` |
+| Render plan | Step 10 | **Decided (10.3, Kenzy):** free plan. No pre-deploy step, so `RUN_MIGRATIONS=1` runs `alembic upgrade head` at container start; the instance sleeps after 15 idle minutes (the cron wakes it). Blueprint: `render.yaml` |
 | Playwright smoke test | Step 10 | Optional per TRD §10 |

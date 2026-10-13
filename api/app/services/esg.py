@@ -140,7 +140,8 @@ def render_html(data: dict) -> str:
   {cert}
   <p class="note">
     Weights are net kg after deductions, from completed pickups confirmed in the period (Africa/Lagos time).
-    CO₂ avoided = net kg × the emission factor per material at the time of weighing (US EPA WARM).
+    CO₂ avoided = net kg × the emission factor per material at the time of weighing (US EPA WARM v16; sachets
+    use the mixed-plastics factor as an estimate).
     Report {e(data['report_id'])}, generated {data['generated']:%d %B %Y, %H:%M}.
   </p>
 </body></html>"""

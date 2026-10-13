@@ -13,7 +13,7 @@ import { materialLabel, type Impact } from "@/lib/types";
 export default function YourImpactPage() {
   return (
     <main className="flex flex-1 flex-col gap-5 p-4 lg:p-8">
-      <PageTitle title="Your impact" sub="From your completed pickups. CO₂ uses US EPA WARM factors per material." />
+      <PageTitle title="Your impact" sub="From your completed pickups. CO₂ uses US EPA WARM factors per material; sachets use the mixed-plastics factor as an estimate." />
       <Suspense fallback={<Skeleton className="h-96 w-full rounded-2xl" />}>
         <ImpactData />
       </Suspense>
@@ -45,7 +45,7 @@ async function ImpactData() {
             <ul className="flex flex-col gap-3">
               {impact.by_material.map((m) => (
                 <li key={m.material} className="flex flex-col gap-1.5">
-                  <span className="flex justify-between text-sm">
+                  <span className="flex flex-wrap justify-between gap-x-3 text-sm">
                     <b>{materialLabel(m.material)}</b>
                     <span className="tabular text-muted-foreground">
                       {kg(m.kg)} · {kg(m.co2_kg)} CO₂
@@ -63,7 +63,7 @@ async function ImpactData() {
       <div className="flex flex-col gap-5">
         <Card className="gap-1 border-[#FDE68A] bg-cream">
           <span className="eyebrow text-[#92400E]">Points earned</span>
-          <Money kobo={impact.earned_kobo} className="text-2xl font-bold" />
+          <Money kobo={impact.earned_kobo} className="text-2xl font-bold whitespace-normal" />
           <span className="text-sm text-muted-foreground">from {impact.pickups} completed pickups</span>
         </Card>
         {me.account_type === "ORGANIZATION" && <EsgReport />}

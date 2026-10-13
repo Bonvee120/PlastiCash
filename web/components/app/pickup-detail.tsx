@@ -220,7 +220,7 @@ function ConfirmOrDispute({ pickup }: { pickup: Pickup }) {
       )}
       <div>
         <p className="text-sm text-muted-foreground">You get</p>
-        {pickup.total_amount_kobo !== null && <Money kobo={pickup.total_amount_kobo} className="text-xl font-bold" />}
+        {pickup.total_amount_kobo !== null && <Money kobo={pickup.total_amount_kobo} className="text-xl font-bold whitespace-normal" />}
         <p className="tabular text-sm text-muted-foreground">for {kg(pickup.total_net_kg)} of plastic</p>
       </div>
       {!disputing ? (

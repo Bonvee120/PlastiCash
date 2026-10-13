@@ -150,3 +150,18 @@ One entry per day: what was done, what broke, what's next.
 **Next**
 - Kenzy: set up the cron (cron-job.org or GitHub Actions) to POST `/api/v1/jobs/reminders` every 15 min with `X-Cron-Secret` once deployed.
 - Step 10 (landing page, polish, deploy).
+
+**Done (Step 10, local part)**
+- 10.1 Landing page `/`: forest hero ("Your plastic is money.") with a live price board, price cards per kg (PET on forest), the problem with cited figures (National Policy; Oke & Olayide 2026), how it works in 5 steps, who it's for (individuals and pickers; schools, offices and estates), impact band from the new public `GET /impact/total` (sums only), who pays (export margin; producers under NESREA's EPR rules), FAQ, call to action and a footer with the hub and WhatsApp. Shared public header (menu button on phones) and footer, also on `/guide`. No photos: there are no real Enugu photos yet and the brief forbids stock; the "Stories from Enugu" carousel is left out rather than invent stories.
+- 10.2 Polish: offline banner ("You're offline. We'll retry when you're back.") that refreshes the page's data on reconnect; sachet CO₂ labelled as an estimate on `/app/impact` and in the ESG PDF (RESEARCH.md decision). 360 px check of every page for every role (horizontal overflow, error screens, console errors): fixed the dashboard grid (its implicit column took the widest card's width), the points total on `/app/impact` and the pickup page (no wrap), the impact band on `/` (₦ amounts too wide for two columns) and the ops area bars.
+- Fixed: `/guide` said door pickup needs 10 kg; the rule is 50 kg.
+- 10.5 README: the problem (with evidence), the hard part (ledger, locks, idempotent webhook, how the tests prove it), why this design (table with sources), who pays, how to run, seeded logins. All 20 required tests exist (`test_<n>_`); the impact test that was also named `test_20_` was renamed (test 20 is the greeting test). 272 pass, 1 skipped on Windows (PDF render; passes in Docker).
+- 10.3 prepared (Kenzy chose Render free and doing the dashboards himself): `render.yaml` (Docker, Frankfurt, free, health check, secrets as sync:false), Dockerfile runs `alembic upgrade head` at start when `RUN_MIGRATIONS=1` (free plan has no pre-deploy step; checked in Docker against Supabase), `.github/workflows/reminders.yml` (every 15 min, retries while the free instance wakes), `docs/DEPLOY.md` step by step with a check per step. Decisions recorded in `tech-stack.md` §8 and `05-setup-and-env.md`.
+
+**Broke (Step 10)**
+- The landing headline was almost invisible: the theme's `h1, h2 { text-heading }` rule beat `text-white` on the forest hero; dark-section headings now force white.
+- The impact band first said "Totals are not available": the running API predated `/impact/total`. Restarted.
+
+**Next**
+- Kenzy: follow `docs/DEPLOY.md` (Render, Vercel, Supabase redirect URLs, Paystack webhook, GitHub secrets for the cron), then run the main journey on the deployed URLs (DEPLOY.md §7). Fix `CLOUDINARY_CLOUD_NAME` first or photo uploads fail there too.
+- Open: field research and named sign-off (RESEARCH.md); Paystack transfers for the business; real Enugu photos for the hero, sign-up and guide.

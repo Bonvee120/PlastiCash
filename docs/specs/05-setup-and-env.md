@@ -72,8 +72,8 @@ The service role key, Paystack secret and Cloudinary secret must **never** appea
 
 ## Deploy
 
-- **API → Render**: Docker web service from `api/`, env vars set in the dashboard, health check `/api/v1/health`. Run `alembic upgrade head` as the pre-deploy command.
+- **API → Render**: Docker web service from `api/` (`render.yaml`), env vars set in the dashboard, health check `/api/v1/health`. On the free plan (no pre-deploy step) `RUN_MIGRATIONS=1` runs `alembic upgrade head` when the container starts; on a paid plan it can move to the pre-deploy command. Step by step: `docs/DEPLOY.md`.
 - **Web → Vercel**: root `web/`, env vars set, `NEXT_PUBLIC_API_URL` = Render URL.
 - **Paystack**: test webhook URL = `https://<render-url>/api/v1/webhooks/paystack`.
-- **Cron**: POST `https://<render-url>/api/v1/jobs/reminders` every 15 min with header `X-Cron-Secret`.
+- **Cron**: POST `https://<render-url>/api/v1/jobs/reminders` every 15 min with header `X-Cron-Secret` (GitHub Actions: `.github/workflows/reminders.yml`).
 - Set `FRONTEND_ORIGIN` on the API to the Vercel URL.

@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { Suspense } from "react";
 
-import { Logo } from "@/components/brand/logo";
 import { BtnLink, Card } from "@/components/brand/ui";
+import { SiteFooter, SiteHeader } from "@/components/public/site-chrome";
 import { Skeleton } from "@/components/ui/skeleton";
 import { get } from "@/lib/api";
 import { naira } from "@/lib/format";
@@ -16,14 +15,7 @@ export const metadata: Metadata = { title: "How much is my plastic? · PlastiCas
 export default function GuidePage() {
   return (
     <div className="flex min-h-svh flex-col bg-canvas">
-      <header className="flex items-center justify-between border-b border-border bg-white px-4 py-3 lg:px-8">
-        <Link href="/" aria-label="PlastiCash home">
-          <Logo size={32} />
-        </Link>
-        <BtnLink href="/login" prefetch={false} size="sm" variant="outline">
-          Log in
-        </BtnLink>
-      </header>
+      <SiteHeader />
       <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-5 p-4 lg:p-8">
         <div>
           <span className="eyebrow text-primary">Guide</span>
@@ -43,7 +35,7 @@ export default function GuidePage() {
             <li>Keep each kind in its own sack: bottles, hard plastic, sachets, cans, tins.</li>
             <li>Remove caps if you can and keep them with hard plastic.</li>
             <li>
-              Door pickup needs at least 10 kg. Less than that? Bring it to the hub: {HUB.address}, {HUB.hours}.
+              Door pickup starts at 50 kg. Less than that? Join your area&apos;s pickup day, or bring it to the hub: {HUB.address}, {HUB.hours}.
             </li>
           </ul>
         </Card>
@@ -56,6 +48,7 @@ export default function GuidePage() {
           </BtnLink>
         </div>
       </main>
+      <SiteFooter />
     </div>
   );
 }

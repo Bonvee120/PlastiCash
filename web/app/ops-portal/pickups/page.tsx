@@ -97,7 +97,7 @@ async function BoardData({ searchParams }: { searchParams: PageProps<"/ops-porta
             {board.area_totals.map((a) => {
               const value = Number(a.estimated_kg);
               return (
-                <li key={a.area} className="grid grid-cols-[150px_1fr_150px] items-center gap-3 text-sm">
+                <li key={a.area} className="grid grid-cols-[110px_1fr] items-center gap-x-3 gap-y-1 text-sm md:grid-cols-[150px_1fr_150px]">
                   <span className="truncate font-semibold">{a.area}</span>
                   <span className="h-3 overflow-hidden rounded-full bg-muted">
                     <span
@@ -105,7 +105,7 @@ async function BoardData({ searchParams }: { searchParams: PageProps<"/ops-porta
                       style={{ width: `${Math.max((value / most) * 100, 2)}%` }}
                     />
                   </span>
-                  <span className="tabular text-right text-muted-foreground">
+                  <span className="tabular col-span-2 text-right text-muted-foreground md:col-span-1">
                     {kg(a.estimated_kg)} · {a.requests} req{a.pooled ? ` · ${a.pooled} pool` : ""}
                   </span>
                 </li>

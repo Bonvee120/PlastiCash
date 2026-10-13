@@ -1,29 +1,350 @@
-import { Recycle } from "lucide-react";
+import { ArrowRight, Building2, CheckCircle2, Droplets, Flame, Home as HomeIcon, Landmark, Scale, ShieldCheck, Ship, Smartphone, Truck, Waves } from "lucide-react";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { Suspense, type ReactNode } from "react";
 
-import { Button } from "@/components/ui/button";
+import { SiteFooter, SiteHeader } from "@/components/public/site-chrome";
+import { Skeleton } from "@/components/ui/skeleton";
+import { api } from "@/lib/api";
+import { AREAS } from "@/lib/areas";
+import { naira } from "@/lib/format";
+import { HUB } from "@/lib/site";
+import { MATERIALS, type CurrentPrice } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
-// Step 1.3 placeholder. The landing page comes in step 10.
-export default function Home() {
+export const metadata: Metadata = {
+  title: "PlastiCash by EcoCyclers · Your plastic is money",
+  description: "Sell your plastic in Enugu by weight. A collector weighs it in front of you, you confirm, and you withdraw to your bank.",
+};
+
+type Totals = { kg_recycled: string; points_paid_kobo: number; co2_kg: string; pickups: number };
+
+// Landing page (03-screens-and-routes.md, DESIGN_BRIEF.md §9). Live prices and totals come from the public API;
+// if the API is down the page still renders, without numbers.
+export default function LandingPage() {
   return (
-    <main className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center gap-6 p-4">
-      <div className="flex items-center gap-2 text-primary-dark">
-        <Recycle className="size-6" aria-hidden />
-        <div>
-          <h1 className="text-3xl font-bold">PlastiCash</h1>
-          <p className="text-sm text-muted-foreground">by EcoCyclers</p>
+    <div className="flex min-h-svh flex-col bg-canvas">
+      <section className="relative overflow-hidden text-white" style={{ background: "linear-gradient(160deg, #052E16 0%, #14532D 55%, #166534 100%)" }}>
+        <SiteHeader dark />
+        <div className="mx-auto grid max-w-[1280px] items-center gap-10 px-4 pt-6 pb-16 lg:grid-cols-[1.1fr_1fr] lg:px-[72px] lg:pt-14 lg:pb-24">
+          <div className="flex flex-col gap-6">
+            <span className="eyebrow text-[#86EFAC]">Enugu · by EcoCyclers</span>
+            <h1 className="font-display text-[44px] !text-white leading-[1.02] font-extrabold tracking-[-0.04em] lg:text-[72px]">
+              Your plastic <br className="hidden sm:block" />
+              is <span className="text-gold">money.</span>
+            </h1>
+            <p className="max-w-xl text-lg text-[#DCFCE7]">
+              Gather bottles, cans and sachets. A verified EcoCyclers collector weighs them in front of you, you confirm the
+              weight, and the points land in your wallet. 1 point = ₦1, withdrawn to any Nigerian bank.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <Link href="/signup" prefetch={false} className="d-btn d-btn-accent d-btn-lg">
+                Start earning <ArrowRight className="size-5" aria-hidden />
+              </Link>
+              <a href="#prices" className="d-btn d-btn-glass d-btn-lg">
+                See today&apos;s prices
+              </a>
+            </div>
+          </div>
+          <Suspense fallback={<Skeleton className="h-80 w-full rounded-3xl bg-white/10" />}>
+            <PriceBoard />
+          </Suspense>
         </div>
-      </div>
+      </section>
 
-      <div className="rounded-xl border bg-accent-light p-4">
-        <p className="text-sm text-muted-foreground">Wallet</p>
-        <p className="tabular text-4xl font-medium text-ink">₦12,450</p>
-      </div>
+      <main className="flex flex-col">
+        <Section id="prices" eyebrow="What we buy" title="Today's prices per kg">
+          <Suspense fallback={<Skeleton className="h-48 w-full rounded-2xl" />}>
+            <PriceCards />
+          </Suspense>
+          <p className="text-sm text-muted-foreground">
+            Prices can change; the price on the day the collector weighs is the one you&apos;re paid.{" "}
+            <Link href="/guide" className="font-bold text-primary">
+              How many bottles make a kilo?
+            </Link>
+          </p>
+        </Section>
 
-      <div className="flex flex-wrap items-center gap-2">
-        <Button>shadcn button</Button>
-        <button className="d-btn d-btn-primary">daisyUI button</button>
-        <span className="d-badge d-badge-warning">Please confirm</span>
+        <Section eyebrow="The problem" title="Plastic blocks drains, floods streets and gets burned">
+          <div className="grid gap-4 md:grid-cols-3">
+            <Fact icon={Waves} value="1.5 million tonnes" source={<Cite href="https://faolex.fao.org/docs/pdf/nig214338.pdf">National Policy on Plastic Waste Management</Cite>}>
+              of plastic waste a year in Nigeria, and less than 30% of it is collected for recycling.
+            </Fact>
+            <Fact icon={Droplets} value="58%" source={<Cite href="https://www.macrothink.org/journal/index.php/emsd/article/view/23735">Oke &amp; Olayide 2026</Cite>}>
+              of households surveyed in Lagos and Abuja don&apos;t separate plastic from other waste, so it ends up in drains and dumps.
+            </Fact>
+            <Fact icon={Flame} value="Burned or dumped" source={<Cite href="https://www.macrothink.org/journal/index.php/emsd/article/view/23735">Oke &amp; Olayide 2026</Cite>}>
+              Over a third of Lagos households in that survey dump plastic in the open or burn it. Paying for it gives it a better place to go.
+            </Fact>
+          </div>
+        </Section>
+
+        <Section id="how-it-works" eyebrow="How it works" title="Five steps, from sack to bank">
+          <ol className="grid gap-4 md:grid-cols-5">
+            <Step n={1} icon={HomeIcon} title="Gather">
+              Keep bottles, hard plastic, sachets, cans and tins in separate sacks.
+            </Step>
+            <Step n={2} icon={Smartphone} title="Request">
+              Ask for a pickup from 50 kg, join your area&apos;s pickup day, or bring it to the hub.
+            </Step>
+            <Step n={3} icon={Scale} title="We weigh">
+              A verified collector weighs each kind in front of you and photographs the scale.
+            </Step>
+            <Step n={4} icon={ShieldCheck} title="You confirm">
+              Check the weights in the app, or give the collector the SMS code. Wrong weight? Dispute it.
+            </Step>
+            <Step n={5} icon={Landmark} title="Get paid">
+              Points land in your wallet. Withdraw to your bank from ₦1,000.
+            </Step>
+          </ol>
+        </Section>
+
+        <Section id="organizations" eyebrow="Who it's for" title="For homes, pickers, schools and businesses">
+          <div className="grid gap-4 md:grid-cols-2">
+            <Audience icon={HomeIcon} title="Individuals and waste pickers" points={[
+              "See the price per kg before anyone comes.",
+              "Every kilo weighed in front of you, with a photo.",
+              "Confirm in the app or by SMS code, no smartphone needed for the code.",
+              "Withdraw to any Nigerian bank account in your name.",
+            ]} />
+            <Audience icon={Building2} title="Schools, offices and estates" points={[
+              "Regular door pickups for large loads.",
+              "Points paid to the organization's account.",
+              "A monthly recycling report (PDF) with kg by material and CO₂ avoided, for ESG reporting.",
+              "One login per organization.",
+            ]} />
+          </div>
+          <p className="text-sm text-muted-foreground">Areas we serve: {AREAS.join(", ")}.</p>
+        </Section>
+
+        <section className="bg-mist">
+          <div className="mx-auto flex max-w-[1280px] flex-col gap-6 px-4 py-14 lg:px-[72px]">
+            <span className="eyebrow text-primary">Impact so far</span>
+            <Suspense fallback={<Skeleton className="h-24 w-full rounded-2xl" />}>
+              <ImpactBand />
+            </Suspense>
+          </div>
+        </section>
+
+        <Section eyebrow="Who pays" title="Where the money comes from">
+          <div className="grid gap-4 md:grid-cols-3">
+            <Fact icon={Truck} value="We collect and sort">
+              EcoCyclers buys plastic at the posted price, then sorts it by type and colour and removes dirt.
+            </Fact>
+            <Fact icon={Ship} value="We bale and export">
+              Clean, sorted bales are sold to recycling companies abroad. The difference between what we pay you and the export
+              price runs the business.
+            </Fact>
+            <Fact
+              icon={CheckCircle2}
+              value="Producers pay too"
+              source={<Cite href="https://www.thisdaylive.com/2026/09/04/nigeria-tightens-war-on-plastic-waste-makes-producers-responsible-for-end-of-life-products/">NESREA, 2026</Cite>}
+            >
+              New rules make producers responsible for recovering their plastic. Every pickup on PlastiCash is weighed and recorded:
+              the kind of record they will need.
+            </Fact>
+          </div>
+        </Section>
+
+        <Section eyebrow="Questions" title="Good to know">
+          <div className="flex max-w-3xl flex-col gap-2">
+            <Faq q="How much plastic do I need?">
+              Door pickup starts at 50 kg. With less, join your area&apos;s pickup day or bring it to the hub at {HUB.address} ({HUB.hours}).
+              There is no minimum at the hub.
+            </Faq>
+            <Faq q="How do I know the weight is right?">
+              The collector weighs each kind in front of you and takes a photo of the scale. Nothing is paid until you confirm. If
+              it&apos;s wrong, dispute it with your own photo and EcoCyclers reviews both.
+            </Faq>
+            <Faq q="When do I get paid?">
+              As soon as you confirm. If you don&apos;t answer within 48 hours, the weight confirms by itself and you&apos;re paid.
+            </Faq>
+            <Faq q="How do I withdraw?">
+              Add a bank account in your name, then withdraw from ₦1,000. EcoCyclers approves it and the money is sent to your bank.
+            </Faq>
+            <Faq q="What is a point?">1 point = ₦1. Your wallet shows both.</Faq>
+          </div>
+        </Section>
+
+        <section className="bg-forest text-white">
+          <div className="mx-auto flex max-w-[1280px] flex-col items-start gap-5 px-4 py-14 lg:flex-row lg:items-center lg:justify-between lg:px-[72px]">
+            <div>
+              <h2 className="font-display text-3xl font-extrabold tracking-[-0.03em] !text-white lg:text-4xl">Start with the sack you have.</h2>
+              <p className="mt-2 text-[#BBF7D0]">Create an account and see your estimate before you request a pickup.</p>
+            </div>
+            <Link href="/signup" prefetch={false} className="d-btn d-btn-accent d-btn-lg">
+              Start earning <ArrowRight className="size-5" aria-hidden />
+            </Link>
+          </div>
+        </section>
+      </main>
+      <SiteFooter />
+    </div>
+  );
+}
+
+async function prices(): Promise<CurrentPrice[] | null> {
+  const result = await api<CurrentPrice[]>("/prices/current");
+  return result.ok ? result.data : null;
+}
+
+async function PriceBoard() {
+  const list = await prices();
+  return (
+    <div className="rounded-3xl border border-white/15 bg-white/10 p-6 backdrop-blur">
+      <div className="mb-4 flex items-center justify-between">
+        <b className="font-display text-xl">Today&apos;s price board</b>
+        <span className="eyebrow text-[#86EFAC]">per kg</span>
       </div>
-    </main>
+      {list ? (
+        <ul className="flex flex-col divide-y divide-white/10">
+          {MATERIALS.map((m) => {
+            const p = list.find((x) => x.material === m.value);
+            return (
+              p && (
+                <li key={m.value} className="flex items-center justify-between py-3">
+                  <span>
+                    <b className="block">{m.label}</b>
+                    <small className="text-[#BBF7D0]">{m.hint}</small>
+                  </span>
+                  <span className="tabular text-2xl font-bold text-gold">{naira(p.price_kobo_per_kg)}</span>
+                </li>
+              )
+            );
+          })}
+        </ul>
+      ) : (
+        <p className="text-[#BBF7D0]">Prices are loading slowly. See them after you sign up, or try again shortly.</p>
+      )}
+    </div>
+  );
+}
+
+async function PriceCards() {
+  const list = await prices();
+  if (!list) return <p className="text-muted-foreground">Prices are not available right now. Try again shortly.</p>;
+  return (
+    <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
+      {MATERIALS.map((m) => {
+        const p = list.find((x) => x.material === m.value);
+        if (!p) return null;
+        const top = m.value === "PET"; // PET is the core material (strongest demand)
+        return (
+          <div key={m.value} className={cn("flex flex-col gap-1 rounded-2xl border p-4", top ? "border-forest bg-forest text-white" : "border-border bg-white")}>
+            <span className={cn("eyebrow", top ? "text-[#86EFAC]" : "text-muted-foreground")}>{m.label}</span>
+            <b className={cn("tabular text-3xl font-bold", top ? "text-gold" : "text-primary-dark")}>{naira(p.price_kobo_per_kg)}</b>
+            <small className={top ? "text-[#BBF7D0]" : "text-muted-foreground"}>
+              {p.items_per_kg ? `≈ ${p.items_per_kg} ${m.value === "SACHET" ? "sachets" : "items"} = 1 kg` : m.hint}
+            </small>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+async function ImpactBand() {
+  const result = await api<Totals>("/impact/total");
+  if (!result.ok) return <p className="text-muted-foreground">Totals are not available right now.</p>;
+  const t = result.data;
+  const number = (v: string | number) => Number(v).toLocaleString("en-NG", { maximumFractionDigits: 0 });
+  return (
+    <div className="grid grid-cols-1 gap-4 min-[420px]:grid-cols-2 md:grid-cols-4">
+      <Stat value={`${number(t.kg_recycled)} kg`} label="plastic recycled" />
+      <Stat value={`₦${number(t.points_paid_kobo / 100)}`} label="paid to recyclers" />
+      <Stat value={`${number(t.co2_kg)} kg`} label="CO₂ avoided (US EPA WARM)" />
+      <Stat value={number(t.pickups)} label="completed pickups" />
+    </div>
+  );
+}
+
+function Section({ id, eyebrow, title, children }: { id?: string; eyebrow: string; title: string; children: ReactNode }) {
+  return (
+    <section id={id} className="scroll-mt-4">
+      <div className="mx-auto flex max-w-[1280px] flex-col gap-6 px-4 py-14 lg:px-[72px]">
+        <div>
+          <span className="eyebrow text-primary">{eyebrow}</span>
+          <h2 className="mt-2 max-w-3xl font-display text-3xl leading-tight font-extrabold tracking-[-0.03em] lg:text-[40px]">{title}</h2>
+        </div>
+        {children}
+      </div>
+    </section>
+  );
+}
+
+function Fact({ icon: Icon, value, source, children }: { icon: typeof Waves; value: string; source?: ReactNode; children: ReactNode }) {
+  return (
+    <div className="flex flex-col gap-2 rounded-2xl border border-border bg-white p-5">
+      <span className="grid size-10 place-items-center rounded-xl bg-mint text-primary">
+        <Icon className="size-5" aria-hidden />
+      </span>
+      <b className="font-display text-2xl font-extrabold tracking-[-0.02em]">{value}</b>
+      <p className="text-[15px] text-slate-700">{children}</p>
+      {source && <small className="text-xs text-muted-foreground">Source: {source}</small>}
+    </div>
+  );
+}
+
+function Cite({ href, children }: { href: string; children: ReactNode }) {
+  return (
+    <a href={href} target="_blank" rel="noreferrer" className="underline underline-offset-2">
+      {children}
+    </a>
+  );
+}
+
+function Step({ n, icon: Icon, title, children }: { n: number; icon: typeof Waves; title: string; children: ReactNode }) {
+  return (
+    <li className="flex flex-col gap-2 rounded-2xl border border-border bg-white p-5">
+      <span className="flex items-center gap-2">
+        <span className="tabular grid size-8 place-items-center rounded-full bg-primary text-sm font-bold text-white">{n}</span>
+        <Icon className="size-5 text-primary" aria-hidden />
+      </span>
+      <b className="text-lg">{title}</b>
+      <p className="text-sm text-slate-700">{children}</p>
+    </li>
+  );
+}
+
+function Audience({ icon: Icon, title, points }: { icon: typeof Waves; title: string; points: string[] }) {
+  return (
+    <div className="flex flex-col gap-3 rounded-2xl border border-border bg-white p-6">
+      <span className="flex items-center gap-3">
+        <span className="grid size-10 place-items-center rounded-xl bg-cream text-[#B45309]">
+          <Icon className="size-5" aria-hidden />
+        </span>
+        <b className="text-xl">{title}</b>
+      </span>
+      <ul className="flex flex-col gap-2">
+        {points.map((p) => (
+          <li key={p} className="flex items-start gap-2 text-[15px]">
+            <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden /> {p}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function Stat({ value, label }: { value: string; label: string }) {
+  return (
+    <div className="flex flex-col gap-1 rounded-2xl bg-white p-5">
+      <b className="tabular font-display text-[26px] font-extrabold tracking-[-0.03em] break-words text-primary-dark lg:text-3xl">{value}</b>
+      <span className="text-sm text-muted-foreground">{label}</span>
+    </div>
+  );
+}
+
+function Faq({ q, children }: { q: string; children: ReactNode }) {
+  return (
+    <details className="group rounded-2xl border border-border bg-white p-4 open:pb-5">
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-base font-bold [&::-webkit-details-marker]:hidden">
+        {q}
+        <span className="text-primary transition-transform group-open:rotate-45" aria-hidden>
+          +
+        </span>
+      </summary>
+      <p className="mt-2 text-[15px] text-slate-700">{children}</p>
+    </details>
   );
 }
