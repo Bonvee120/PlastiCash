@@ -77,3 +77,17 @@ The service role key, Paystack secret and Cloudinary secret must **never** appea
 - **Paystack**: test webhook URL = `https://<render-url>/api/v1/webhooks/paystack`.
 - **Cron**: POST `https://<render-url>/api/v1/jobs/reminders` every 15 min with header `X-Cron-Secret` (GitHub Actions: `.github/workflows/reminders.yml`).
 - Set `FRONTEND_ORIGIN` on the API to the Vercel URL.
+
+## Google sign-in (Supabase Auth)
+
+The login and sign-up pages have "Continue with Google". Until it is switched on, the button says so and nothing else happens.
+
+1. Google Cloud Console → APIs & Services → OAuth consent screen: app name PlastiCash, support email, the `email` and `profile` scopes; publish it (or add test users).
+2. Credentials → Create credentials → OAuth client ID → Web application.
+   - Authorised JavaScript origins: `http://localhost:3001` and the Vercel URL.
+   - Authorised redirect URI: `https://<project-ref>.supabase.co/auth/v1/callback` (Supabase shows the exact one on the Google provider page).
+3. Supabase → Authentication → Sign In / Providers → Google: enable, paste the client ID and client secret, save.
+4. Supabase → Authentication → URL Configuration → Redirect URLs: add `http://localhost:3001/auth/callback` and `https://<vercel-url>/auth/callback`.
+
+A new Google user lands on sign-up step 2 (Individual or Organization) with their name filled in; the API takes the email from the Google-backed token as usual.
+

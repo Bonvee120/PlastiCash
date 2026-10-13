@@ -9,7 +9,7 @@ type Props = {
   title: string;
   description: string;
   children: ReactNode;
-  // Top-right on laptop and under the form on phone, e.g. "Have an account? Log in".
+  // Under the form and its buttons on every screen, e.g. "New here? Create an account".
   footer: ReactNode;
   // "Step 1 of 2" with segments, for sign-up.
   step?: { current: number; total: number };
@@ -35,14 +35,13 @@ export function AuthCard({ title, description, children, footer, step }: Props) 
       </div>
 
       <main className="relative -mt-9 flex flex-1 flex-col gap-5 rounded-t-[28px] bg-canvas px-4 pt-7 pb-10 lg:mt-0 lg:rounded-none lg:bg-white lg:px-[72px] lg:pt-10">
-        <div className="hidden items-center justify-between lg:flex">
+        <div className="hidden lg:flex">
           <Link href="/" aria-label="PlastiCash home">
             <Logo size={38} />
           </Link>
-          <span className="text-sm text-muted-foreground">{footer}</span>
         </div>
 
-        <div className="mx-auto flex w-full max-w-[560px] flex-col gap-5 lg:mt-8">
+        <div className="mx-auto flex w-full max-w-[440px] flex-col gap-6 lg:mt-10">
           {step && (
             <div>
               <span className="eyebrow text-primary">
@@ -62,7 +61,7 @@ export function AuthCard({ title, description, children, footer, step }: Props) 
             <p className="mt-2 text-[15px] text-muted-foreground">{description}</p>
           </div>
           {children}
-          <p className="text-center text-sm text-muted-foreground lg:hidden">{footer}</p>
+          <p className="border-t border-border pt-5 text-center text-sm text-muted-foreground">{footer}</p>
         </div>
       </main>
     </div>

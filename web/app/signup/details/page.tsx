@@ -6,12 +6,13 @@ import { AuthCard } from "@/components/auth/auth-card";
 import { LogoutButton } from "@/components/auth/logout-button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { loadMe, ROLE_HOME } from "@/lib/me";
+import { createClient } from "@/lib/supabase/server";
 
 import { DetailsForm } from "./details-form";
 
 export const metadata: Metadata = { title: "Finish signing up", robots: { index: false, follow: false } };
 
-// Sign-up step 2 (after email + password and the first login): Individual or Organization details.
+// Sign-up step 2 (after email + password and the first login, or after Google): Individual or Organization details.
 export default function DetailsPage() {
   return (
     <AuthCard
@@ -33,5 +34,11 @@ async function OnlyWithoutProfile() {
   if (state.kind === "logged-out") redirect("/login?next=/signup/details");
   if (state.kind === "ok") redirect(ROLE_HOME[state.me.role]);
   if (state.kind === "inactive") redirect("/app");
-  return <DetailsForm />;
+  // Google sign-ups arrive with their name in the session; offer it so they don't type it again.
+  const {
+    data: { session },
+  } = await (await createClient()).auth.getSession();
+  const meta = session?.user.user_metadata ?? {};
+  const name = typeof meta.full_name === "string" ? meta.full_name : typeof meta.name === "string" ? meta.name : "";
+  return <DetailsForm defaultFullName={name.slice(0, 200)} />;
 }

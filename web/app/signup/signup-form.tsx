@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
 
+import { GoogleButton, OrDivider, PasswordInput } from "@/components/auth/auth-fields";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createClient } from "@/lib/supabase/client";
@@ -73,23 +74,27 @@ export function SignupForm() {
       </div>
       <div className="flex flex-col gap-2">
         <Label htmlFor="password">Password</Label>
-        <Input
+        <PasswordInput
           id="password"
           name="password"
-          type="password"
           autoComplete="new-password"
           minLength={MIN_PASSWORD}
+          aria-describedby="password-hint"
           required
         />
-        <p className="text-sm text-muted-foreground">At least {MIN_PASSWORD} characters.</p>
+        <p id="password-hint" className="text-sm text-muted-foreground">
+          At least {MIN_PASSWORD} characters.
+        </p>
       </div>
       <div className="flex flex-col gap-2">
         <Label htmlFor="confirm">Confirm password</Label>
-        <Input id="confirm" name="confirm" type="password" autoComplete="new-password" required />
+        <PasswordInput id="confirm" name="confirm" autoComplete="new-password" required />
       </div>
-      <button type="submit" className="d-btn d-btn-primary d-btn-block" disabled={pending}>
+      <button type="submit" className="d-btn d-btn-primary d-btn-block mt-1" disabled={pending}>
         {pending ? "Creating account…" : "Create account"}
       </button>
+      <OrDivider />
+      <GoogleButton />
     </form>
   );
 }

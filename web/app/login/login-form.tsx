@@ -5,14 +5,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
 import { toast } from "sonner";
 
+import { GoogleButton, OrDivider, PasswordInput, safeNext } from "@/components/auth/auth-fields";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createClient } from "@/lib/supabase/client";
-
-// Only same-site paths, so ?next= can't send people to another website.
-function safeNext(next: string | null) {
-  return next && next.startsWith("/") && !next.startsWith("//") ? next : "/app";
-}
 
 export function LoginForm() {
   const router = useRouter();
@@ -22,6 +18,9 @@ export function LoginForm() {
   useEffect(() => {
     if (searchParams.get("error") === "confirm") {
       toast.error("That confirmation link didn't work. It may have expired; try logging in or sign up again.");
+    }
+    if (searchParams.get("error") === "oauth") {
+      toast.error("Google sign-in didn't finish. Try again, or use your email and password.", { id: "oauth" });
     }
     // Log-out ends with a full page load (which clears toasts), so the login page shows the toast itself.
     // The id stops a second toast if the effect runs twice.
@@ -73,11 +72,13 @@ export function LoginForm() {
       </div>
       <div className="flex flex-col gap-2">
         <Label htmlFor="password">Password</Label>
-        <Input id="password" name="password" type="password" autoComplete="current-password" required />
+        <PasswordInput id="password" name="password" autoComplete="current-password" required />
       </div>
-      <button type="submit" className="d-btn d-btn-primary d-btn-block" disabled={pending}>
+      <button type="submit" className="d-btn d-btn-primary d-btn-block mt-1" disabled={pending}>
         {pending ? "Logging in…" : "Log in"}
       </button>
+      <OrDivider />
+      <GoogleButton next={safeNext(searchParams.get("next"))} />
     </form>
   );
 }

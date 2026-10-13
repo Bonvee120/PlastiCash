@@ -17,8 +17,11 @@ const INITIAL: DetailsState = { attempt: 0, values: {}, fieldErrors: {}, message
 const selectClass =
   "h-13 w-full rounded-input border border-input bg-white px-3.5 text-base font-medium outline-none focus-visible:border-2 focus-visible:border-primary aria-invalid:border-2 aria-invalid:border-destructive";
 
-export function DetailsForm() {
-  const [state, action, pending] = useActionState(createProfile, INITIAL);
+export function DetailsForm({ defaultFullName = "" }: { defaultFullName?: string }) {
+  const [state, action, pending] = useActionState(createProfile, {
+    ...INITIAL,
+    values: { full_name: defaultFullName },
+  });
   const [accountType, setAccountType] = useState(state.values.account_type || "INDIVIDUAL");
   const isOrganization = accountType === "ORGANIZATION";
   const { values, fieldErrors: errors } = state;

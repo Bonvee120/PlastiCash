@@ -27,7 +27,7 @@ When a spec and the code disagree, the spec wins. If a spec is unclear or two sp
 
 - **web/**: Next.js (App Router) + TypeScript, Tailwind CSS, shadcn/ui, daisyUI (with class prefix `d-`), Framer Motion, Leaflet (react-leaflet), Sonner toasts, shadcn Skeleton. Deployed on Vercel.
 - **api/**: Python 3.12, FastAPI, SQLModel, Alembic, pytest. **Async throughout:** `async def` endpoints and dependencies, SQLModel `AsyncSession` on the `asyncpg` driver (`postgresql+asyncpg://` URLs), an async Alembic env, and async tests (`pytest-asyncio`, `httpx.AsyncClient`). Runs in Docker. Deployed on Render.
-- **Supabase**: Postgres database, Auth (email + password), Realtime. Supabase Storage is not used; photos go to Cloudinary.
+- **Supabase**: Postgres database, Auth (email + password, and Google sign-in, added 13 Oct 2026 at Kenzy's request), Realtime. Supabase Storage is not used; photos go to Cloudinary.
 - **Integrations**: Paystack (test mode: transfer recipients, transfers, webhook), Cloudinary (signed uploads), Termii (SMS codes and reminders, sandbox), WeasyPrint (ESG PDF).
 
 ## Repo layout
