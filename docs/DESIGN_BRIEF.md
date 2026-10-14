@@ -221,7 +221,7 @@ Three carousels appear in the mockup. All of them follow these rules:
 
 | Where | Behaviour |
 |---|---|
-| **Landing hero** (`/`, laptop) | Three slides, cross-fade, auto-advance every 5 s, prev/next arrows + dots. Each slide pairs a headline with a photo |
+| **Landing hero** (`/`, laptop) | Three slides, cross-fade, auto-advance every 5 s, prev/next arrows + dots. Each slide pairs a headline with a photo. Built 13 Oct 2026: photos and headlines are managed by admins in `/ops-portal/hero` (brand slides until photos exist); the carousel takes the place of the price board, and prices stay in the section below |
 | **Landing hero** (`/`, phone) | Photo-only carousel above the headline, auto-advance 4.5 s |
 | **Sign-up** (`/signup`, laptop) | Full-height photo panel, 3 slides with headline + one line, auto-advance 4.5 s |
 | **Welcome** (`/welcome`, phone, first visit only) | Three swipeable slides with a bottom sheet: copy, dots, **Skip** and **Next**. The last slide's button says **Get started** |
@@ -246,7 +246,7 @@ Every route below exists in the mockup. **L** = laptop layout, **P** = phone lay
   - "Stories from Enugu" carousel.
   - Impact band: kg recycled, points paid, CO₂ avoided.
   - Still to design (in the spec but not yet in the mockup): how it works, for individuals and organizations, FAQ, and the footer with the hub address and WhatsApp.
-- **`/guide`:** bottles per kg per material, a photo of one full sack, and the hub address and hours (14 Ogui Road, Mon–Sat 8 am to 5 pm).
+- **`/guide`:** bottles per kg per material, a photo of one full sack, and the hub address and hours (21A Off Umuawulu, by Ugwuaji, Enugu/PH Expressway, Mon–Sat 8 am to 5 pm).
 - **`/signup`:**
   - Layout: L split screen with the carousel; P is a form with step segments.
   - Step 2 asks "Who's recycling?" with Just me / Organization cards, then full name, phone (+234), area and street.
@@ -330,10 +330,10 @@ Every route below exists in the mockup. **L** = laptop layout, **P** = phone lay
 | 3 | Young woman smiles at her phone on the porch as her points arrive | Sign-up, welcome 3, stories |
 | 4 | Green Hills students carry sacks of bottles across the school yard | Impact (organization), hero, stories |
 | 5 | Clean drain on Zik Avenue after a community pickup day | Dashboard banner, stories |
-| 6 | EcoCyclers hub on Ogui Road: bales, scale and today's price board | Log in, guide, stories |
+| 6 | EcoCyclers hub on the Enugu/PH Expressway: bales, scale and today's price board | Log in, guide, stories |
 | 7 | One full EcoCyclers sack of PET bottles next to a 1 kg bundle | Bottle guide, request estimate |
 | 8 | Close-up of a scale reading (collector's proof photo) | Confirm weights, disputes |
-| 9 | Bales leaving the Ogui Road hub on a truck | Stories, ops |
+| 9 | Bales leaving the hub on a truck | Stories, ops |
 
 The photo slots in the mockup are illustrated placeholders. Figma's AI image credits ran out before real images could be generated.
 
@@ -349,6 +349,11 @@ The photo slots in the mockup are illustrated placeholders. Figma's AI image cre
 - Keep all copy in one file so Igbo and Pidgin translations can be added later.
 
 ## 12. Motion
+
+Built 13 Oct 2026 (landing, blog list, events): sections and cards fade and rise in as they scroll into view, impact
+numbers count up, the hero carousel cross-fades. The hero text, first image and page headings are never faded in, so the
+largest content paints at once (LCP). Reduced motion is honoured in CSS (`[data-reveal]` forced visible), so nothing is
+hidden before scripts load. The animation engine (`motion`, lazy features) loads after the page.
 
 - **Timing:** 150–250 ms with ease-out. Carousels cross-fade over 600–700 ms.
 - **Use motion to explain change:**

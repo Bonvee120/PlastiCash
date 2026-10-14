@@ -606,17 +606,18 @@ async function HeroSlides() {
 // Latest posts and upcoming climate events; each block shows only when there is something published.
 async function ClimateNews() {
   const [posts, events] = await Promise.all([
-    getPosts(3),
-    getEvents("upcoming", 3),
+    getPosts(4),
+    getEvents("upcoming", 4),
   ]);
   if (posts.length === 0 && events.length === 0) return null;
+  // Posts in a two-by-two grid across the full width; events below in two columns.
   return (
     <Section
       id="news"
       eyebrow="Climate news"
       title="From the blog, and what is coming up"
     >
-      <div className="grid gap-8 lg:grid-cols-[1.4fr_1fr]">
+      <div className="flex flex-col gap-10">
         {posts.length > 0 && (
           <div className="flex flex-col gap-4">
             <div className="flex items-baseline justify-between">
@@ -625,13 +626,10 @@ async function ClimateNews() {
                 All posts →
               </Link>
             </div>
-            <Stagger className="grid gap-4 sm:grid-cols-2">
-              {posts.map((p, i) => (
-                <StaggerItem
-                  key={p.id}
-                  className={cn(i === 0 && "sm:col-span-2")}
-                >
-                  <PostCard post={p} large={i === 0} />
+            <Stagger className="grid gap-5 sm:grid-cols-2">
+              {posts.map((p) => (
+                <StaggerItem key={p.id}>
+                  <PostCard post={p} />
                 </StaggerItem>
               ))}
             </Stagger>
@@ -645,7 +643,7 @@ async function ClimateNews() {
                 All events →
               </Link>
             </div>
-            <Stagger as="ul" className="flex flex-col gap-3">
+            <Stagger as="ul" className="grid gap-3 lg:grid-cols-2">
               {events.map((e) => (
                 <StaggerItem key={e.id} as="li">
                   <EventRow event={e} />

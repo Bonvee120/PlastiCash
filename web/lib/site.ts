@@ -1,6 +1,8 @@
-// Public contact details shown in the app. Set in web/.env.local; the hub falls back to the brief's address.
+// Public contact details shown in the app. Set in web/.env.local; the hub falls back to the EcoCyclers hub address.
 export const HUB = {
-  address: process.env.NEXT_PUBLIC_HUB_ADDRESS || "14 Ogui Road",
+  address:
+    process.env.NEXT_PUBLIC_HUB_ADDRESS ||
+    "21A Off Umuawulu, by Ugwuaji, Enugu/PH Expressway",
   hours: "Mon to Sat, 8 am to 5 pm",
 };
 
