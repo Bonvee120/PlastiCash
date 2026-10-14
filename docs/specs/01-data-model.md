@@ -200,6 +200,20 @@ Browser push for admins: one row per browser or device that turned on notificati
 
 RLS on with no policy and no grants for `anon`/`authenticated`: only FastAPI reads it. Rows the push service reports as gone (404/410) are deleted.
 
+## 9–11. Content (added 13 Oct 2026): `posts`, `events`, `hero_slides`
+
+Written by admins in the ops portal, read by anyone through FastAPI (published rows only). RLS on with no policy and no
+grants for the browser roles, like every other table.
+
+`posts`: id, slug (unique; from the title; fixed once published), title, excerpt, body_md (Markdown, rendered without raw
+HTML), cover_url (Cloudinary), author_id (FK profiles, set null), byline (the writer's name shown to readers; empty = the admin account's name; added 14 Oct 2026), published_at (null = draft), created_at, updated_at.
+
+`events`: id, title, starts_at, ends_at (null or ≥ starts_at), location, is_online, summary, cover_url, link_url
+(http/https only), published, created_by (FK profiles, set null), created_at, updated_at. Upcoming = not finished yet
+(ends_at, or starts_at when there is no end, is in the future).
+
+`hero_slides`: id, image_url (Cloudinary), headline, subline, position (lower first), active, created_at.
+
 ## Row Level Security
 
 Enable RLS on **all 7 tables** in an Alembic migration (`op.execute`). FastAPI connects as the database owner, so RLS doesn't block it. The browser only needs Realtime on `pickups`, so add only these policies:

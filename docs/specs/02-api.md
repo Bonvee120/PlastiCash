@@ -108,3 +108,20 @@ Private portal. Every route is `require_admin`.
 
 `POST /pickups` pushes "New pickup request: <first name>" (area, estimated kg, day; no phone or street) to every active admin's devices after the response is sent; a push failure never fails the request.
 
+## Content (added 13 Oct 2026)
+
+| Method | Path | Notes |
+|---|---|---|
+| GET | `/blog?limit&offset` | Public. Published posts, newest first (no body) |
+| GET | `/blog/{slug}` | Public. One published post with its Markdown body; 404 for drafts |
+| GET | `/events?when=upcoming\|past` | Public. Published events; upcoming soonest first, past newest first |
+| GET | `/hero-slides` | Public. Active slides in order (max 10) |
+| GET/POST | `/admin/posts` | ADMIN. All posts / create (`{title, excerpt, body_md, cover_url?, byline?, publish}`); `author_name` in every post response is the byline, else the admin's name; slug made from the title, unique |
+| GET/PATCH/DELETE | `/admin/posts/{id}` | ADMIN. `publish: true/false` publishes or unpublishes |
+| GET/POST | `/admin/events` | ADMIN. All events / create |
+| PATCH/DELETE | `/admin/events/{id}` | ADMIN |
+| GET/POST | `/admin/hero-slides` | ADMIN |
+| PATCH/DELETE | `/admin/hero-slides/{id}` | ADMIN |
+
+`POST /uploads/signature` also takes `blog`, `event` and `hero` (admins only). Every image URL must be one of our
+Cloudinary uploads.

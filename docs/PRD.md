@@ -85,6 +85,7 @@ WhatsApp bot · mobile money payouts · multiple logins per organization · admi
 | U13 | I withdraw | Minimum ₦1,000; can't exceed balance; status shows Pending → Processing → Paid, or Failed/Rejected with money returned |
 | U14 | I see my impact | Total kg by material, points earned, CO₂ saved |
 | U15 | (Organization) I download an ESG report | PDF for a month or year with kg by material, CO₂ saved, pickups count |
+| U16 | (Anyone) I read news and see upcoming climate events | `/blog` lists published posts, newest first; `/events` lists upcoming events (soonest first) with date, place or online, description and a link to register elsewhere; past events move to an archive; the landing page shows the latest posts and next events |
 
 ### Collector
 | ID | Story | Acceptance criteria |
@@ -107,6 +108,9 @@ WhatsApp bot · mobile money payouts · multiple logins per organization · admi
 | A6 | I manage users and collectors | Create collectors, deactivate accounts, mark verified pickers |
 | A7 | I manage stock | See raw kg per material; create bales (not more than raw stock); mark bales processed and sold with buyer and price; see real loss % |
 | A8 | I see how the business is doing | Kg this month, points paid, pending withdrawals, open disputes, estimate accuracy, disputes per collector |
+| A9 | I write the blog (added 13 Oct 2026) | Title, author name (the real writer, shown to readers instead of the admin account; added 14 Oct 2026), summary, cover photo and Markdown text with a formatting toolbar and preview; save as draft or publish; unpublish; delete; drafts are never public; the address stays the same once published |
+| A10 | I list climate events (added 13 Oct 2026) | Title, start and optional end (Lagos time), place or online, description, optional image and registration link; show or hide; delete |
+| A11 | I set the landing hero photos (added 13 Oct 2026) | Upload a photo with a headline and optional line, order them, hide or delete; until there are photos the hero shows brand slides |
 
 ## 7. Business rules
 

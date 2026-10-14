@@ -459,3 +459,65 @@ class PushSubscription(SQLModel, table=True):
     p256dh: str = Field(sa_column=txt(nullable=False))
     auth: str = Field(sa_column=txt(nullable=False))
     created_at: datetime | None = Field(default=None, sa_column=now_ts())
+
+
+# ===== 9-11. Content: blog posts, climate events, landing hero slides (added 13 Oct 2026, admin-written) =====
+
+
+class Post(SQLModel, table=True):
+    """A blog post. Body is Markdown (rendered on the web without raw HTML). Draft while published_at is empty."""
+
+    __tablename__ = "posts"
+    __table_args__ = (Index("posts_published_idx", text("published_at desc")),)
+
+    id: UUID | None = Field(default=None, sa_column=uuid_pk())
+    slug: str = Field(sa_column=txt(nullable=False, unique=True))
+    title: str = Field(sa_column=txt(nullable=False))
+    excerpt: str = Field(sa_column=txt(nullable=False))
+    body_md: str = Field(sa_column=txt(nullable=False))
+    cover_url: str | None = Field(default=None, sa_column=txt())
+    author_id: UUID | None = Field(default=None, sa_column=fk("profiles.id", ondelete="SET NULL"))
+    # The name shown on the post (the real writer); empty = the admin account's name.
+    byline: str | None = Field(default=None, sa_column=txt())
+    published_at: datetime | None = Field(default=None, sa_column=ts())
+    created_at: datetime | None = Field(default=None, sa_column=now_ts())
+    updated_at: datetime | None = Field(default=None, sa_column=now_ts())
+
+
+class Event(SQLModel, table=True):
+    """An upcoming (or past) event in the climate and recycling field, with a link to register elsewhere."""
+
+    __tablename__ = "events"
+    __table_args__ = (
+        CheckConstraint("ends_at is null or ends_at >= starts_at", name="events_ends_after_start"),
+        Index("events_starts_idx", "starts_at"),
+    )
+
+    id: UUID | None = Field(default=None, sa_column=uuid_pk())
+    title: str = Field(sa_column=txt(nullable=False))
+    starts_at: datetime = Field(sa_column=ts(nullable=False))
+    ends_at: datetime | None = Field(default=None, sa_column=ts())
+    location: str = Field(sa_column=txt(nullable=False))
+    is_online: bool = Field(default=False, sa_column=flag(False))
+    summary: str = Field(sa_column=txt(nullable=False))
+    cover_url: str | None = Field(default=None, sa_column=txt())
+    link_url: str | None = Field(default=None, sa_column=txt())
+    published: bool = Field(default=False, sa_column=flag(False))
+    created_by: UUID | None = Field(default=None, sa_column=fk("profiles.id", ondelete="SET NULL"))
+    created_at: datetime | None = Field(default=None, sa_column=now_ts())
+    updated_at: datetime | None = Field(default=None, sa_column=now_ts())
+
+
+class HeroSlide(SQLModel, table=True):
+    """A photo in the landing page's hero carousel, with its headline. Lower position shows first."""
+
+    __tablename__ = "hero_slides"
+    __table_args__ = (Index("hero_slides_order_idx", "position"),)
+
+    id: UUID | None = Field(default=None, sa_column=uuid_pk())
+    image_url: str = Field(sa_column=txt(nullable=False))
+    headline: str = Field(sa_column=txt(nullable=False))
+    subline: str | None = Field(default=None, sa_column=txt())
+    position: int = Field(default=0, sa_column=counter())
+    active: bool = Field(default=True, sa_column=flag(True))
+    created_at: datetime | None = Field(default=None, sa_column=now_ts())
