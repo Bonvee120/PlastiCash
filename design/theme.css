@@ -193,6 +193,10 @@
   html {
     @apply font-sans;
   }
+  /* Keep #anchor targets clear of the sticky public header. */
+  html {
+    scroll-padding-top: 88px;
+  }
   body {
     @apply bg-background text-foreground;
   }
@@ -281,3 +285,13 @@
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
+
+/* Landing motion (web/components/motion/reveal.tsx) starts elements faded out. For visitors who ask for reduced motion,
+   show them as they are: CSS, so it works before scripts load and regardless of what the server rendered. */
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+

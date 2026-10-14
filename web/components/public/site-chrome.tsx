@@ -8,12 +8,15 @@ import { cn } from "@/lib/utils";
 
 // Public site chrome (DESIGN_BRIEF.md §6.1): logo, How it works, Prices, For organizations, Bottle guide, Log in and
 // "Start earning" (amber). On a phone the links fold into a menu button. Links into the logged-in area don't prefetch.
+// The header sticks to the top while scrolling.
 
 const LINKS = [
   { href: "/#how-it-works", label: "How it works" },
   { href: "/#prices", label: "Prices" },
   { href: "/#organizations", label: "For organizations" },
   { href: "/guide", label: "Bottle guide" },
+  { href: "/blog", label: "Blog" },
+  { href: "/events", label: "Events" },
 ];
 
 export function SiteHeader({ dark = false }: { dark?: boolean }) {
@@ -23,8 +26,10 @@ export function SiteHeader({ dark = false }: { dark?: boolean }) {
   return (
     <header
       className={cn(
-        "relative z-20",
-        dark ? "text-white" : "border-b border-border bg-card",
+        "sticky top-0 z-40",
+        dark
+          ? "bg-[#052E16]/95 text-white backdrop-blur"
+          : "border-b border-border bg-card/95 backdrop-blur",
       )}
     >
       <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-4 px-4 py-4 lg:px-[72px]">
@@ -136,6 +141,8 @@ export function SiteFooter() {
         <div className="flex flex-col gap-2 text-sm">
           <b className="text-white">PlastiCash</b>
           <Link href="/guide">Bottle guide</Link>
+          <Link href="/blog">Blog</Link>
+          <Link href="/events">Climate events</Link>
           <Link href="/signup" prefetch={false}>
             Create an account
           </Link>
