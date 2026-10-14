@@ -224,3 +224,4 @@ One entry per day: what was done, what broke, what's next.
 - Real hub address as the default: 21A Off Umuawulu, by Ugwuaji, Enugu/PH Expressway (`web/lib/site.ts`; `NEXT_PUBLIC_HUB_ADDRESS` still overrides).
 - Landing "Latest posts": up to 4 posts, two by two across the full width; upcoming events below in two columns.
 - Blog author name (Kenzy's request): posts get an optional `byline` (migration `7d3b9e2a6f10`, applied to Supabase); the editor has an "Author name" field; readers see the byline, or the admin account's name when it is empty. Test added in `tests/test_content.py`.
+- Login and sign-up carousel now shows the landing hero photos (admin uploads) behind the same welcome lines; gradient until photos exist. Photos load lazily, so phones (panel hidden) download none.

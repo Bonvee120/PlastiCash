@@ -8,17 +8,27 @@ export type Slide = { title: string; highlight: string; line: string; shot: stri
 
 // Sign-up/login photo carousel (docs/DESIGN_BRIEF.md §8): cross-fade, auto-advance every 4.5 s, dots
 // (8 px, active 26 px gold on dark), keyboard reachable, paused when the user prefers reduced motion.
-// Photo slots show a forest gradient until the real Enugu photos (shot list §10) arrive.
-export function PhotoCarousel({ slides, interval = 4500 }: { slides: Slide[]; interval?: number }) {
+// Behind the text it shows the landing hero photos the admin uploads (ops portal, Hero slides), in turn; with no
+// photos yet, a forest gradient. The text slides stay the same; with more photos than texts the texts repeat.
+export function PhotoCarousel({
+  slides,
+  photos = [],
+  interval = 4500,
+}: {
+  slides: Slide[];
+  photos?: string[];
+  interval?: number;
+}) {
+  const count = Math.max(slides.length, photos.length);
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
 
   useEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
     if (reduce.matches || paused) return;
-    const timer = window.setInterval(() => setActive((i) => (i + 1) % slides.length), interval);
+    const timer = window.setInterval(() => setActive((i) => (i + 1) % count), interval);
     return () => window.clearInterval(timer);
-  }, [paused, slides.length, interval]);
+  }, [paused, count, interval]);
 
   return (
     <section
@@ -30,28 +40,43 @@ export function PhotoCarousel({ slides, interval = 4500 }: { slides: Slide[]; in
       onFocus={() => setPaused(true)}
       onBlur={() => setPaused(false)}
     >
-      {slides.map((slide, i) => (
+      {Array.from({ length: count }, (_, i) => {
+        const slide = slides[i % slides.length]!;
+        const photo = photos.length ? photos[i % photos.length] : null;
+        return (
         <div
-          key={slide.title}
+          key={i}
           role="group"
           aria-roledescription="slide"
-          aria-label={`Slide ${i + 1} of ${slides.length}`}
+          aria-label={`Slide ${i + 1} of ${count}`}
           aria-hidden={i !== active}
           className={cn(
             "absolute inset-0 transition-opacity duration-700 ease-out motion-reduce:transition-none",
             i === active ? "opacity-100" : "pointer-events-none opacity-0",
           )}
         >
-          {/* Photo slot: forest-to-green with a soft glow, until the real photo is in */}
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                "radial-gradient(circle at 70% 30%, rgb(34 197 94 / 0.35), transparent 55%), linear-gradient(160deg, #166534, #052E16)",
-            }}
-            title={`Photo: ${slide.shot}`}
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-forest/10 from-35% to-forest/90" />
+          {photo ? (
+            // eslint-disable-next-line @next/next/no-img-element -- Cloudinary serves a cropped WebP
+            <img
+              src={cloudinaryPanel(photo)}
+              alt=""
+              className="absolute inset-0 h-full w-full object-cover"
+              // Lazy: the panel is hidden on phones, and hidden lazy images are never downloaded.
+              loading="lazy"
+            />
+          ) : (
+            // Photo slot: forest-to-green with a soft glow, until the admin adds photos
+            <div
+              className="absolute inset-0"
+              style={{
+                background:
+                  "radial-gradient(circle at 70% 30%, rgb(34 197 94 / 0.35), transparent 55%), linear-gradient(160deg, #166534, #052E16)",
+              }}
+              title={`Photo: ${slide.shot}`}
+            />
+          )}
+          {/* Forest fade from the bottom keeps the text readable on any photo */}
+          <div className="absolute inset-0 bg-gradient-to-b from-forest/10 from-30% via-forest/55 to-forest/95" />
           <div className="absolute inset-x-12 bottom-24">
             <p className="font-display text-5xl leading-none font-extrabold tracking-[-0.04em]">
               {slide.title}
@@ -61,11 +86,12 @@ export function PhotoCarousel({ slides, interval = 4500 }: { slides: Slide[]; in
             <p className="mt-3.5 max-w-[420px] text-[#DCFCE7]">{slide.line}</p>
           </div>
         </div>
-      ))}
+        );
+      })}
       <div className="absolute bottom-12 left-12 z-10 flex items-center gap-1.5" role="tablist" aria-label="Choose slide">
-        {slides.map((slide, i) => (
+        {Array.from({ length: count }, (_, i) => (
           <button
-            key={slide.title}
+            key={i}
             type="button"
             role="tab"
             aria-selected={i === active}
@@ -80,6 +106,11 @@ export function PhotoCarousel({ slides, interval = 4500 }: { slides: Slide[]; in
       </div>
     </section>
   );
+}
+
+// Tall crop for the 600 px side panel, chosen around the subject.
+function cloudinaryPanel(url: string) {
+  return url.includes("/upload/") ? url.replace("/upload/", "/upload/f_auto,q_auto,c_fill,g_auto,w_900,h_1350/") : url;
 }
 
 // Copy from docs/DESIGN_BRIEF.md §8 (welcome slides).

@@ -1,9 +1,10 @@
 import Link from "next/link";
-import type { ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
 
 import { Logo } from "@/components/brand/logo";
 import { ThemeToggle } from "@/components/brand/theme";
 import { PhotoCarousel, WELCOME_SLIDES } from "@/components/brand/photo-carousel";
+import { getHeroSlides } from "@/lib/content";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -17,12 +18,15 @@ type Props = {
 };
 
 // Auth pages (docs/DESIGN_BRIEF.md §6.1, §9): split screen on a laptop (600 px photo carousel, form max 560 px);
-// on a phone a forest header with the logo, then the form on a rounded sheet.
+// on a phone a forest header with the logo, then the form on a rounded sheet. The carousel shows the welcome lines
+// over the same photos the admin uploads for the landing hero.
 export function AuthCard({ title, description, children, footer, step }: Props) {
   return (
     <div className="flex flex-1 flex-col bg-canvas lg:grid lg:min-h-svh lg:grid-cols-[600px_1fr] lg:bg-card">
       <div className="hidden lg:block">
-        <PhotoCarousel slides={WELCOME_SLIDES} />
+        <Suspense fallback={<PhotoCarousel slides={WELCOME_SLIDES} />}>
+          <WelcomeCarousel />
+        </Suspense>
       </div>
 
       {/* Phone header */}
@@ -69,4 +73,9 @@ export function AuthCard({ title, description, children, footer, step }: Props) 
       </main>
     </div>
   );
+}
+
+async function WelcomeCarousel() {
+  const photos = (await getHeroSlides()).map((s) => s.image_url);
+  return <PhotoCarousel slides={WELCOME_SLIDES} photos={photos} />;
 }
