@@ -100,7 +100,7 @@ async def committed(engine: AsyncEngine) -> AsyncIterator[AsyncEngine]:
     yield engine
     async with engine.begin() as connection:
         await connection.execute(
-            text("truncate profiles, prices, pickups, pickup_items, ledger_entries, withdrawals, bales cascade")
+            text("truncate profiles, prices, pickups, pickup_items, ledger_entries, withdrawals, bales, posts, events, hero_slides cascade")
         )
 
 

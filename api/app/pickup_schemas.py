@@ -92,7 +92,7 @@ class EstimateOut(BaseModel):
 
 
 class UploadSignatureIn(_Strict):
-    purpose: Literal["request", "weigh", "dispute"]
+    purpose: Literal["request", "weigh", "dispute", "blog", "event", "hero"]
 
 
 class PickupCreate(EstimateIn):

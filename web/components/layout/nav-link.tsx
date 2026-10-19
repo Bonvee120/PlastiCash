@@ -3,10 +3,13 @@
 import {
   AlertTriangle,
   Boxes,
+  CalendarDays,
   House,
+  Images,
   LayoutDashboard,
   Leaf,
   List,
+  Newspaper,
   Plus,
   SlidersHorizontal,
   Tag,
@@ -120,6 +123,9 @@ const OPS_NAV: NavItem[] = [
   { href: "/ops-portal/prices", label: "Prices", icon: Tag },
   { href: "/ops-portal/users", label: "Users and collectors", icon: Users },
   { href: "/ops-portal/stock", label: "Stock and bales", icon: Boxes },
+  { href: "/ops-portal/blog", label: "Blog", icon: Newspaper },
+  { href: "/ops-portal/events", label: "Events", icon: CalendarDays },
+  { href: "/ops-portal/hero", label: "Hero slides", icon: Images },
 ];
 
 export function UserSidebarNav() {

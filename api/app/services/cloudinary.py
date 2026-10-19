@@ -7,7 +7,16 @@ from urllib.parse import urlparse
 from app.config import get_settings
 from app.errors import ApiError
 
-FOLDERS = {"request": "plasticash/requests", "weigh": "plasticash/weighing", "dispute": "plasticash/disputes"}
+FOLDERS = {
+    "request": "plasticash/requests",
+    "weigh": "plasticash/weighing",
+    "dispute": "plasticash/disputes",
+    # admin content
+    "blog": "plasticash/blog",
+    "event": "plasticash/events",
+    "hero": "plasticash/hero",
+}
+ADMIN_PURPOSES = {"blog", "event", "hero"}
 
 
 def signature(purpose: str) -> dict:

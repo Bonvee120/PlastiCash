@@ -12,7 +12,8 @@ export type Totals = { kg_recycled: string; points_paid_kobo: number; co2_kg: st
 
 async function publicGet<T>(path: string): Promise<T | null> {
   try {
-    const response = await fetch(`${API_URL}${path}`, { signal: AbortSignal.timeout(10_000) });
+    // no-store: the "use cache" layer above is the only cache (expired by tags); a second fetch cache could keep stale data.
+    const response = await fetch(`${API_URL}${path}`, { cache: "no-store", signal: AbortSignal.timeout(10_000) });
     return response.ok ? ((await response.json()) as T) : null;
   } catch {
     return null;

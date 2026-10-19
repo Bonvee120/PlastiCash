@@ -8,8 +8,11 @@ Money is shown as points with naira: "2,450 pts (₦2,450)".
 
 | Route | Content |
 |---|---|
-| `/` | Landing page: hero ("Your plastic is money"), problem (drains, floods, burning), how it works (5 steps), what we buy (live prices from `/prices/current`), for individuals / for organizations, impact counter, who pays (export story), FAQ, CTA to sign up, "Chat on WhatsApp" link (wa.me) |
+| `/` | Landing page: hero ("Your plastic is money") with a photo carousel managed in `/ops-portal/hero` (brand slides until photos exist; cross-fade every 5 s, arrows, dots, swipe; pauses on hover and for reduced motion), latest blog posts and upcoming events (when any are published), scroll-in motion on the sections below the hero, problem (drains, floods, burning), how it works (5 steps), what we buy (live prices from `/prices/current`), for individuals / for organizations, impact counter, who pays (export story), FAQ, CTA to sign up, "Chat on WhatsApp" link (wa.me) |
 | `/guide` | Bottles per kg and sack guide: "about N bottles = 1 kg = ₦X today" per material |
+| `/blog` | Published posts, newest first (added 13 Oct 2026) |
+| `/blog/[slug]` | One post: title, date, author, cover, Markdown body (no raw HTML), Open Graph tags |
+| `/events` | Upcoming climate and recycling events (soonest first) and a short past-events archive; times in Lagos time |
 | `/login`, `/signup` | Supabase email + password. Sign-up step 2 chooses Individual or Organization and fills the matching fields (calls `POST /me/profile`). |
 
 ## User (role USER) — `/app/...`
@@ -49,6 +52,9 @@ Not linked anywhere on the public site. Access is still enforced by role on ever
 | `/ops-portal/withdrawals` | Queue with user, amount, bank; approve / reject |
 | `/ops-portal/users` | Users and collectors; create collector; deactivate; verified picker badge; manual adjustment |
 | `/ops-portal/stock` | Raw stock per material, create bale, bales list with status actions (process, sell with buyer + price), real loss % |
+| `/ops-portal/blog`, `/ops-portal/blog/new`, `/ops-portal/blog/[id]` | Posts (drafts and published); editor with title, summary, cover, Markdown toolbar (headings, bold, italic, link, lists, quote, photo) and preview; publish, unpublish, delete (added 13 Oct 2026) |
+| `/ops-portal/events` | Events list; add or edit in a dialog (title, start/end in Lagos time, place or online, description, image, registration link, show on site); delete |
+| `/ops-portal/hero` | Landing hero photos: upload with headline and line, reorder, hide, delete |
 
 ## Route protection
 

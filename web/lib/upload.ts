@@ -1,12 +1,12 @@
 "use client";
 
-import { uploadSignature } from "@/lib/actions";
+import { uploadSignature, type UploadPurpose } from "@/lib/actions";
 
 const MAX_BYTES = 5 * 1024 * 1024; // TRD: max upload 5 MB
 
 // Upload a photo straight from the browser to Cloudinary with a signature from our API (TRD §2).
 // Returns the secure URL, which is all we store.
-export async function uploadPhoto(file: File, purpose: "request" | "weigh" | "dispute"): Promise<string> {
+export async function uploadPhoto(file: File, purpose: UploadPurpose): Promise<string> {
   if (!file.type.startsWith("image/")) throw new Error("Choose a photo (JPG or PNG).");
   if (file.size > MAX_BYTES) throw new Error("That photo is over 5 MB. Take a new one or choose a smaller one.");
   const signed = await uploadSignature(purpose);

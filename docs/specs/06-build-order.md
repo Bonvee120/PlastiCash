@@ -48,5 +48,9 @@ Impact page and API, ESG PDF for organizations (WeasyPrint), `/jobs/reminders` w
 Landing page (problem, how it works, live prices, who it's for, who pays, impact), toasts and skeletons everywhere, mobile check, deploy API to Render and web to Vercel, set Paystack webhook and cron, seed production demo data. README with: The problem (with evidence), The hard part, Why this design (with sources), Who pays.
 **Done when:** the main journey works on the deployed URLs; all 20 tests in 04-money-rules-and-tests.md pass (the capstone minimum is 15); README and LOG.md are complete.
 
+## Step 11 — Content and motion (added 13 Oct 2026, Kenzy's request)
+Blog and climate events written in the ops portal and shown publicly; landing hero photo carousel managed in the ops portal; scroll-in motion on the landing page.
+**Done when:** an admin publishes a post, an event and a hero photo and they appear on the public pages at once; drafts stay private; motion respects reduced motion; the hero is not faded in (LCP).
+
 ## Out of scope for the MVP
 WhatsApp bot, mobile money payouts, multiple logins per organization, admin-defined time slots, plastic credits/EPR data sales, route optimisation.

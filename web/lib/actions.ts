@@ -21,7 +21,9 @@ export type UploadSignature = {
   signature: string;
 };
 
-export async function uploadSignature(purpose: "request" | "weigh" | "dispute") {
+export type UploadPurpose = "request" | "weigh" | "dispute" | "blog" | "event" | "hero";
+
+export async function uploadSignature(purpose: UploadPurpose) {
   return call<UploadSignature>("/uploads/signature", "POST", { purpose });
 }
 

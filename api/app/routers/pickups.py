@@ -9,7 +9,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from app.auth import CurrentProfile, UserProfile
 from app.db import get_session
 from app.errors import ApiError
-from app.models import Pickup, PickupStatus, Profile
+from app.models import Pickup, PickupStatus, Profile, Role
 from app.pickup_schemas import CancelIn, DisputeIn, PickupCreate, UploadSignatureIn, UserPickupOut
 from app.schemas import display_name
 from app.services import cloudinary, pickups, push
@@ -38,7 +38,10 @@ async def _view(session: AsyncSession, pickup: Pickup) -> UserPickupOut:
 
 @router.post("/uploads/signature", dependencies=[Depends(rate_limit("upload", 30, HOUR))])
 async def upload_signature(body: UploadSignatureIn, me: CurrentProfile) -> dict:
-    """Signed params for a direct browser upload to Cloudinary (request, weigh or dispute photo)."""
+    """Signed params for a direct browser upload to Cloudinary (request, weigh or dispute photo; blog, event and hero
+    images for admins only)."""
+    if body.purpose in cloudinary.ADMIN_PURPOSES and me.role != Role.ADMIN:
+        raise ApiError(403, "FORBIDDEN", "Only admins can upload content images.")
     return cloudinary.signature(body.purpose)
 
 
