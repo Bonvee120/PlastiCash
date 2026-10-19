@@ -29,7 +29,7 @@ COMPLETED and CANCELLED are final.
 
 **Request** (`POST /withdrawals`), one transaction:
 1. `SELECT * FROM profiles WHERE id = :user FOR UPDATE` (serializes concurrent requests by the same user).
-2. Check bank details exist, `amount ≥ 100000` kobo, `amount ≤ balance`.
+2. Check bank details exist, `amount ≥ 500000` kobo (MIN_WITHDRAWAL_KOBO), `amount ≤ balance`.
 3. Insert withdrawal `PENDING` (snapshot bank details) and `WITHDRAWAL_HOLD` of `-amount`.
 4. Commit.
 
@@ -72,7 +72,7 @@ Each pickup is handled in its own transaction with the row locked, so running th
 7. Illegal transitions return 409 (e.g. confirm a CANCELLED pickup, weigh without QR scan).
 8. Dispute → resolve credits once at the resolved weight with the original price snapshot.
 9. Auto-confirm at 48 h credits once; running the job twice doesn't double-credit.
-10. Withdrawal below ₦1,000 or above balance is rejected.
+10. Withdrawal below ₦5,000 or above balance is rejected.
 11. Reject withdrawal restores the balance.
 12. Deduction greater than gross is rejected.
 13. Wrong OTP 5 times locks it.

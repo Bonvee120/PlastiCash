@@ -43,7 +43,7 @@ Base URL: `/api/v1`. JSON in and out. Money in responses is given as both `amoun
 | Method | Path | What it does |
 |---|---|---|
 | GET | `/wallet` | Balance (points + kobo), ledger entries paginated |
-| POST | `/withdrawals` | `{amount_kobo}` → PENDING + HOLD (locking, see money rules). Requires saved bank details. Min ₦1,000. |
+| POST | `/withdrawals` | `{amount_kobo}` → PENDING + HOLD (locking, see money rules). Requires saved bank details. Min ₦5,000. |
 | GET | `/withdrawals` | My withdrawals |
 | GET | `/impact` | Totals: kg by material, total kg, points earned, CO₂ saved (computed from completed pickups × factor) |
 | GET | `/reports/esg?year=2026&month=10` | ORGANIZATION only. PDF (WeasyPrint): org name, period, kg by material, CO₂ saved, pickup count, certificate line. `month` optional (annual if omitted). |

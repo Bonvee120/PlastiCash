@@ -160,7 +160,7 @@ Balance: `SELECT COALESCE(SUM(amount_kobo),0) FROM ledger_entries WHERE user_id 
 |---|---|---|
 | id | uuid PK | also used as the Paystack transfer `reference` |
 | user_id | uuid FK profiles | |
-| amount_kobo | bigint | ≥ minimum (₦1,000 = 100000) |
+| amount_kobo | bigint | ≥ minimum (₦5,000 = 500000; the DB check is a ₦1,000 floor) |
 | status | withdrawal_status | |
 | bank_name, account_number, account_name | text | snapshot at request time |
 | paystack_recipient_code | text | snapshot |

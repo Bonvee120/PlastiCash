@@ -25,7 +25,7 @@ Shared layout: top bar with "Welcome, {display_name}" and balance; bottom nav on
 | `/app/request` | Step form: materials → estimate (sacks, bags or bottle count; live kg + points estimate and progress bar to 50 kg) → photo → map pin (Leaflet) + address + area → preferred date + window → review. Under 50 kg: show hub address and "Join next area pickup day" option. |
 | `/app/pickups` | List with status badges |
 | `/app/pickups/[id]` | Status timeline; QR code to show the collector (ASSIGNED/EN_ROUTE); live collector marker via Supabase Realtime subscription to this pickup row; weight breakdown per material with collector photo; **Confirm** and **Dispute** buttons while AWAITING_CONFIRMATION, with countdown to auto-confirm; dispute form (photo, claimed kg, reason); resolution note when resolved |
-| `/app/wallet` | Balance, ledger history, withdraw form (min ₦1,000), withdrawals with status |
+| `/app/wallet` | Balance, ledger history, withdraw form (min ₦5,000), withdrawals with status |
 | `/app/settings` | Profile fields, bank details (select bank, enter account number, show resolved account name, save) |
 | `/app/impact` | Kg by material chart, total kg, points earned, CO₂ saved. ORGANIZATION only: ESG report section with month/year picker and "Download PDF". |
 

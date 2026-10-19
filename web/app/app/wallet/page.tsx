@@ -11,7 +11,7 @@ import { WalletView } from "./wallet-view";
 export default function WalletPage() {
   return (
     <main className="flex flex-1 flex-col gap-5 p-4 lg:p-8">
-      <PageTitle title="Wallet" sub="1 point = ₦1. Withdraw to your bank from ₦1,000." />
+      <PageTitle title="Wallet" sub="1 point = ₦1. Withdraw to your bank from ₦5,000." />
       <Suspense fallback={<Skeleton className="h-96 w-full rounded-2xl" />}>
         <Data />
       </Suspense>

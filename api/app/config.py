@@ -43,7 +43,7 @@ class Settings(BaseSettings):
     trust_proxy: bool = False
 
     frontend_origin: str = "http://localhost:3000"
-    min_withdrawal_kobo: int = 100_000
+    min_withdrawal_kobo: int = 500_000
     door_min_kg: int = 50
     auto_confirm_hours: int = 48
     sms_enabled: bool = False

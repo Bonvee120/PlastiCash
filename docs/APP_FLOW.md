@@ -125,7 +125,7 @@ flowchart TD
   C --> D[Paystack resolves account name]
   D --> E[User confirms name: recipient saved]
   E --> A
-  B -->|Yes| F[Enter amount ≥ ₦1,000 and ≤ balance]
+  B -->|Yes| F[Enter amount ≥ ₦5,000 and ≤ balance]
   F --> G[Confirm dialog]
   G --> H[PENDING: amount held from balance]
   H --> I{Admin review}

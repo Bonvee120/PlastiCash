@@ -17,7 +17,7 @@ import type { Me } from "@/lib/me";
 import type { LedgerEntry, Wallet, Withdrawal } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
-const MIN_KOBO = 100_000;
+const MIN_KOBO = 500_000;
 const FILTERS = { all: "All", earned: "Earned", withdrawals: "Withdrawals" } as const;
 type Filter = keyof typeof FILTERS;
 
@@ -175,8 +175,8 @@ function WithdrawForm({ balance, bank }: { balance: number; bank: Me["bank"] }) 
   const [pending, setPending] = useState(false);
   const amount = Math.round(Number(naira_ || 0) * 100);
   const error =
-    !naira_ ? null : amount < MIN_KOBO ? "The minimum is ₦1,000." : amount > balance ? "That's more than your balance." : null;
-  const quick = [100_000, 200_000, balance].filter((k, i, all) => k >= MIN_KOBO && k <= balance && all.indexOf(k) === i);
+    !naira_ ? null : amount < MIN_KOBO ? "The minimum is ₦5,000." : amount > balance ? "That's more than your balance." : null;
+  const quick = [500_000, 1_000_000, balance].filter((k, i, all) => k >= MIN_KOBO && k <= balance && all.indexOf(k) === i);
 
   async function withdraw() {
     setPending(true);
@@ -195,7 +195,7 @@ function WithdrawForm({ balance, bank }: { balance: number; bank: Me["bank"] }) 
       {!bank ? (
         <p className="text-sm text-muted-foreground">Add a bank account first.</p>
       ) : balance < MIN_KOBO ? (
-        <p className="text-sm text-muted-foreground">You can withdraw once you have ₦1,000.</p>
+        <p className="text-sm text-muted-foreground">You can withdraw once you have ₦5,000.</p>
       ) : (
         <>
           <div className="flex flex-wrap gap-2">
@@ -220,7 +220,7 @@ function WithdrawForm({ balance, bank }: { balance: number; bank: Me["bank"] }) 
               aria-invalid={!!error}
               className="tabular"
             />
-            <p className={cn("text-sm", error ? "text-bad" : "text-muted-foreground")}>{error ?? "Minimum ₦1,000."}</p>
+            <p className={cn("text-sm", error ? "text-bad" : "text-muted-foreground")}>{error ?? "Minimum ₦5,000."}</p>
           </div>
           <Btn variant="accent" block disabled={!naira_ || !!error} onClick={() => setAsking(true)}>
             Withdraw

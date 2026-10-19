@@ -105,7 +105,7 @@ export default function LandingPage() {
               </span>
               <h1 className="font-display text-[44px] !text-white leading-[1.02] font-extrabold tracking-[-0.04em] lg:text-[72px]">
                 Your plastic <br className="hidden sm:block" />
-                is <span className="text-gold">money.</span>
+                na <span className="text-gold">money.</span>
               </h1>
               <p className="max-w-xl text-lg text-[#DCFCE7]">
                 Gather bottles, cans and sachets. A verified EcoCyclers
@@ -226,7 +226,7 @@ export default function LandingPage() {
                 code. Wrong weight? Dispute it.
               </Step>
               <Step n={5} icon={Landmark} title="Get paid">
-                Points land in your wallet. Withdraw to your bank from ₦1,000.
+                Points land in your wallet. Withdraw to your bank from ₦5,000.
               </Step>
             </Stagger>
           </Section>
@@ -323,7 +323,7 @@ export default function LandingPage() {
                 hours, the weight confirms by itself and you&apos;re paid.
               </Faq>
               <Faq q="How do I withdraw?">
-                Add a bank account in your name, then withdraw from ₦1,000.
+                Add a bank account in your name, then withdraw from ₦5,000.
                 EcoCyclers approves it and the money is sent to your bank.
               </Faq>
               <Faq q="What is a point?">

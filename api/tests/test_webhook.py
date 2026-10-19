@@ -32,7 +32,7 @@ def webhook_secret(monkeypatch) -> None:
 
 
 def signed(event: str, reference: str, *, secret: str = SECRET, **data) -> tuple[bytes, dict]:
-    body = json.dumps({"event": event, "data": {"reference": reference, "amount": 100_000, **data}}).encode()
+    body = json.dumps({"event": event, "data": {"reference": reference, "amount": 500_000, **data}}).encode()
     signature = hmac.new(secret.encode(), body, hashlib.sha512).hexdigest()
     return body, {"x-paystack-signature": signature, "content-type": "application/json"}
 
@@ -43,14 +43,14 @@ async def deliver(client: AsyncClient, event: str, reference: str, **kwargs):
 
 
 async def processing_withdrawal(session: AsyncSession) -> Withdrawal:
-    """A ₦1,000 payout that an admin approved: PROCESSING, with the hold in place (balance ₦2,000 of ₦3,000)."""
+    """A ₦5,000 payout that an admin approved: PROCESSING, with the hold in place (balance ₦10,000 of ₦15,000)."""
     admin = await make_user(session, "Admin", role=Role.ADMIN)
     user = await make_user(session, "Chinaza")
     user.bank_name, user.account_number, user.account_name = "Access Bank", "0234567890", "CHINAZA OKAFOR"
     user.paystack_recipient_code = "RCP_test"
     session.add(user)
-    await ledger.add_adjustment(session, user.id, 300_000, "Opening balance for test", admin.id)
-    withdrawal = await withdrawals.request_withdrawal(session, user.id, 100_000)
+    await ledger.add_adjustment(session, user.id, 1_500_000, "Opening balance for test", admin.id)
+    withdrawal = await withdrawals.request_withdrawal(session, user.id, 500_000)
     await withdrawals.approve(session, withdrawal.id, admin)
     await session.flush()
     return withdrawal
@@ -73,7 +73,7 @@ async def test_3_duplicate_success_pays_once(client: AsyncClient, session: Async
     assert (withdrawal.status, withdrawal.paid_at) == (W.PAID, paid_at)
     rows = (await session.exec(select(func.count()).where(LedgerEntry.withdrawal_id == withdrawal.id))).one()
     assert rows == 1  # only the hold: no extra rows
-    assert await ledger.balance_kobo(session, withdrawal.user_id) == 200_000
+    assert await ledger.balance_kobo(session, withdrawal.user_id) == 1_000_000
 
 
 async def test_4_duplicate_failure_reverses_once(client: AsyncClient, session: AsyncSession) -> None:
@@ -84,7 +84,7 @@ async def test_4_duplicate_failure_reverses_once(client: AsyncClient, session: A
     await session.refresh(withdrawal)
     assert (withdrawal.status, withdrawal.failure_reason) == (W.FAILED, "Account closed")
     assert await entries(session, withdrawal, LedgerType.WITHDRAWAL_REVERSAL) == 1
-    assert await ledger.balance_kobo(session, withdrawal.user_id) == 300_000  # restored once
+    assert await ledger.balance_kobo(session, withdrawal.user_id) == 1_500_000  # restored once
 
 
 @pytest.mark.parametrize(
@@ -103,7 +103,7 @@ async def test_5_bad_signature_is_401_and_changes_nothing(client: AsyncClient, s
     if headers == "other key":
         body, headers = signed("transfer.success", str(withdrawal.id), secret="sk_test_attacker")
     elif headers == "tampered body":
-        body, headers = body.replace(b"100000", b"999999"), good
+        body, headers = body.replace(b"500000", b"999999"), good
     response = await client.post(URL, content=body, headers=headers)
     assert response.status_code == 401
     assert response.json()["code"] == "BAD_SIGNATURE"
@@ -125,7 +125,7 @@ async def test_reversed_counts_as_failed(client: AsyncClient, session: AsyncSess
     await deliver(client, "transfer.reversed", str(withdrawal.id))
     await session.refresh(withdrawal)
     assert withdrawal.status == W.FAILED
-    assert await ledger.balance_kobo(session, withdrawal.user_id) == 300_000
+    assert await ledger.balance_kobo(session, withdrawal.user_id) == 1_500_000
 
 
 async def test_success_after_failure_changes_nothing(client: AsyncClient, session: AsyncSession) -> None:
@@ -171,4 +171,4 @@ async def test_4_simultaneous_duplicate_failures_reverse_once(
     assert [r.status_code for r in responses] == [200, 200, 200]
     async with AsyncSession(committed) as check:
         assert await entries(check, withdrawal, LedgerType.WITHDRAWAL_REVERSAL) == 1
-        assert await ledger.balance_kobo(check, withdrawal.user_id) == 300_000
+        assert await ledger.balance_kobo(check, withdrawal.user_id) == 1_500_000

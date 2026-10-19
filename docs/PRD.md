@@ -82,7 +82,7 @@ WhatsApp bot · mobile money payouts · multiple logins per organization · admi
 | U10 | I dispute a wrong weight | While awaiting confirmation I upload my photo, my weight and a reason; nothing is paid until the admin decides |
 | U11 | I'm reminded if I forget | Reminders at 2, 12 and 24 h; auto-confirm at 48 h |
 | U12 | I add my bank account | I pick a bank and enter my account number; I see the resolved account name before saving |
-| U13 | I withdraw | Minimum ₦1,000; can't exceed balance; status shows Pending → Processing → Paid, or Failed/Rejected with money returned |
+| U13 | I withdraw | Minimum ₦5,000; can't exceed balance; status shows Pending → Processing → Paid, or Failed/Rejected with money returned |
 | U14 | I see my impact | Total kg by material, points earned, CO₂ saved |
 | U15 | (Organization) I download an ESG report | PDF for a month or year with kg by material, CO₂ saved, pickups count |
 | U16 | (Anyone) I read news and see upcoming climate events | `/blog` lists published posts, newest first; `/events` lists upcoming events (soonest first) with date, place or online, description and a link to register elsewhere; past events move to an archive; the landing page shows the latest posts and next events |
@@ -123,7 +123,7 @@ WhatsApp bot · mobile money payouts · multiple logins per organization · admi
 | Auto-confirm | 48 hours after weighing |
 | Reminders | 2 h, 12 h, 24 h |
 | OTP | 6 digits, 30 min, 5 attempts, 3 resends |
-| Minimum withdrawal | ₦1,000 |
+| Minimum withdrawal | ₦5,000 |
 | Withdrawals | Bank account only; admin approves |
 | Price changes | Never affect pickups already weighed |
 | Corrections | New ledger entry with note; never edit history |
