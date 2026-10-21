@@ -12,6 +12,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 from app.admin_schemas import AdminWithdrawalOut
 from app.auth import AdminProfile, require_admin
+from app.config import get_settings
 from app.db import get_session
 from app.errors import ApiError
 from app.models import Material, Pickup, PickupStatus, Price, Profile, Role, Withdrawal, WithdrawalStatus
@@ -60,6 +61,14 @@ async def approve_withdrawal(withdrawal_id: UUID, admin: AdminProfile, session: 
     The final PAID / FAILED comes by webhook. If Paystack refused, the payout is FAILED and the money goes back."""
     withdrawal = await withdrawals.approve(session, withdrawal_id, admin)
     await session.commit()
+    if get_settings().paystack_fake_transfers:
+        # Local testing only: no Paystack call; PAID at once, as if the transfer.success webhook had arrived.
+        await withdrawals.record_transfer(session, withdrawal.id, f"TRF_fake_{withdrawal.id.hex[:12]}")
+        await withdrawals.mark_paid(session, withdrawal.id)
+        await session.commit()
+        refreshed = await withdrawals.lock_withdrawal(session, withdrawal.id)
+        await session.commit()
+        return WithdrawalOut.from_withdrawal(refreshed)
     try:
         result = await paystack.initiate_transfer(
             withdrawal.amount_kobo,

@@ -216,3 +216,33 @@ async def test_admin_queue_filters_by_status(client: AsyncClient, session: Async
     assert withdrawal_id in [w["id"] for w in queue]
     paid = (await client.get("/api/v1/admin/withdrawals", params={"status": "PAID"}, headers=bearer(admin.id))).json()
     assert withdrawal_id not in [w["id"] for w in paid]
+
+
+# ----- fake transfers (local testing only) -----
+
+
+@respx.mock
+async def test_fake_transfers_pay_without_calling_paystack(
+    client: AsyncClient, session: AsyncSession, admin, monkeypatch
+) -> None:
+    from app.config import Settings
+    from app.routers import admin as admin_router
+
+    monkeypatch.setattr(admin_router, "get_settings", lambda: Settings(paystack_fake_transfers=True))
+    user, withdrawal_id = await pending(client, session, admin)
+    route = respx.post(TRANSFER).respond(500)
+    response = await client.post(f"/api/v1/admin/withdrawals/{withdrawal_id}/approve", headers=bearer(admin.id))
+    assert response.status_code == 200 and response.json()["status"] == "PAID"
+    assert not route.called
+    assert (await session.get(Withdrawal, withdrawal_id)).paystack_transfer_code.startswith("TRF_fake_")
+    assert await balance(client, user) == 1_000_000  # the hold stays: the money is out
+
+
+def test_fake_transfers_refused_with_a_live_key() -> None:
+    from pydantic import ValidationError
+
+    from app.config import Settings
+
+    with pytest.raises(ValidationError, match="live Paystack key"):
+        Settings(paystack_fake_transfers=True, paystack_secret_key="sk_live_x")
+    assert Settings(paystack_fake_transfers=True, paystack_secret_key="sk_test_x").paystack_fake_transfers

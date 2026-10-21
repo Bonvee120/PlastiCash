@@ -225,3 +225,7 @@ One entry per day: what was done, what broke, what's next.
 - Landing "Latest posts": up to 4 posts, two by two across the full width; upcoming events below in two columns.
 - Blog author name (Kenzy's request): posts get an optional `byline` (migration `7d3b9e2a6f10`, applied to Supabase); the editor has an "Author name" field; readers see the byline, or the admin account's name when it is empty. Test added in `tests/test_content.py`.
 - Login and sign-up carousel now shows the landing hero photos (admin uploads) behind the same welcome lines; gradient until photos exist. Photos load lazily, so phones (panel hidden) download none.
+
+## 2026-10-21
+
+- Supabase stops auto-granting API roles access to new `public` tables on 30 Oct 2026. Only Realtime on `pickups` relied on it, so migration `c4f1a8e2d7b9` grants `select on pickups to authenticated` explicitly (no-op on the current database; RLS still limits rows). Downgrade is a no-op so it can't break Realtime. Not yet applied to Supabase; tests not run.

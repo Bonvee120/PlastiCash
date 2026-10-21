@@ -1,6 +1,7 @@
 from functools import lru_cache
 from pathlib import Path
 
+from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 API_DIR = Path(__file__).resolve().parent.parent
@@ -22,6 +23,9 @@ class Settings(BaseSettings):
     supabase_service_role_key: str = ""
 
     paystack_secret_key: str = ""
+    # Local testing only: an approved withdrawal is PAID at once without calling Paystack (a Starter business
+    # can't send transfers, even in test mode). Never set on Render; refused with a live key.
+    paystack_fake_transfers: bool = False
 
     cloudinary_cloud_name: str = ""
     cloudinary_api_key: str = ""
@@ -49,6 +53,12 @@ class Settings(BaseSettings):
     sms_enabled: bool = False
 
     seed_password: str = ""  # scripts/seed.py only: password for the demo Supabase Auth accounts
+
+    @model_validator(mode="after")
+    def _no_fake_transfers_with_live_key(self) -> "Settings":
+        if self.paystack_fake_transfers and self.paystack_secret_key.startswith("sk_live_"):
+            raise ValueError("PAYSTACK_FAKE_TRANSFERS can't be on with a live Paystack key (sk_live_).")
+        return self
 
 
 @lru_cache

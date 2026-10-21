@@ -28,6 +28,7 @@ SUPABASE_URL=https://xxxx.supabase.co
 SUPABASE_JWT_SECRET=                          # only if the project uses legacy HS256 JWTs; else JWKS is used
 SUPABASE_SERVICE_ROLE_KEY=                    # server only: creating collector accounts
 PAYSTACK_SECRET_KEY=sk_test_...
+PAYSTACK_FAKE_TRANSFERS=false  # local testing only: approve = PAID without Paystack; refused with sk_live_
 CLOUDINARY_CLOUD_NAME=
 CLOUDINARY_API_KEY=
 CLOUDINARY_API_SECRET=

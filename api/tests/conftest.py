@@ -1,4 +1,5 @@
 import asyncio
+import os
 from collections.abc import AsyncIterator
 from pathlib import Path
 from types import SimpleNamespace
@@ -12,6 +13,9 @@ from httpx import ASGITransport, AsyncClient
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 from sqlmodel.ext.asyncio.session import AsyncSession
+
+# Tests always exercise the real Paystack paths, whatever the local api/.env says.
+os.environ["PAYSTACK_FAKE_TRANSFERS"] = "false"
 
 from app import auth
 from app.config import Settings, get_settings
