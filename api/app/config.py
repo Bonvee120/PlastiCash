@@ -47,6 +47,8 @@ class Settings(BaseSettings):
     trust_proxy: bool = False
 
     frontend_origin: str = "http://localhost:3000"
+    # /docs, /redoc and /openapi.json map every route for anyone; on for local development only.
+    api_docs: bool = False
     min_withdrawal_kobo: int = 500_000
     door_min_kg: int = 50
     auto_confirm_hours: int = 48

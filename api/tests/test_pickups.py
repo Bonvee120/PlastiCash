@@ -127,9 +127,11 @@ async def test_estimate_by_count_needs_items_per_kg(client: AsyncClient, world) 
 
 async def test_upload_signature(client: AsyncClient, world, app_settings) -> None:
     signed = (await call(client, "POST", "/uploads/signature", world["user"], json={"purpose": "request"})).json()
-    to_sign = f"folder={signed['folder']}&timestamp={signed['timestamp']}{app_settings.cloudinary_api_secret}"
+    to_sign = (f"allowed_formats={signed['allowed_formats']}&folder={signed['folder']}&timestamp={signed['timestamp']}"
+               f"{app_settings.cloudinary_api_secret}")
     assert signed["signature"] == hashlib.sha1(to_sign.encode()).hexdigest()
     assert signed["folder"] == "plasticash/requests" and "api_secret" not in signed
+    assert "svg" not in signed["allowed_formats"] and "pdf" not in signed["allowed_formats"]
     assert app_settings.cloudinary_api_secret not in str(signed)
 
 

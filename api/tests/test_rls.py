@@ -46,9 +46,38 @@ async def test_assigned_collector_reads_the_pickup(session: AsyncSession, two_us
     assert owners == [bob.id]
 
 
+async def test_assigned_collector_cannot_read_the_qr_token(session: AsyncSession, two_users_with_pickups) -> None:
+    _, bob = two_users_with_pickups
+    collector = await make_user(session, "Collector")
+    await session.exec(
+        text("update pickups set collector_id = :c, status = 'ASSIGNED' where user_id = :u").bindparams(
+            c=collector.id, u=bob.id
+        )
+    )
+    await act_as(session, "authenticated", collector.id)
+    with pytest.raises(ProgrammingError, match="permission denied"):
+        await session.exec(text("select qr_token from pickups"))
+
+
+@pytest.mark.parametrize("column", ["qr_token", "otp_hash", "address", "dispute_reason"])
+async def test_owner_reads_only_realtime_columns(session: AsyncSession, two_users_with_pickups, column: str) -> None:
+    alice, _ = two_users_with_pickups
+    await act_as(session, "authenticated", alice.id)
+    with pytest.raises(ProgrammingError, match="permission denied"):
+        await session.exec(text(f"select {column} from pickups"))
+
+
+async def test_browser_cannot_change_pickups(session: AsyncSession, two_users_with_pickups) -> None:
+    alice, _ = two_users_with_pickups
+    await act_as(session, "authenticated", alice.id)
+    with pytest.raises(ProgrammingError, match="permission denied"):
+        await session.exec(text("update pickups set status = 'COMPLETED'"))
+
+
 async def test_anon_reads_no_pickups(session: AsyncSession, two_users_with_pickups) -> None:
     await act_as(session, "anon")
-    assert (await session.exec(text("select count(*) from pickups"))).scalar_one() == 0
+    with pytest.raises(ProgrammingError, match="permission denied"):
+        await session.exec(text("select id from pickups"))
 
 
 @pytest.mark.parametrize("table", ["profiles", "prices", "pickup_items", "ledger_entries", "withdrawals", "bales"])

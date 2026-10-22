@@ -16,6 +16,7 @@ export type UploadSignature = {
   cloud_name: string;
   api_key: string;
   upload_url: string;
+  allowed_formats: string;
   folder: string;
   timestamp: string;
   signature: string;

@@ -14,6 +14,7 @@ export async function uploadPhoto(file: File, purpose: UploadPurpose): Promise<s
   const form = new FormData();
   form.append("file", file);
   form.append("api_key", signed.data.api_key);
+  form.append("allowed_formats", signed.data.allowed_formats);
   form.append("timestamp", signed.data.timestamp);
   form.append("folder", signed.data.folder);
   form.append("signature", signed.data.signature);
