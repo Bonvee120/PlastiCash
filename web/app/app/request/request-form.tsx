@@ -448,17 +448,38 @@ function EstimatePanel({ estimate, loading }: { estimate: Estimate | null; loadi
   );
 }
 
+// Tap +/- or type the number. Limits match the API: sacks up to 200 (one decimal), counts up to 100,000 (whole).
 function Counter({ value, step, label, onChange }: { value: number; step: number; label: string; onChange: (v: number) => void }) {
+  const whole = Number.isInteger(step);
+  const max = whole ? 100_000 : 200;
+  const clamp = (v: number) => Math.min(max, Math.max(0, whole ? Math.floor(v) : +v.toFixed(1)));
+  // While typing, keep what was typed (an empty box, "2.") instead of snapping it to a number.
+  const [draft, setDraft] = useState<string | null>(null);
   return (
     <div className="flex items-center gap-3">
       <div className="flex items-center rounded-xl border border-border bg-canvas">
-        <button type="button" aria-label={`Fewer ${label}`} onClick={() => onChange(Math.max(0, +(value - step).toFixed(1)))} className="grid size-11 place-items-center">
+        <button type="button" aria-label={`Fewer ${label}`} onClick={() => onChange(clamp(value - step))} className="grid size-11 place-items-center">
           <Minus className="size-4" aria-hidden />
         </button>
-        <span className="tabular min-w-14 text-center font-semibold" aria-live="polite">
-          {value}
-        </span>
-        <button type="button" aria-label={`More ${label}`} onClick={() => onChange(+(value + step).toFixed(1))} className="grid size-11 place-items-center rounded-xl bg-primary text-primary-foreground">
+        <input
+          type="number"
+          inputMode={whole ? "numeric" : "decimal"}
+          min={0}
+          max={max}
+          step={whole ? 1 : 0.1}
+          aria-label={label}
+          value={draft ?? String(value)}
+          onFocus={(e) => e.target.select()}
+          onChange={(e) => {
+            setDraft(e.target.value);
+            const n = Number(e.target.value);
+            if (e.target.value !== "" && Number.isFinite(n)) onChange(clamp(n));
+            else if (e.target.value === "") onChange(0);
+          }}
+          onBlur={() => setDraft(null)}
+          className="tabular w-20 bg-transparent text-center font-semibold outline-none [appearance:textfield] focus-visible:rounded-md focus-visible:ring-2 focus-visible:ring-primary [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+        />
+        <button type="button" aria-label={`More ${label}`} onClick={() => onChange(clamp(value + step))} className="grid size-11 place-items-center rounded-xl bg-primary text-primary-foreground">
           <Plus className="size-4" aria-hidden />
         </button>
       </div>
