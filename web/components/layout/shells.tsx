@@ -18,6 +18,7 @@ import {
   UserBottomNav,
   UserSidebarNav,
 } from "@/components/layout/nav-link";
+import { OpsSidebar } from "@/components/layout/ops-sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { api, get } from "@/lib/api";
 import { money } from "@/lib/format";
@@ -270,7 +271,8 @@ export function CollectorShell({
 export function OpsShell({ me, children }: { me: Me; children: ReactNode }) {
   return (
     <div className="flex min-h-svh flex-1 flex-col bg-canvas lg:grid lg:grid-cols-[240px_1fr]">
-      <aside className="flex flex-col gap-1 bg-forest p-5 text-[#BBF7D0] lg:sticky lg:top-0 lg:h-svh">
+      {/* Green from the top of the screen to the bottom on every size: a column from lg, a slide-out menu below. */}
+      <OpsSidebar>
         <Link
           href="/ops-portal"
           className="px-1 pb-6"
@@ -283,17 +285,17 @@ export function OpsShell({ me, children }: { me: Me; children: ReactNode }) {
         </Suspense>
         {/* New request alerts: pop-up while the portal is open, and push on this device when switched on. */}
         <NewRequestAlerts />
-        <div className="flex items-start gap-2 pt-4 lg:mt-auto lg:pt-6">
+        <div className="mt-auto flex items-start gap-2 pt-6">
           <div className="min-w-0 flex-1">
             <PushToggle dark />
           </div>
           <ThemeToggle dark />
         </div>
-        <div className="hidden flex-col gap-3 pt-4 lg:flex">
+        <div className="flex flex-col gap-3 pt-4">
           <p className="text-[13px] text-[#86EFAC]">{greeting(me)}</p>
           <LogoutButton dark />
         </div>
-      </aside>
+      </OpsSidebar>
       <div className="flex min-w-0 flex-1 flex-col">{children}</div>
     </div>
   );

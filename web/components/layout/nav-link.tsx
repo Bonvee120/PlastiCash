@@ -166,7 +166,7 @@ export function OpsNav({ counts }: { counts?: OpsCounts }) {
     return item;
   });
   return (
-    <nav aria-label="Ops portal" className="flex gap-1 overflow-x-auto lg:flex-col lg:overflow-visible">
+    <nav aria-label="Ops portal" className="flex flex-col gap-1">
       {withCounts.map((item) => (
         <OpsLink key={item.href} item={item} exact={item.href === "/ops-portal"} />
       ))}
