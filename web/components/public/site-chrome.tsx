@@ -32,7 +32,7 @@ export function SiteHeader({ dark = false }: { dark?: boolean }) {
           : "border-b border-border bg-card/95 backdrop-blur",
       )}
     >
-      <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-4 px-4 py-4 lg:px-[72px]">
+      <div className="container-site flex items-center justify-between gap-4 py-4">
         <Link href="/" aria-label="PlastiCash home">
           <Logo variant={dark ? "white" : "color"} size={34} />
         </Link>
@@ -115,7 +115,7 @@ export function SiteHeader({ dark = false }: { dark?: boolean }) {
 export function SiteFooter() {
   return (
     <footer className="bg-forest text-[#BBF7D0]">
-      <div className="mx-auto grid max-w-[1280px] gap-8 px-4 py-12 sm:grid-cols-3 lg:px-[72px]">
+      <div className="container-site grid gap-8 py-12 sm:grid-cols-3">
         <div className="flex flex-col gap-3">
           <Logo variant="white" size={32} subline="by EcoCyclers" />
           <p className="text-sm">

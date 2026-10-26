@@ -87,3 +87,20 @@
 
 /* All other design tokens live in the repo's design/theme.css (docs/DESIGN_BRIEF.md). */
 @import "../../design/theme.css";
+
+/* Public site container: header, hero, sections and footer all share it so their edges line up. Phones and tablets
+   keep 16px gutters and the lg gutter stays 72px; from xl the box grows to 1536px with 64px gutters, so wide
+   screens get more content instead of empty margins. */
+@utility container-site {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 1280px;
+  padding-inline: 1rem;
+  @variant lg {
+    padding-inline: 72px;
+  }
+  @variant xl {
+    max-width: 1536px;
+    padding-inline: 64px;
+  }
+}

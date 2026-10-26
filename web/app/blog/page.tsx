@@ -21,7 +21,7 @@ export default function BlogPage() {
     <MotionRoot>
       <div className="flex min-h-svh flex-col bg-canvas">
         <SiteHeader />
-        <main className="mx-auto flex w-full max-w-[1100px] flex-1 flex-col gap-8 px-4 py-10 lg:px-8">
+        <main className="container-site flex flex-1 flex-col gap-8 py-10">
           <div>
             <span className="eyebrow text-primary">Blog</span>
             <h1 className="mt-2 font-display text-4xl leading-tight font-extrabold tracking-[-0.03em] lg:text-5xl">
@@ -45,7 +45,7 @@ async function Posts() {
       <EmptyState icon={Newspaper} text="No posts yet. Check back soon." />
     );
   return (
-    <Stagger className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+    <Stagger className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 2xl:gap-6">
       {posts.map((p, i) => (
         <StaggerItem
           key={p.id}

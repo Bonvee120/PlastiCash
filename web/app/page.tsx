@@ -97,13 +97,13 @@ export default function LandingPage() {
               "linear-gradient(160deg, #052E16 0%, #14532D 55%, #166534 100%)",
           }}
         >
-          <div className="mx-auto grid max-w-[1280px] items-center gap-10 px-4 pt-6 pb-16 lg:grid-cols-[1.1fr_1fr] lg:px-[72px] lg:pt-14 lg:pb-24">
+          <div className="container-site grid items-center gap-10 pt-6 pb-16 lg:grid-cols-[1.1fr_1fr] lg:pt-14 lg:pb-24 xl:grid-cols-[1fr_1.1fr] xl:gap-16 xl:pt-16 xl:pb-28 2xl:gap-24">
             {/* Hero shows at once (no fade): it holds the largest text and image, so fading would delay LCP. */}
             <div className="flex flex-col gap-6">
               <span className="eyebrow text-[#86EFAC]">
                 Enugu · by EcoCyclers
               </span>
-              <h1 className="font-display text-[44px] !text-white leading-[1.02] font-extrabold tracking-[-0.04em] lg:text-[72px]">
+              <h1 className="font-display text-[44px] !text-white leading-[1.02] font-extrabold tracking-[-0.04em] lg:text-[72px] 2xl:text-[84px]">
                 Your plastic <br className="hidden sm:block" />
                 na <span className="text-gold">money.</span>
               </h1>
@@ -264,7 +264,7 @@ export default function LandingPage() {
           </Section>
 
           <section className="bg-mist">
-            <div className="mx-auto flex max-w-[1280px] flex-col gap-6 px-4 py-14 lg:px-[72px]">
+            <div className="container-site flex flex-col gap-6 py-14">
               <span className="eyebrow text-primary">Impact so far</span>
               <Suspense
                 fallback={<Skeleton className="h-24 w-full rounded-2xl" />}
@@ -333,7 +333,7 @@ export default function LandingPage() {
           </Section>
 
           <section className="bg-forest text-white">
-            <div className="mx-auto flex max-w-[1280px] flex-col items-start gap-5 px-4 py-14 lg:flex-row lg:items-center lg:justify-between lg:px-[72px]">
+            <div className="container-site flex flex-col items-start gap-5 py-14 lg:flex-row lg:items-center lg:justify-between">
               <div>
                 <h2 className="font-display text-3xl font-extrabold tracking-[-0.03em] !text-white lg:text-4xl">
                   Start with the sack you have.
@@ -454,7 +454,7 @@ function Section({
 }) {
   return (
     <section id={id} className="scroll-mt-4">
-      <div className="mx-auto flex max-w-[1280px] flex-col gap-6 px-4 py-14 lg:px-[72px]">
+      <div className="container-site flex flex-col gap-6 py-14">
         <Reveal>
           <span className="eyebrow text-primary">{eyebrow}</span>
           <h2 className="mt-2 max-w-3xl font-display text-3xl leading-tight font-extrabold tracking-[-0.03em] lg:text-[40px]">

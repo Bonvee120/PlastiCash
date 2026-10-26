@@ -21,7 +21,7 @@ export default function EventsPage() {
     <MotionRoot>
       <div className="flex min-h-svh flex-col bg-canvas">
         <SiteHeader />
-        <main className="mx-auto flex w-full max-w-[860px] flex-1 flex-col gap-8 px-4 py-10 lg:px-8">
+        <main className="container-site flex flex-1 flex-col gap-8 py-10">
           <div>
             <span className="eyebrow text-primary">Events</span>
             <h1 className="mt-2 font-display text-4xl leading-tight font-extrabold tracking-[-0.03em] lg:text-5xl">
@@ -57,7 +57,7 @@ async function EventLists() {
             text="No upcoming events right now. Check back soon."
           />
         ) : (
-          <Stagger as="ul" className="flex flex-col gap-3">
+          <Stagger as="ul" className="grid gap-3 lg:grid-cols-2">
             {upcoming.map((e) => (
               <StaggerItem key={e.id} as="li">
                 <EventRow event={e} />
@@ -69,7 +69,7 @@ async function EventLists() {
       {past.length > 0 && (
         <section className="flex flex-col gap-3 opacity-80">
           <h2 className="text-xl font-bold">Past events</h2>
-          <ul className="flex flex-col gap-3">
+          <ul className="grid gap-3 lg:grid-cols-2">
             {past.map((e) => (
               <li key={e.id}>
                 <EventRow event={e} />

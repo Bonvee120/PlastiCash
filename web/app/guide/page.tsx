@@ -20,7 +20,7 @@ export default function GuidePage() {
   return (
     <div className="flex min-h-svh flex-col bg-canvas">
       <SiteHeader />
-      <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-5 p-4 lg:p-8">
+      <main className="container-site flex flex-1 flex-col gap-5 py-4 lg:py-8">
         <div>
           <span className="eyebrow text-primary">Guide</span>
           <h1 className="mt-1 text-[28px] leading-tight font-bold lg:text-4xl">How much is my plastic worth?</h1>
@@ -34,7 +34,7 @@ export default function GuidePage() {
         </Suspense>
         <Card className="gap-2">
           <h2 className="text-[17px] font-bold">Tips for a better price</h2>
-          <ul className="list-disc space-y-1 pl-5 text-sm text-slate-700">
+          <ul className="max-w-4xl list-disc space-y-1 pl-5 text-sm text-slate-700">
             <li>Empty the bottles and squeeze out water. Water and dirt are taken off the weight.</li>
             <li>Keep each kind in its own sack: bottles, hard plastic, sachets, cans, tins.</li>
             <li>Remove caps if you can and keep them with hard plastic.</li>
