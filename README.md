@@ -62,13 +62,21 @@ docker compose up -d db-test                 # Postgres 16 on port 5433, for tes
 cd api && python -m venv .venv && .venv/Scripts/pip install -r requirements.txt   # (bin/pip on macOS/Linux)
 cp .env.example .env                         # fill in Supabase, Paystack, Cloudinary, Termii, secrets
 alembic upgrade head && python -m scripts.seed
-uvicorn app.main:app --reload --port 8001
+uvicorn app.main:app --reload --port 8000
 pytest                                       # real Postgres; Paystack and Termii are mocked
 
 cd ../web && npm install
-cp .env.example .env.local                   # NEXT_PUBLIC_API_URL=http://localhost:8001/api/v1, Supabase URL and anon key
+cp .env.example .env.local                   # NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1, Supabase URL and anon key
 npm run dev
 ```
+
+Day to day, once the setup above is done, start both servers with one command from `web/`:
+
+```bash
+npm run dev:all
+```
+
+It starts the API on the port in `NEXT_PUBLIC_API_URL` (`web/.env.local`) and the web app on the port in `FRONTEND_ORIGIN` (`api/.env`), so the two always agree. A server that is already running is reused rather than started a second time. Ctrl+C stops both.
 
 The ESG PDF needs WeasyPrint's system libraries (Pango, HarfBuzz); they are in the Docker image (`docker build -t plasticash-api api`). Without them the API answers 503 for the PDF and everything else works.
 

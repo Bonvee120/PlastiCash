@@ -25,7 +25,10 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
   const reduce = useReducedMotion();
   const items = slides.length ? slides : null;
   const count = items ? items.length : PLACEHOLDERS.length;
-  const [index, setIndex] = useState(0);
+  const [rawIndex, setIndex] = useState(0);
+  // The slide list can change length while the page is open (API down, so placeholders; admin adds or removes a
+  // photo), and the old index may then point past the end. Wrap it instead of reading a missing slide.
+  const index = rawIndex % count;
   const [paused, setPaused] = useState(false);
   const go = (to: number) => setIndex((to + count) % count);
   // Swipe with plain touch events (the library's drag would need its larger feature bundle).
@@ -38,7 +41,7 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
   }, [reduce, paused, count]);
 
   const current = items ? items[index] : null;
-  const placeholder = items ? null : PLACEHOLDERS[index]!;
+  const placeholder = items ? null : PLACEHOLDERS[index];
 
   return (
     <section

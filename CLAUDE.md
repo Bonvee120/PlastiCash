@@ -75,7 +75,8 @@ When a spec and the code disagree, the spec wins. If a spec is unclear or two sp
 
 ## Commands
 
-- API dev: `cd api && uvicorn app.main:app --reload`
+- API and web together: `cd web && npm run dev:all` (ports read from `web/.env.local` and `api/.env`; reuses servers already running). Prefer this.
+- API dev: `cd api && uvicorn app.main:app --reload --port 8000` (the port must match `NEXT_PUBLIC_API_URL` in `web/.env.local`)
 - Migrations: `cd api && alembic revision --autogenerate -m "..." && alembic upgrade head`
 - Tests: `docker compose up -d db-test && cd api && pytest` (tests need real Postgres for the locking tests, not SQLite)
 - Seed: `cd api && python -m scripts.seed`
